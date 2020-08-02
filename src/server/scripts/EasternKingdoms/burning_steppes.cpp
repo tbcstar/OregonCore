@@ -35,7 +35,7 @@
  ######*/
 
 #define GOSSIP_HELLO    "公务,约翰。我需要一些温莎元帅的信息。告诉我你最后一次见到他是什么时候。"
-#define GOSSIP_SELECT1  "那你是怎么做的?"
+#define GOSSIP_SELECT1  "So what did you do?"
 #define GOSSIP_SELECT2  "开始讲道理吧，矮人。我不想和你的饼干，你的爸爸，或任何的"不检点"有任何关系。"
 #define GOSSIP_SELECT3  "反对者？"
 #define GOSSIP_SELECT4  "有趣的...继续约翰。"
