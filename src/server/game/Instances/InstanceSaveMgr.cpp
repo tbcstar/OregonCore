@@ -329,7 +329,7 @@ void InstanceSaveManager::CleanupInstances()
         while (result->NextRow());
     }
 
-    sLog.outString(">> Initialized %u instances", (uint32)InstanceSet.size());
+    sLog.outString(">> 初始化 %u 副本", (uint32)InstanceSet.size());
 }
 
 void InstanceSaveManager::PackInstances()

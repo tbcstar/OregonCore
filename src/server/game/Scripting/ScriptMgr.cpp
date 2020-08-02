@@ -203,9 +203,9 @@ void ScriptMgr::ScriptsInit()
 
     AddScripts();
 
-    outstring_log(">> Loaded %i C++ Scripts.", sScriptMgr.GetScriptCount());
+    outstring_log(">> 加载 %i个 C++ Scripts.", sScriptMgr.GetScriptCount());
 
-    sLog.outString(">> Load Overriden SQL Data.");
+    sLog.outString(">> 加载 Overriden SQL Data.");
     LoadOverridenSQLData();
 }
 

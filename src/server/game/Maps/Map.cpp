@@ -189,11 +189,11 @@ void Map::LoadMap(int gx, int gy, bool reload)
     int len = sWorld.GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
     tmp = new char[len];
     snprintf(tmp, len, (char*)(sWorld.GetDataPath() + "maps/%03u%02u%02u.map").c_str(), GetId(), gx, gy);
-    sLog.outDetail("Loading map %s", tmp);
+    sLog.outDetail("加载 map %s", tmp);
     // loading data
     GridMaps[gx][gy] = new GridMap();
     if (!GridMaps[gx][gy]->loadData(tmp))
-        sLog.outError("Error loading map file: \n %s\n", tmp);
+        sLog.outError("加载Map文件时出错: \n %s\n", tmp);
     delete [] tmp;
 
     sScriptMgr.OnLoadGridMap(this, gx, gy);
@@ -403,7 +403,7 @@ bool Map::EnsureGridLoaded(const Cell& cell)
     ASSERT(grid != NULL);
     if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
     {
-        sLog.outMap("Loading grid[%u,%u] for map %u instance %u", cell.GridX(), cell.GridY(), GetId(), i_InstanceId);
+        sLog.outMap("加载 grid[%u,%u] map的 %u 副本 %u", cell.GridX(), cell.GridY(), GetId(), i_InstanceId);
 
         setGridObjectDataLoaded(true, cell.GridX(), cell.GridY());
 
@@ -976,7 +976,7 @@ bool Map::UnloadGrid(NGridType& ngrid, bool unloadAll)
                 return false;
         }
 
-        sLog.outMap("Unloading grid[%u,%u] for map %u", x, y, GetId());
+        sLog.outMap("卸载 grid[%u,%u] 的 map %u", x, y, GetId());
 
         if (!unloadAll)
         {
@@ -1034,7 +1034,7 @@ bool Map::UnloadGrid(NGridType& ngrid, bool unloadAll)
 
         GridMaps[gx][gy] = NULL;
     }
-    DEBUG_LOG("Unloading grid[%u,%u] for map %u finished", x, y, GetId());
+    DEBUG_LOG("卸载 grid[%u,%u] for map %u finished", x, y, GetId());
     return true;
 }
 
@@ -2539,7 +2539,7 @@ void InstanceMap::CreateInstanceData(bool load)
             const char* data = fields[0].GetString();
             if (data && *data)
             {
-                sLog.outMap("Loading instance data for %s with id %u", sObjectMgr.GetScriptName(i_script_id), i_InstanceId);
+                sLog.outMap("为%s加载id为%u的副本数据", sObjectMgr.GetScriptName(i_script_id), i_InstanceId);
                 i_data->Load(data);
             }
         }

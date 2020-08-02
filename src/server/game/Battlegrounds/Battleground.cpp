@@ -278,7 +278,7 @@ void Battleground::Update(uint32 diff)
                 RemovePlayerFromResurrectQueue(itr->first);
                 break;
             default:
-                sLog.outError("Battleground: Unknown remove player case!");
+                sLog.outError("Battleground: 未知删除玩家案例！");
             }
         }
         m_RemovedPlayers.clear();
@@ -507,7 +507,7 @@ void Battleground::SendPacketToAll(WorldPacket* packet)
         if (plr)
             plr->GetSession()->SendPacket(packet);
         else
-            sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到!", GUID_LOPART(itr->first));
     }
 }
 
@@ -522,7 +522,7 @@ void Battleground::SendPacketToTeam(uint32 TeamID, WorldPacket* packet, Player* 
 
         if (!plr)
         {
-            sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到!", GUID_LOPART(itr->first));
             continue;
         }
 
@@ -557,7 +557,7 @@ void Battleground::PlaySoundToTeam(uint32 SoundID, uint32 TeamID)
 
         if (!plr)
         {
-            sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到!", GUID_LOPART(itr->first));
             continue;
         }
 
@@ -583,7 +583,7 @@ void Battleground::CastSpellOnTeam(uint32 SpellID, uint32 TeamID)
 
         if (!plr)
         {
-            sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到!", GUID_LOPART(itr->first));
             continue;
         }
 
@@ -606,7 +606,7 @@ void Battleground::YellToAll(Creature* creature, const char* text, uint32 langua
         Player* plr = sObjectMgr.GetPlayer(itr->first);
         if (!plr)
         {
-            sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到!", GUID_LOPART(itr->first));
             continue;
         }
         creature->BuildMonsterChat(&data, CHAT_MSG_MONSTER_YELL, text, language, creature->GetName(), itr->first);
@@ -626,7 +626,7 @@ void Battleground::RewardHonorToTeam(uint32 Honor, uint32 TeamID)
 
         if (!plr)
         {
-            sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到!!", GUID_LOPART(itr->first));
             continue;
         }
 
@@ -653,7 +653,7 @@ void Battleground::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
 
         if (!plr)
         {
-            sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到!", GUID_LOPART(itr->first));
             continue;
         }
 
@@ -752,11 +752,11 @@ void Battleground::EndBattleground(uint32 winner)
                 SetArenaTeamRatingChangeForTeam(HORDE, winner_change);
                 SetArenaTeamRatingChangeForTeam(ALLIANCE, loser_change);
             }
-            sLog.outArena("Arena match Type: %u for Team1Id: %u - Team2Id: %u ended. WinnerTeamId: %u. Winner rating: %u, Loser rating: %u. RatingChange: %i.", m_ArenaType, m_ArenaTeamIds[BG_TEAM_ALLIANCE], m_ArenaTeamIds[BG_TEAM_HORDE], winner_arena_team->GetId(), winner_rating, loser_rating, winner_change);
+            sLog.outArena("竞技场比赛类型: %u 对于队伍1ID: %u - 队伍2Id: %u 结束了。 获胜队伍ID: %u. Winner rating: %u, Loser rating: %u. RatingChange: %i.", m_ArenaType, m_ArenaTeamIds[BG_TEAM_ALLIANCE], m_ArenaTeamIds[BG_TEAM_HORDE], winner_arena_team->GetId(), winner_rating, loser_rating, winner_change);
             if (sWorld.getConfig(CONFIG_ARENA_LOG_EXTENDED_INFO))
                 for (Battleground::BattlegroundScoreMap::const_iterator itr = GetPlayerScoresBegin(); itr != GetPlayerScoresEnd(); ++itr)
                     if (Player* player = sObjectMgr.GetPlayer(itr->first))
-                        sLog.outArena("Statistics for %s (GUID: " UI64FMTD ", Team: %d, IP: %s): %u damage, %u healing, %u killing blows", player->GetName(), itr->first, player->GetArenaTeamId(m_ArenaType == 5 ? 2 : m_ArenaType == 3), player->GetSession()->GetRemoteAddress().c_str(), itr->second->DamageDone, itr->second->HealingDone, itr->second->KillingBlows);
+                        sLog.outArena("统计 %s (GUID: " UI64FMTD ", 队伍: %d, IP: %s): %u 伤害， %u 治愈， %u 击杀数", player->GetName(), itr->first, player->GetArenaTeamId(m_ArenaType == 5 ? 2 : m_ArenaType == 3), player->GetSession()->GetRemoteAddress().c_str(), itr->second->DamageDone, itr->second->HealingDone, itr->second->KillingBlows);
         }
         else
         {
@@ -790,7 +790,7 @@ void Battleground::EndBattleground(uint32 winner)
                 else
                     loser_arena_team->OfflineMemberLost(itr->first, winner_rating);
             }
-            sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到！", GUID_LOPART(itr->first));
             continue;
         }
 
@@ -1133,7 +1133,7 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         if (Transport)
             player->TeleportToBGEntryPoint();
 
-        sLog.outDetail("BATTLEGROUND: Removed player %s from Battleground.", player->GetName());
+        sLog.outDetail("BATTLEGROUND: 将玩家 %s 从战场中移除。", player->GetName());
     }
 
     if (!GetPlayersSize() && !GetInvitedCount(HORDE) && !GetInvitedCount(ALLIANCE))
@@ -1181,7 +1181,7 @@ void Battleground::StartBattleground()
     SetStartTime(0);
     SetLastResurrectTime(0);
     if (m_IsRated)
-        sLog.outArena("Arena match type: %u for Team1Id: %u - Team2Id: %u started.", m_ArenaType, m_ArenaTeamIds[BG_TEAM_ALLIANCE], m_ArenaTeamIds[BG_TEAM_HORDE]);
+        sLog.outArena("竞技场比赛类型: %u 对于队伍1 ID: %u - 队伍2 ID: %u 启动。", m_ArenaType, m_ArenaTeamIds[BG_TEAM_ALLIANCE], m_ArenaTeamIds[BG_TEAM_HORDE]);
 
 #ifdef ELUNA
     sEluna->OnBGStart(this, (BattlegroundTypeId)GetTypeID(), GetInstanceID());
@@ -1267,7 +1267,7 @@ void Battleground::AddPlayer(Player* plr)
     }
 
     // Log
-    sLog.outDetail("BATTLEGROUND: Player %s joined the battle.", plr->GetName());
+    sLog.outDetail("BATTLEGROUND: 玩家 %s 加入战斗。", plr->GetName());
 }
 
 // This method should be called when player logs out from running battleground
@@ -1411,7 +1411,7 @@ void Battleground::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
         itr->second->HealingDone += value;
         break;
     default:
-        sLog.outError("Battleground: Unknown player score type %u", type);
+        sLog.outError("Battleground: 未知玩家得分类型 %u", type);
         break;
     }
 }
@@ -1473,8 +1473,8 @@ bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float 
     GameObject* go = new GameObject;
     if (!go->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, x, y, z, o, rotation0, rotation1, rotation2, rotation3, 100, GO_STATE_READY))
     {
-        sLog.outErrorDb("Gameobject template %u not found in database! Battleground not created!", entry);
-        sLog.outError("Cannot create gameobject template %u! Battleground not created!", entry);
+        sLog.outErrorDb("在数据库中找不到Gameobject template %u！ 未创建战场！", entry);
+        sLog.outError("无法创建Gameobject template %u！ 未创建战场！", entry);
         delete go;
         return false;
     }
@@ -1526,7 +1526,7 @@ void Battleground::DoorClose(uint32 type)
         }
     }
     else
-        sLog.outError("Battleground: Door object not found (cannot close doors)");
+        sLog.outError("Battleground: Door object not found (不能关闭的门)");
 }
 
 void Battleground::DoorOpen(uint32 type)
@@ -1539,14 +1539,14 @@ void Battleground::DoorOpen(uint32 type)
         obj->UseDoorOrButton(RESPAWN_ONE_DAY);
     }
     else
-        sLog.outError("Battleground: Door object not found! - doors will be closed.");
+        sLog.outError("Battleground: Door object 没有找到！ - 大门将会关闭。");
 }
 
 GameObject* Battleground::GetBGObject(uint32 type)
 {
     GameObject* obj = GetBgMap()->GetGameObject(m_BgObjects[type]);
     if (!obj)
-        sLog.outError("couldn't get gameobject %i", type);
+        sLog.outError("无法获取 gameobject %i", type);
     return obj;
 }
 
@@ -1554,7 +1554,7 @@ Creature* Battleground::GetBGCreature(uint32 type)
 {
     Creature* creature = GetBgMap()->GetCreature(m_BgCreatures[type]);
     if (!creature)
-        sLog.outError("couldn't get creature %i", type);
+        sLog.outError("无法获取 creature %i", type);
     return creature;
 }
 
@@ -1653,7 +1653,7 @@ bool Battleground::DelCreature(uint32 type)
     Creature* cr = GetBgMap()->GetCreature(m_BgCreatures[type]);
     if (!cr)
     {
-        sLog.outError("Can't find creature guid: %u", GUID_LOPART(m_BgCreatures[type]));
+        sLog.outError("找不到 creature guid: %u", GUID_LOPART(m_BgCreatures[type]));
         return false;
     }
     //@todo only delete creature after not in combat
@@ -1670,7 +1670,7 @@ bool Battleground::DelObject(uint32 type)
     GameObject* obj = GetBgMap()->GetGameObject(m_BgObjects[type]);
     if (!obj)
     {
-        sLog.outError("Can't find gobject guid: %u", GUID_LOPART(m_BgObjects[type]));
+        sLog.outError("找不到 gobject guid: %u", GUID_LOPART(m_BgObjects[type]));
         return false;
     }
 
@@ -1865,7 +1865,7 @@ void Battleground::PlayerRelogin(uint64 guid)
     Player* plr = sObjectMgr.GetPlayer(guid);
     if (!plr)
     {
-        sLog.outError("Battleground: Player (GUID: %u) not found!", GUID_LOPART(guid));
+        sLog.outError("Battleground: 玩家 (GUID: %u) 没有找到！", GUID_LOPART(guid));
         return;
     }
 
@@ -1909,7 +1909,7 @@ int32 Battleground::GetObjectType(uint64 guid)
     for (uint32 i = 0; i < m_BgObjects.size(); ++i)
         if (m_BgObjects[i] == guid)
             return i;
-    sLog.outError("Battleground: cheating? a player used a gameobject which isnt supposed to be a usable object!");
+    sLog.outError("Battleground: 作弊?一个玩家使用了一个gameobject，它不应该是一个可用的object!");
     return -1;
 }
 

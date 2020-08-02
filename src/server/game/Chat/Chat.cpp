@@ -271,7 +271,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
 
                 Player* p = m_session->GetPlayer();
                 ObjectGuid sel_guid = p->GetSelection();
-                sLog.outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
+                sLog.outCommand(m_session->GetAccountId(), "命令: %s [玩家: %s (账号: %u) X: %f Y: %f Z: %f 地图: %u 选择: %s]",
                     fullcmd.c_str(), p->GetName(), m_session->GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(),
                     sel_guid.GetString().c_str());
             }
@@ -322,7 +322,7 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
         // expected subcommand by full name DB content
         else if (*text)
         {
-            sLog.outError("Table `command` have unexpected subcommand '%s' in command '%s', skip.", text, fullcommand.c_str());
+            sLog.outError("表 `command` 中命令 '%s' 具有额外的子命令 '%s', 跳过。", text, fullcommand.c_str());
             return false;
         }
 
@@ -338,9 +338,9 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
     if (!cmd.empty())
     {
         if (&table == &getCommandTable())
-            sLog.outError("Table `command` have non-existing command '%s', skip.", cmd.c_str());
+            sLog.outError("表 `command` 中具有不存在的命令 '%s', 跳过.", cmd.c_str());
         else
-            sLog.outError("Table `command` have non-existing subcommand '%s' in command '%s', skip.", cmd.c_str(), fullcommand.c_str());
+            sLog.outError("表 `command` 中命令 '%s' 具有不存在的子命令 '%s', 跳过.", cmd.c_str(), fullcommand.c_str());
     }
 
     return false;

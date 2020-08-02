@@ -16,7 +16,7 @@
  */
 
 /* ScriptData
-SDName: Npc_Innkeeper
+SDName: Npc_旅馆老板
 SD%Complete: 50
 SDComment:
 SDCategory: NPCs
@@ -31,7 +31,7 @@ EndScriptData */
 #define SPELL_TRICK_OR_TREATED  24755
 #define SPELL_TREAT             24715
 
-#define LOCALE_TRICK_OR_TREAT_0 "Trick or Treat!"
+#define LOCALE_TRICK_OR_TREAT_0 "不给糖就捣乱！"
 #define LOCALE_TRICK_OR_TREAT_2 "Des bonbons ou des blagues!"
 #define LOCALE_TRICK_OR_TREAT_3 "Ses oder Saures!"
 #define LOCALE_TRICK_OR_TREAT_6 "ruco o trato!"
@@ -92,34 +92,34 @@ public:
             else
             {
                 int32 trickspell = 0;
-                switch (rand() % 9)                             // note that female characters can get male costumes and vice versa
+                switch (rand() % 9)                             // 注意，女性角色可以得到男性服装，反之亦然
                 {
                 case 0:
-                    trickspell = 24753;                     // cannot cast, random 30sec
+                    trickspell = 24753;                     // 不能施放，任意30秒
                     break;
                 case 1:
-                    trickspell = 24713;                     // lepper gnome costume
+                    trickspell = 24713;                     // 莱佩尔侏儒/地精服装
                     break;
                 case 2:
-                    trickspell = 24735;                     // male ghost costume
+                    trickspell = 24735;                     // 男鬼服装
                     break;
                 case 3:
-                    trickspell = 24736;                     // female ghostcostume
+                    trickspell = 24736;                     // 女鬼服装
                     break;
                 case 4:
-                    trickspell = 24710;                     // male ninja costume
+                    trickspell = 24710;                     // 男忍者服装
                     break;
                 case 5:
-                    trickspell = 24711;                     // female ninja costume
+                    trickspell = 24711;                     // 女忍者服装
                     break;
                 case 6:
-                    trickspell = 24708;                     // male pirate costume
+                    trickspell = 24708;                     // 男海盗服装
                     break;
                 case 7:
-                    trickspell = 24709;                     // female pirate costume
+                    trickspell = 24709;                     // 女海盗服装
                     break;
                 case 8:
-                    trickspell = 24723;                     // skeleton costume
+                    trickspell = 24723;                     // 骨架服装
                     break;
                 }
                 pPlayer->CastSpell(pPlayer, trickspell, true);

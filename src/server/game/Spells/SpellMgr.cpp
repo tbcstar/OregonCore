@@ -897,7 +897,7 @@ void SpellMgr::LoadSpellTargetPositions()
 
 
 
-        sLog.outString(">> Loaded %u spell target coordinates", count);
+        sLog.outString(">> 加载 %u个 spell target coordinates", count);
         return;
     }
 
@@ -958,7 +958,7 @@ void SpellMgr::LoadSpellTargetPositions()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u spell teleport coordinates", count);
+    sLog.outString(">> 加载 %u个 spell teleport coordinates", count);
 }
 
 void SpellMgr::LoadSpellAffects()
@@ -972,7 +972,7 @@ void SpellMgr::LoadSpellAffects()
     if (!result)
     {
 
-        sLog.outString(">> Loaded %u spell affect definitions", count);
+        sLog.outString(">> 加载 %u个 spell affect definitions", count);
         return;
     }
 
@@ -1027,7 +1027,7 @@ void SpellMgr::LoadSpellAffects()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u spell affect definitions", count);
+    sLog.outString(">> 加载 %u个 spell affect definitions", count);
 
     for (uint32 id = 0; id < sSpellStore.GetNumRows(); ++id)
     {
@@ -1096,7 +1096,7 @@ void SpellMgr::LoadSpellProcEvents()
     QueryResult_AutoPtr result = WorldDatabase.Query("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMask, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event");
     if (!result)
     {
-        sLog.outString(">> Loaded %u spell proc event conditions", count);
+        sLog.outString(">> 加载 %u个 spell proc event conditions", count);
         return;
     }
 
@@ -1141,9 +1141,9 @@ void SpellMgr::LoadSpellProcEvents()
     while (result->NextRow());
 
     if (customProc)
-        sLog.outString(">> Loaded %u custom spell proc event conditions +%u custom",  count, customProc);
+        sLog.outString(">> 加载 %u个 custom spell proc event conditions +%u custom",  count, customProc);
     else
-        sLog.outString(">> Loaded %u spell proc event conditions", count);
+        sLog.outString(">> 加载 %u个 spell proc event conditions", count);
 }
 
 
@@ -1271,7 +1271,7 @@ void SpellMgr::LoadSpellGroups()
     QueryResult_AutoPtr result = WorldDatabase.Query("SELECT id, spell_id FROM spell_group");
     if ( !result )
     {
-        sLog.outString( ">> Loaded %u spell group definitions", count );
+        sLog.outString( ">> 加载 %u个 spell group definitions", count );
         return;
     }
 
@@ -1338,7 +1338,7 @@ void SpellMgr::LoadSpellGroups()
         }
     }
 
-    sLog.outString( ">> Loaded %u spell group definitions", count );
+    sLog.outString( ">> 加载 %u个 spell group definitions", count );
 }
 
 void SpellMgr::LoadSpellGroupStackRules()
@@ -1351,7 +1351,7 @@ void SpellMgr::LoadSpellGroupStackRules()
     QueryResult_AutoPtr result = WorldDatabase.Query("SELECT group_id, stack_rule FROM spell_group_stack_rules");
     if ( !result )
     {
-        sLog.outString( ">> Loaded %u spell group stack rules", count );
+        sLog.outString( ">> 加载 %u个 spell group stack rules", count );
         return;
     }
 
@@ -1381,7 +1381,7 @@ void SpellMgr::LoadSpellGroupStackRules()
     }
     while ( result->NextRow() );
 
-    sLog.outString( ">> Loaded %u spell group stack rules", count );
+    sLog.outString( ">> 加载 %u个 spell group stack rules", count );
 }
 
 void SpellMgr::LoadSpellThreats()
@@ -1395,7 +1395,7 @@ void SpellMgr::LoadSpellThreats()
 
     if (!result)
     {
-        sLog.outString( ">> Loaded %u aggro generating spells", count);
+        sLog.outString( ">> 加载 %u个 aggro generating spells", count);
         return;
     }
 
@@ -1421,7 +1421,7 @@ void SpellMgr::LoadSpellThreats()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u SpellThreatEntries.", count);
+    sLog.outString(">> 加载 %u个 SpellThreatEntries.", count);
 }
 
 void SpellMgr::LoadSpellEnchantProcData()
@@ -1434,7 +1434,7 @@ void SpellMgr::LoadSpellEnchantProcData()
     QueryResult_AutoPtr result = WorldDatabase.Query("SELECT entry, customChance, PPMChance, procEx FROM spell_enchant_proc_data");
     if (!result)
     {
-        sLog.outString(">> Loaded %u spell enchant proc event conditions", count);
+        sLog.outString(">> 加载 %u个 spell enchant proc event conditions", count);
         return;
     }
 
@@ -1463,7 +1463,7 @@ void SpellMgr::LoadSpellEnchantProcData()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u enchant proc data definitions", count);
+    sLog.outString(">> 加载 %u个 enchant proc data definitions", count);
 }
 
 void SpellMgr::LoadSpellDummyCondition()
@@ -1492,11 +1492,11 @@ void SpellMgr::LoadSpellDummyCondition()
         }
         while (result->NextRow());
 
-        sLog.outString(">> Loaded %llu spell dummy conditions", result->GetRowCount());
+        sLog.outString(">> 加载 %llu个 spell dummy conditions", result->GetRowCount());
         return;
     }
 
-    sLog.outString(">> Loaded 0 spell dummy conditions");
+    sLog.outString(">> 加载 0个 spell dummy conditions");
 }
 
 bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const* spellInfo_1, uint32 spellId_2) const
@@ -1813,7 +1813,7 @@ void SpellMgr::LoadSpellRequired()
 
     if (!result)
     {
-        sLog.outString(">> Loaded 0 spell required records");
+        sLog.outString(">> 加载 0个 spell required records");
         sLog.outErrorDb("spell_required table is empty!");
         return;
     }
@@ -1832,7 +1832,7 @@ void SpellMgr::LoadSpellRequired()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u spell required records", rows);
+    sLog.outString(">> 加载 %u个 spell required records", rows);
 }
 
 struct SpellRankEntry
@@ -2084,7 +2084,7 @@ void SpellMgr::LoadSpellChains()
     //    for (UNORDERED_MAP<uint32, SpellChainNode>::iterator itr=mSpellChains.begin();itr != mSpellChains.end();itr++)
     //       sLog.outString("Id: %u, Rank: %d , %s",itr->first,itr->second.rank, sSpellStore.LookupEntry(itr->first)->Rank[sWorld.GetDefaultDbcLocale()]);
 
-    sLog.outString(">> Loaded %u spell chains", count);
+    sLog.outString(">> 加载 %u个 spell chains", count);
 }
 
 void SpellMgr::LoadSpellLearnSkills()
@@ -2119,7 +2119,7 @@ void SpellMgr::LoadSpellLearnSkills()
         }
     }
 
-    sLog.outString(">> Loaded %u Spell Learn Skills from DBC", dbc_count);
+    sLog.outString(">> 加载 %u个 Spell Learn Skills from DBC", dbc_count);
 }
 
 void SpellMgr::LoadSpellLearnSpells()
@@ -2130,7 +2130,7 @@ void SpellMgr::LoadSpellLearnSpells()
     if (!result)
     {
 
-        sLog.outString(">> Loaded 0 spell learn spells");
+        sLog.outString(">> 加载 0个 spell learn spells");
         sLog.outErrorDb("spell_learn_spell table is empty!");
         return;
     }
@@ -2206,7 +2206,7 @@ void SpellMgr::LoadSpellLearnSpells()
         }
     }
 
-    sLog.outString(">> Loaded %u spell learn spells + %u found in DBC", count, dbc_count);
+    sLog.outString(">> 加载 %u个 spell learn spells + %u found in DBC", count, dbc_count);
 }
 
 void SpellMgr::LoadSpellPetAuras()
@@ -2219,7 +2219,7 @@ void SpellMgr::LoadSpellPetAuras()
     QueryResult_AutoPtr result = WorldDatabase.Query("SELECT spell, pet, aura FROM spell_pet_auras");
     if (!result)
     {
-        sLog.outString(">> Loaded %u spell pet auras", count);
+        sLog.outString(">> 加载 %u个 spell pet auras", count);
         return;
     }
 
@@ -2271,7 +2271,7 @@ void SpellMgr::LoadSpellPetAuras()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u spell pet auras", count);
+    sLog.outString(">> 加载 %u个 spell pet auras", count);
 }
 
 // set data in core for now
@@ -2762,7 +2762,7 @@ void SpellMgr::LoadSpellCustomCooldowns()
     QueryResult_AutoPtr result = WorldDatabase.Query("SELECT spellid, cooldown FROM spell_cooldown");
     if (!result)
     {
-        sLog.outString(">> Loaded %u custom spell cooldowns", count);
+        sLog.outString(">> 加载 %u个 custom spell cooldowns", count);
         return;
     }
 
@@ -2787,7 +2787,7 @@ void SpellMgr::LoadSpellCustomCooldowns()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u custom spell cooldowns", count);
+    sLog.outString(">> 加载 %u个 custom spell cooldowns", count);
 }
 
 void SpellMgr::LoadSpellLinked()
@@ -2799,7 +2799,7 @@ void SpellMgr::LoadSpellLinked()
     QueryResult_AutoPtr result = WorldDatabase.Query("SELECT spell_trigger, spell_effect, type FROM spell_linked_spell");
     if (!result)
     {
-        sLog.outString(">> Loaded %u linked spells", count);
+        sLog.outString(">> 加载 %u个 linked spells", count);
         return;
     }
 
@@ -2855,7 +2855,7 @@ void SpellMgr::LoadSpellLinked()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u linked spells", count);
+    sLog.outString(">> 加载 %u个 linked spells", count);
 }
 
 // Some checks for spells, to prevent adding depricated/broken spells for trainers, spell book, etc
@@ -3085,7 +3085,7 @@ void SpellMgr::LoadSkillLineAbilityMap()
         ++count;
     }
 
-    sLog.outString(">> Loaded %u SkillLineAbility MultiMap", count);
+    sLog.outString(">> 加载 %u个 SkillLineAbility MultiMap", count);
 }
 
 DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto, bool triggered)

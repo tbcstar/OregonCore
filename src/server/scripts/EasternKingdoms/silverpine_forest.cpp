@@ -37,8 +37,8 @@ EndContentData */
 ## npc_astor_hadren
 ######*/
 
-#define GOSSIP_HAH "You're Astor Hadren, right?"
-#define GOSSIP_SAH "You've got something I need, Astor. And I'll be taking it now."
+#define GOSSIP_HAH "你是阿斯托·哈德恩，对吧?"
+#define GOSSIP_SAH "你有我需要的东西，阿斯托。我现在就要。"
 
 
 
@@ -86,8 +86,8 @@ enum eErland
 
 #define QUEST_PYREWOOD_AMBUSH 452
 
-#define NPCSAY_INIT "Get ready, they'll be arriving any minute..." //not blizzlike
-#define NPCSAY_END "Thanks for your help!" //not blizzlike
+#define NPCSAY_INIT "准备好，他们马上就到..." //not blizzlike
+#define NPCSAY_END "感谢您的帮助！" //not blizzlike
 
 static float PyrewoodSpawnPoints[3][4] =
 {

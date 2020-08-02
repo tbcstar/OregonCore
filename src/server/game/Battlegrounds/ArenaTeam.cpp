@@ -83,7 +83,7 @@ bool ArenaTeam::Create(uint64 captainGuid, uint32 type, std::string arenaTeamNam
     CharacterDatabase.CommitTransaction();
 
     AddMember(m_CaptainGuid);
-    sLog.outArena("New ArenaTeam created [Id: %u] [Type: %u] [Captain GUID: " UI64FMTD "]", GetId(), GetType(), GetCaptain());
+    sLog.outArena("创建了新的竞技场队伍 [Id: %u] [类型: %u] [队长 GUID: " UI64FMTD "]", GetId(), GetType(), GetCaptain());
     return true;
 }
 
@@ -101,7 +101,7 @@ bool ArenaTeam::AddMember(const uint64& playerGuid)
     {
         if (pl->GetArenaTeamId(GetSlot()))
         {
-            sLog.outError("Arena::AddMember() : player already in this sized team");
+            sLog.outError("竞技场::添加成员() : 玩家已经在这个类型的队伍中了");
             return false;
         }
 
@@ -121,7 +121,7 @@ bool ArenaTeam::AddMember(const uint64& playerGuid)
         // check if player already in arenateam of that size
         if (Player::GetArenaTeamIdFromDB(playerGuid, GetType()) != 0)
         {
-            sLog.outError("Arena::AddMember() : player " UI64FMTD " already in this sized team", playerGuid);
+            sLog.outError("竞技场::添加成员() : 玩家 " UI64FMTD " 已经在这个类型的队伍了", playerGuid);
             return false;
         }
     }
@@ -152,7 +152,7 @@ bool ArenaTeam::AddMember(const uint64& playerGuid)
         // hide promote/remove buttons
         if (m_CaptainGuid != playerGuid)
             pl->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 1);
-        sLog.outArena("Player: %s [GUID: %u] joined arena team type: %u [Id: %u].", pl->GetName(), pl->GetGUIDLow(), GetType(), GetId());
+        sLog.outArena("玩家: %s [GUID: %u] 加入竞技场队伍类型: %u [Id: %u].", pl->GetName(), pl->GetGUIDLow(), GetType(), GetId());
     }
     return true;
 }
@@ -201,7 +201,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult_AutoPtr arenaTeamMembersResult)
         if (arenaTeamId < m_TeamId)
         {
             // there is in table arena_team_member record which doesn't have arenateamid in arena_team table, report error
-            sLog.outErrorDb("ArenaTeam %u does not exist but it has record in arena_team_member table, deleting it!", arenaTeamId);
+            sLog.outErrorDb("竞技场队伍 %u 不存在，但在arena_team_member表中有记录，请删除它!", arenaTeamId);
             CharacterDatabase.PExecute("DELETE FROM arena_team_member WHERE arenateamid = '%u'", arenaTeamId);
             continue;
         }
@@ -223,7 +223,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult_AutoPtr arenaTeamMembersResult)
         //check if member exists in characters table
         if (newmember.name.empty())
         {
-            sLog.outErrorDb("ArenaTeam %u has member with empty name - probably player %u doesn't exist, deleting him from memberlist!", arenaTeamId, GUID_LOPART(newmember.guid));
+            sLog.outErrorDb("竞技场队伍 %u 有空名字的成员-可能玩家%u不存在，请在成员列表中删除他!", arenaTeamId, GUID_LOPART(newmember.guid));
             this->DelMember(newmember.guid);
             continue;
         }
@@ -238,7 +238,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult_AutoPtr arenaTeamMembersResult)
     if (Empty() || !captainPresentInTeam)
     {
         // arena team is empty or captain is not in team, delete from db
-        sLog.outErrorDb("ArenaTeam %u does not have any members or its captain is not in team, disbanding it...", m_TeamId);
+        sLog.outErrorDb("竞技场队伍 %u 没有任何成员或者它的队长不在队伍中，解散它…", m_TeamId);
         return false;
     }
 
@@ -262,7 +262,7 @@ void ArenaTeam::SetCaptain(const uint64& guid)
     if (Player* newcaptain = sObjectMgr.GetPlayer(guid))
     {
         newcaptain->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 0);
-        sLog.outArena("Player: %s [GUID: %u] promoted player: %s [GUID: %u] to leader of arena team [Id: %u] [Type: %u].", oldcaptain->GetName(), oldcaptain->GetGUIDLow(), newcaptain->GetName(), newcaptain->GetGUIDLow(), GetId(), GetType());
+        sLog.outArena("玩家: %s [GUID: %u] 提升玩家: %s [GUID: %u] 为竞技场队伍队长 [Id: %u] [类型: %u].", oldcaptain->GetName(), oldcaptain->GetGUIDLow(), newcaptain->GetName(), newcaptain->GetGUIDLow(), GetId(), GetType());
     }
 }
 
@@ -298,7 +298,7 @@ void ArenaTeam::DelMember(uint64 guid)
         // delete all info regarding this team
         for (uint32 i = 0; i < ARENA_TEAM_END; ++i)
             player->SetArenaTeamInfoField(GetSlot(), ArenaTeamInfoType(i), 0);
-        sLog.outArena("Player: %s [GUID: %u] left arena team type: %u [Id: %u].", player->GetName(), player->GetGUIDLow(), GetType(), GetId());
+        sLog.outArena("玩家: %s [GUID: %u] 离开了竞技场队伍类型： %u [Id: %u].", player->GetName(), player->GetGUIDLow(), GetType(), GetId());
     }
 
     CharacterDatabase.PExecute("DELETE FROM arena_team_member WHERE arenateamid = '%u' AND guid = '%u'", GetId(), GUID_LOPART(guid));
@@ -316,7 +316,7 @@ void ArenaTeam::Disband(WorldSession* session)
 
     if (session)
         if (Player* player = session->GetPlayer())
-            sLog.outArena("Player: %s [GUID: %u] disbanded arena team type: %u [Id: %u].", player->GetName(), player->GetGUIDLow(), GetType(), GetId());
+            sLog.outArena("玩家: %s [GUID: %u] 解散竞技场队伍 类型：%u [Id: %u].", player->GetName(), player->GetGUIDLow(), GetType(), GetId());
 
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM arena_team WHERE arenateamid = '%u'", m_TeamId);
@@ -512,7 +512,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
     default:
         break;
     }
-    sLog.outError("FATAL: Unknown arena team type %u for some arena team", type);
+    sLog.outError("致命:某些竞技场队伍不知道竞技场队伍类型 %u", type);
     return 0xFF;
 }
 

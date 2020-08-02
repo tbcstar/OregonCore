@@ -47,7 +47,7 @@ EndContentData */
 ## npc_archmage_malin
 ######*/
 
-#define GOSSIP_ITEM_MALIN "Can you send me to Theramore? I have an urgent message for Lady Jaina from Highlord Bolvar."
+#define GOSSIP_ITEM_MALIN "你能送我去塞拉摩吗？我有来自伯瓦尔·弗塔根公爵的吉安娜夫人紧急消息。"
 
 
 
@@ -85,10 +85,10 @@ EndContentData */
 ## npc_lady_katrana_prestor
 ######*/
 
-#define GOSSIP_ITEM_KAT_1 "Pardon the intrusion, Lady Prestor, but Highlord Bolvar suggested that I seek your advice."
-#define GOSSIP_ITEM_KAT_2 "My apologies, Lady Prestor."
-#define GOSSIP_ITEM_KAT_3 "Begging your pardon, Lady Prestor. That was not my intent."
-#define GOSSIP_ITEM_KAT_4 "Thank you for your time, Lady Prestor."
+#define GOSSIP_ITEM_KAT_1 "恕我冒昧，普瑞斯托夫人，但伯瓦尔·弗塔根公爵建议我征求您的意见。"
+#define GOSSIP_ITEM_KAT_2 "抱歉，普瑞斯托夫人。"
+#define GOSSIP_ITEM_KAT_3 "请原谅，普瑞斯托夫人。那不是我的意图。"
+#define GOSSIP_ITEM_KAT_4 "谢谢您的宝贵时间，普瑞斯托夫人。"
 
 
 
