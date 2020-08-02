@@ -1503,8 +1503,7 @@ void World::SetInitialWorldSettings()
     sConsole.SetLoadingLabel("加载 Game Object Templates...");     // must be after LoadPageTexts
     sObjectMgr.LoadGameobjectInfo();
 
-    sConsole.SetLoadingLabel("加载 
-	..");
+    sConsole.SetLoadingLabel("加载 Spell Chain Data...");
     sSpellMgr.LoadSpellChains();
 
     sConsole.SetLoadingLabel("加载 Spell Required Data...");
