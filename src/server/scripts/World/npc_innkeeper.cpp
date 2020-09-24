@@ -16,7 +16,7 @@
  */
 
 /* ScriptData
-SDName: Npc_ÂÃ¹ÝÀÏ°å
+SDName: Npc_æ—…é¦†è€æ¿
 SD%Complete: 50
 SDComment:
 SDCategory: NPCs
@@ -31,10 +31,10 @@ EndScriptData */
 #define SPELL_TRICK_OR_TREATED  24755
 #define SPELL_TREAT             24715
 
-#define LOCALE_TRICK_OR_TREAT_0 "²»¸øÌÇ¾Íµ·ÂÒ£¡"
+#define LOCALE_TRICK_OR_TREAT_0 "ä¸ç»™ç³–å°±æ£ä¹±ï¼"
 #define LOCALE_TRICK_OR_TREAT_2 "Des bonbons ou des blagues!"
-#define LOCALE_TRICK_OR_TREAT_3 "Süßes oder Saures!"
-#define LOCALE_TRICK_OR_TREAT_6 "¡Truco o trato!"
+#define LOCALE_TRICK_OR_TREAT_3 "Sîªes oder Saures!"
+#define LOCALE_TRICK_OR_TREAT_6 "î“šruco o trato!"
 
 class npc_innkeeper : public CreatureScript
 {
@@ -92,34 +92,34 @@ public:
             else
             {
                 int32 trickspell = 0;
-                switch (rand() % 9)                             // ×¢Òâ£¬Å®ÐÔ½ÇÉ«¿ÉÒÔµÃµ½ÄÐÐÔ·þ×°£¬·´Ö®ÒàÈ»
+                switch (rand() % 9)                             // æ³¨æ„ï¼Œå¥³æ€§è§’è‰²å¯ä»¥å¾—åˆ°ç”·æ€§æœè£…ï¼Œåä¹‹äº¦ç„¶
                 {
                 case 0:
-                    trickspell = 24753;                     // ²»ÄÜÊ©·Å£¬ÈÎÒâ30Ãë
+                    trickspell = 24753;                     // ä¸èƒ½æ–½æ”¾ï¼Œä»»æ„30ç§’
                     break;
                 case 1:
-                    trickspell = 24713;                     // À³Åå¶ûÙªÈå/µØ¾«·þ×°
+                    trickspell = 24713;                     // èŽ±ä½©å°”ä¾å„’/åœ°ç²¾æœè£…
                     break;
                 case 2:
-                    trickspell = 24735;                     // ÄÐ¹í·þ×°
+                    trickspell = 24735;                     // ç”·é¬¼æœè£…
                     break;
                 case 3:
-                    trickspell = 24736;                     // Å®¹í·þ×°
+                    trickspell = 24736;                     // å¥³é¬¼æœè£…
                     break;
                 case 4:
-                    trickspell = 24710;                     // ÄÐÈÌÕß·þ×°
+                    trickspell = 24710;                     // ç”·å¿è€…æœè£…
                     break;
                 case 5:
-                    trickspell = 24711;                     // Å®ÈÌÕß·þ×°
+                    trickspell = 24711;                     // å¥³å¿è€…æœè£…
                     break;
                 case 6:
-                    trickspell = 24708;                     // ÄÐº£µÁ·þ×°
+                    trickspell = 24708;                     // ç”·æµ·ç›—æœè£…
                     break;
                 case 7:
-                    trickspell = 24709;                     // Å®º£µÁ·þ×°
+                    trickspell = 24709;                     // å¥³æµ·ç›—æœè£…
                     break;
                 case 8:
-                    trickspell = 24723;                     // ¹Ç¼Ü·þ×°
+                    trickspell = 24723;                     // éª¨æž¶æœè£…
                     break;
                 }
                 pPlayer->CastSpell(pPlayer, trickspell, true);
