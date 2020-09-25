@@ -10,7 +10,7 @@ ConfVersion=2015070961
 # REALMD SETTINGS
 #
 #    LoginDatabaseInfo
-#        Database connection settings for the realm server.
+#        realm服务器的数据库连接设置.
 #        Default:
 #                    hostname;port;username;password;database
 #                    .;somenumber;username;password;database
@@ -21,112 +21,112 @@ ConfVersion=2015070961
 #                     - use Unix sockets in Unix/Linux
 #
 #    LogsDir
-#        Logs directory setting.
-#        Important: Logs dir must exists, or all logs need to be disabled
+#        日志目录设置。
+#        重要提示:Logs dir必须存在，否则需要禁用所有日志
 #        Default: "" - no log directory prefix, if used log names isn't
-#         absolute path then logs will be stored in current directory.
+#         然后日志将存储在当前目录中.
 #
 #    MaxPingTime
-#         Settings for maximum database-ping interval (minutes between pings)
+#         最大数据库ping间隔(ping之间的分钟)的设置
 #
 #    RealmServerPort
 #         Default RealmServerPort
 #
 #    BindIP
-#         Bind Realm Server to IP/hostname
+#         将 Realm Server 绑定到 IP/hostname
 #
 #    PidFile
-#        Realmd daemon PID file
-#        Default: ""             - do not create PID file
-#                 "./realmd.pid" - create PID file (recommended name)
+#        Realmd守护进程PID文件
+#        Default: ""             - 不创建PID文件
+#                 "./realmd.pid" - 创建PID文件(推荐名称)
 #
 #    LogMask
-##        Server console/file level of logging
+##       服务器控制台/文件级别的日志记录
 #        This is a bitmask. Possible values:
 #        STRING = 1, BASIC = 2, DETAIL = 4, DEBUG = 8,
 #        ERROR = 16, ERROR_DB = 32, SQL = 64, ARENA = 128,
 #        WARDEN = 256, CHAT = 512, COMMAND = 1024,
 #        CHAR = 2048, REMOTE = 4096, MAP = 8192, VMAP = 16384
 #        MMAP = 32768, NETWORK = 65536
-#        Example: I want to see basic output and errors:
+#        Example: 我想看看基本的输出和错误:
 #                 STRING + BASIC + ERROR + ERROR_DB =
 #                 1      + 2     + 16    + 32       = 51 
 #        Default: 51
 #
 #    LogFile
-#        Logfile name, here will go all messages you don't have specific log for.
+#        日志文件名，这里将删除所有没有特定日志的消息
 #        Default: "realmd.log"
-#                 "" - Empty name disable creating log file
+#                 "" -空名称禁用创建日志文件
 #
 #    LogTimestamp
-#        Logfile with timestamp of server start in name
+#        名称中带有服务器启动时间戳的日志文件
 #         in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name
+#        Default: 0 - 名称中没有时间戳
+#                 1 - 在名称中添加时间戳
 #
 #    LogColors
-#        Color for messages (format "normal basic detail debug")
-#        Default: "0 6 4 3 1 1 2 7 5 0 4 0 1 3 2 4 0" - default color scheme
-#        Colors: 0  - BLACK (no color, skip)
-#                1  - RED
-#                2  - GREEN
-#                3  - BROWN
-#                4  - BLUE
-#                5  - MAGENTA
-#                6  - CYAN
-#                7  - GREY
-#                8  - YELLOW
+#        消息颜色(格式为“常规基本细节调试”)
+#        Default: "0 6 4 3 1 1 2 7 5 0 4 0 1 3 2 4 0" - 默认颜色方案
+#        Colors: 0  - 黑色 (没有颜色,跳过)
+#                1  - 红色
+#                2  - 绿色
+#                3  - 棕色
+#                4  - 蓝色
+#                5  - 洋红色
+#                6  - 蓝绿色
+#                7  - 灰色
+#                8  - 黄色
 #                9  - LRED
 #                10 - LGREEN
-#                11 - LBLUE
+#                11 - 蓝色
 #                12 - LMAGENTA
 #                13 - LCYAN
-#                14 - WHITE
+#                14 - 白色
 #        Example: "0 6 4 3 1 1 2 7 5 0 4 0 1 3 2 4 0"
 #
 #    DBLogMask
-#        Log level of DB logging.
-#        This is a bitmask. See LogMask above for details.
-#        Default: 0 - disabled
+#        DB日志记录的日志级别。
+#        这是位掩码，有关详细信息，请参阅上面的LogMask
+#        Default: 0 - 禁用
 #
 #    UseProcessors
-#        Processors mask for multi-processor system (Used only in Windows)
-#        Default: 0 (selected by OS)
-#                 number (bitmask value of selected processors)
+#       多处理器系统的处理器掩码(仅用于Windows)
+#        Default: 0 (选择操作系统)
+#                 number (选定处理器的位掩码值)
 #
 #    ProcessPriority
-#        Process proirity setting (Used only at Windows)
-#        Default: 1 (HIGH)
-#                 0 (Normal)
+#        进程proirity设置(仅用于Windows)
+#        Default: 1 (高)
+#                 0 (正常)
 #
 #    RealmsStateUpdateDelay
-#        Realm list Update up delay
-#         (updated at realm list request if delay expired).
+#        Realm list更新延迟
+#         (如果延迟过期，将按realm列表请求更新).
 #        Default: 20
-#                 0  (Disabled)
+#                 0  (禁用)
 #
-#    WrongPass.MaxCount
-#        Number of login attemps with wrong password
-#         before the account or IP is banned
-#        Default: 0  (Never ban)
+#    WrongPass.MaxCount-重复次数
+#        在帐户或IP被禁止之前
+#        密码错误的登录尝试次数
+#        Default: 0  (不禁止)
 #
-#    WrongPass.BanTime
-#        Duration of the ban in seconds (0 means permanent ban)
+#    WrongPass.BanTime-禁用时长
+#       禁令持续时间(以秒为单位)(0表示永久禁令)
 #        Default: 600
 #
-#    WrongPass.BanType
-#        Ban the IP or account on which login is attempted
-#        Default: 0 (Ban IP)
-#                 1 (Ban Account)
+#    WrongPass.BanType-禁用类型
+#       禁止尝试登录的IP或帐户
+#        Default: 0 (禁止IP)
+#                 1 (禁封账号)
 #
 ###############################################################################
 
-LoginDatabaseInfo = "127.0.0.1;3306;oregon;oregon;realmd"
-LogsDir = ""
+LoginDatabaseInfo = "127.0.0.1;3310;root;A111111a;realmd"
+LogsDir = "/home/server/log"
 MaxPingTime = 30
 RealmServerPort = 3724
 BindIP = "0.0.0.0"
-PidFile = ""
+PidFile = "./realmd.pid"
 LogMask = 51
 LogFile = "realmd.log"
 LogTimestamp = 0
@@ -136,6 +136,6 @@ DBLogMask = 0
 UseProcessors = 0
 ProcessPriority = 1
 RealmsStateUpdateDelay = 20
-WrongPass.MaxCount = 0
+WrongPass.MaxCount = 10
 WrongPass.BanTime = 600
-WrongPass.BanType = 0
+WrongPass.BanType = 1
