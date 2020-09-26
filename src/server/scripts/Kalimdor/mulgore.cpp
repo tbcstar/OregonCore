@@ -36,7 +36,7 @@ EndContentData */
 # npc_skorn_whitecloud
 ######*/
 
-#define GOSSIP_SW "Tell me a story, Skorn."
+#define GOSSIP_SW "给我讲个故事，斯考恩。"
 
 
 

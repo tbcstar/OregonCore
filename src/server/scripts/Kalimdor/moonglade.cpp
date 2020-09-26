@@ -47,8 +47,8 @@ enum eBunthen
     TAXI_PATH_ID_HORDE          = 316
 };
 
-#define GOSSIP_ITEM_THUNDER     "I'd like to fly to Thunder Bluff."
-#define GOSSIP_ITEM_AQ_END      "Do you know where I can find Half Pendant of Aquatic Endurance?"
+#define GOSSIP_ITEM_THUNDER     "我想乘飞艇去雷霆崖。"
+#define GOSSIP_ITEM_AQ_END      "您知道我在哪里可以找到半块水兽耐力坠饰吗？"
 
 
 
@@ -58,10 +58,10 @@ enum eBunthen
 ## npc_great_bear_spirit
 ######*/
 
-#define GOSSIP_BEAR1 "What do you represent, spirit?"
-#define GOSSIP_BEAR2 "I seek to understand the importance of strength of the body."
-#define GOSSIP_BEAR3 "I seek to understand the importance of strength of the heart."
-#define GOSSIP_BEAR4 "I have heard your words, Great Bear Spirit, and I understand. I now seek your blessings to fully learn the way of the Claw."
+#define GOSSIP_BEAR1 "你代表什么，精神？"
+#define GOSSIP_BEAR2 "我试图去理解身体力量的重要性。"
+#define GOSSIP_BEAR3 "我试图了解心脏力量的重要性。"
+#define GOSSIP_BEAR4 "我已经听了您的话，大熊精神，我明白了。 我现在寻求您的祝福，以充分学习利爪的方式。"
 
 
 
@@ -71,8 +71,8 @@ enum eBunthen
 ## npc_silva_filnaveth
 ######*/
 
-#define GOSSIP_ITEM_RUTHERAN    "I'd like to fly to Rut'theran Village."
-#define GOSSIP_ITEM_AQ_AGI      "Do you know where I can find Half Pendant of Aquatic Agility?"
+#define GOSSIP_ITEM_RUTHERAN    "我想乘飞艇去鲁瑟兰村。"
+#define GOSSIP_ITEM_AQ_AGI      "您知道我在哪里可以找到半块水兽敏捷坠饰吗？"
 
 
 

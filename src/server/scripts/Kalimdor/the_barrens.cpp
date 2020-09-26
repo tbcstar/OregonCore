@@ -40,7 +40,7 @@ EndContentData */
 ## npc_beaten_corpse
 ######*/
 
-#define GOSSIP_CORPSE "Examine corpse in detail..."
+#define GOSSIP_CORPSE "仔细检查尸体…"
 
 enum eQuests
 {
@@ -84,7 +84,7 @@ enum eGilthares
 ## npc_sputtervalve
 ######*/
 
-#define GOSSIP_SPUTTERVALVE "Can you tell me about this shard?"
+#define GOSSIP_SPUTTERVALVE "能跟我说说这个碎片吗？"
 
 
 

@@ -237,15 +237,15 @@ const Position DeserterDisappearPos = { -3609.03f, -4332.91f, 9.39354f, 3.73862f
 static float m_afSpawn[] = { -3383.501953f, -3203.383301f, 36.149f };
 static float m_afMoveTo[] = { -3371.414795f, -3212.179932f, 34.210f };
 
-#define GOSSIP_ITEM_DESERTER "Your propaganda wont`t work on me. Spout your treasonous filth elsewhere traitor!"
-#define SAY_1 "If you think you can stop us, you're mistaken, 'friend.'"
+#define GOSSIP_ITEM_DESERTER "你的宣传对我不起作用。把你那反叛的肮脏言论散播到别处去，叛徒!"
+#define SAY_1 "如果你认为你能阻止我们，那你就错了，“朋友”。"
 
 #define SPELL_SUMMON_RESTLESS_APPARITION    42511
 #define SPELL_CONSUME_FLESH                 37933           //Risen Husk
 #define SPELL_INTANGIBLE_PRESENCE           43127           //Risen Spirit
-#define GOSSIP_ITEM_THERAMORE_GUARD "You look like an intelligent person. Why don't you read one of these leaflets and give it some thought?"
-#define GOSSIP_ITEM_JAINA "I know this is rather silly but i have a young ward who is a bit shy and would like your autograph."
-#define GOSSIP_SURVEY_ALCAZ_ISLAND "Lady Jaina told me to speak to you about using a Gryphon to survey Alcaz Island."
+#define GOSSIP_ITEM_THERAMORE_GUARD "你看起来像个聪明人。你为什么不读读这些传单，再好好想一想呢？"
+#define GOSSIP_ITEM_JAINA "我知道这很愚蠢，但我有一个年轻的守卫，他有点害羞，想请您签名。"
+#define GOSSIP_SURVEY_ALCAZ_ISLAND "吉安娜夫人让我跟你谈谈用鹰头狮来勘察阿尔卡兹岛的事。"
 #define QUEST_ALCAZ_ISLAND 11142
 
 class mobs_risen_husk_spirit : public CreatureScript

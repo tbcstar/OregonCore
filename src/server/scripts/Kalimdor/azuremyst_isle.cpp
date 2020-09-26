@@ -286,7 +286,7 @@ enum eSpark
     SPELL_DYNAMITE = 7978
 };
 
-#define GOSSIP_FIGHT    "Traitor! You will be brought to justice!"
+#define GOSSIP_FIGHT    "叛徒!你会被绳之以法的!"
 
 class npc_engineer_spark_overgrind : CreatureScript
 {

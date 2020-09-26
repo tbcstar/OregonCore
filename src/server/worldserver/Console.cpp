@@ -38,11 +38,11 @@ static const unsigned int sOregonLogoCols = 56;
 
 static const char* Menu[] =
 {
-    "Run a Command",
-    "Toggle Output",
+    "   运行命令  ",
+    "   显示日志  ",
     "-------------",
-    "   Restart   ",
-    " Halt Server ",
+    "   重启服务  ",
+    "   关闭服务  ",
 };
 static const int MenuItems = sizeof(Menu) / sizeof(*Menu);
 

@@ -39,7 +39,7 @@ EndContentData */
 
 #define QUEST_5727  5727
 
-#define GOSSIP_HNF "You may speak frankly, Neeru..."
+#define GOSSIP_HNF "你可以坦率地说，尼尔鲁..."
 #define GOSSIP_SNF "[PH] ..."
 
 
@@ -69,13 +69,13 @@ enum eShenthul
 #define SPELL_CHAIN_LIGHTNING   16033
 #define SPELL_SHOCK             16034
 
-#define GOSSIP_HTW "Please share your wisdom with me, Warchief."
-#define GOSSIP_STW1 "What discoveries?"
-#define GOSSIP_STW2 "Usurper?"
-#define GOSSIP_STW3 "With all due respect, Warchief - why not allow them to be destroyed? Does this not strengthen our position?"
-#define GOSSIP_STW4 "I... I did not think of it that way, Warchief."
-#define GOSSIP_STW5 "I live only to serve, Warchief! My life is empty and meaningless without your guidance."
-#define GOSSIP_STW6 "Of course, Warchief!"
+#define GOSSIP_HTW "请和我分享你的智慧，酋长。"
+#define GOSSIP_STW1 发现什么?"
+#define GOSSIP_STW2 "篡位者？"
+#define GOSSIP_STW3 "恕我直言，酋长 - 为什么不让他们被摧毁？ 这不会巩固我们的地位吗？"
+#define GOSSIP_STW4 "我...我没想到那样，酋长。"
+#define GOSSIP_STW5 "我活着就是为了服务，酋长!没有你的指引，我的生命是空虚的，毫无意义的。"
+#define GOSSIP_STW6 "当然,酋长!"
 
 //@todo verify abilities/timers
 
@@ -89,14 +89,14 @@ enum eShenthul
 ## npc_eitrigg
 ######*/
 
-#define GOSSIP_HELLO    "Hello, Eitrigg. I bring news from Blackrock Spire."
-#define GOSSIP_SELECT1  "There is only one Warchief, Eitrigg!"
-#define GOSSIP_SELECT2  "What do you mean?"
-#define GOSSIP_SELECT3  "Hearthglen?? But..."
-#define GOSSIP_SELECT4  "I will take you up on that offer, Eitrigg."
-#define GOSSIP_SELECT5  "Ah, so that is how they pushed the Dark Iron to the lower parts of the Spire."
-#define GOSSIP_SELECT6  "Perhaps there exists a way?"
-#define GOSSIP_SELECT7  "As you wish, Eitrigg."
+#define GOSSIP_HELLO    "你好,伊崔格。我带来了贝莱德尖塔的消息。"
+#define GOSSIP_SELECT1  "这里只有一个酋长，伊崔格！"
+#define GOSSIP_SELECT2  "你是什么意思?"
+#define GOSSIP_SELECT3  "壁炉谷?但是…"
+#define GOSSIP_SELECT4  "我会接受你的提议的，伊崔格。"
+#define GOSSIP_SELECT5  "啊，原来他们就是这样把黑铁部族推到塔尖下面的。"
+#define GOSSIP_SELECT6  "也许有办法?"
+#define GOSSIP_SELECT7  "如你所愿，伊崔格。"
 
 
 
