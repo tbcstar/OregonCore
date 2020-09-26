@@ -1189,8 +1189,8 @@ GM.TicketSystem.ChanceOfGMSurvey = 0
 
 Visibility.GroupMode = 1
 Visibility.Distance.Continents = 90
-Visibility.Distance.Instances = 170
-Visibility.Distance.BGArenas = 533
+Visibility.Distance.Instances = 100
+Visibility.Distance.BGArenas = 100
 
 Visibility.Notify.Period.OnContinents = 1000
 Visibility.Notify.Period.InInstances  = 1000
