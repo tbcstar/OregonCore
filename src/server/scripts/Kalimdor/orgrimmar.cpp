@@ -70,7 +70,7 @@ enum eShenthul
 #define SPELL_SHOCK             16034
 
 #define GOSSIP_HTW "请和我分享你的智慧，酋长。"
-#define GOSSIP_STW1 发现什么?"
+#define GOSSIP_STW1 "发现什么?"
 #define GOSSIP_STW2 "篡位者？"
 #define GOSSIP_STW3 "恕我直言，酋长 - 为什么不让他们被摧毁？ 这不会巩固我们的地位吗？"
 #define GOSSIP_STW4 "我...我没想到那样，酋长。"
