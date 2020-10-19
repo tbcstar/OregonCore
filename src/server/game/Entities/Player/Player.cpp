@@ -3919,7 +3919,6 @@ bool Player::ResetTalents(bool no_cost)
     }
 
     return true;
-}
 
 bool Player::HasTalent(uint32 spell, uint8 spec) const
 {
@@ -15464,7 +15463,7 @@ bool Player::LoadFromDB(uint32 guid, SqlQueryHolder* holder)
 	m_specsCount = fields[57].GetUInt32();
 	m_activeSpec = fields[58].GetUInt32();
 	
-	QueryResult_AutoPtr actionResult = CharacterDatabase.PQuery("SELECT button, action, type, misc FROM character_action WHERE guid = '%u' AND spec = '%u' ORDER BY button", GetGUIDLow(), m_activeSpec);
+	QueryResult* actionResult = CharacterDatabase.PQuery("SELECT button, action, type, misc FROM character_action WHERE guid = '%u' AND spec = '%u' ORDER BY button", GetGUIDLow(), m_activeSpec);
 	_LoadActions(actionResult);
 
     // unread mails and next delivery time, actual mails not loaded
@@ -15559,7 +15558,7 @@ bool Player::LoadFromDB(uint32 guid, SqlQueryHolder* holder)
     return true;
 }
 
-void Player::_LoadTalents(QueryResult_AutoPtr result)
+void Player::_LoadTalents(QueryResult* result)
 {
     //QueryResult *result = CharacterDatabase.PQuery("SELECT spell,spec FROM character_talents WHERE guid = '%u'",GetGUIDLow());
 
@@ -17151,7 +17150,7 @@ void Player::ActivateSpec(uint8 spec)
 
 std::string Player::GetSpecName(uint8 spec)
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT name FROM character_talent_name WHERE guid='%u' AND spec='%u'", GetGUIDLow(), spec);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT name FROM character_talent_name WHERE guid='%u' AND spec='%u'", GetGUIDLow(), spec);
     if (!result)
         return "NULL";
 
@@ -21512,7 +21511,7 @@ void Player::RemoveRestFlag(RestFlag restFlag)
     {
         _restTime = 0;
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
-+   }
+   }
 }
 
 void Player::addTalent(uint32 spellId, uint8 spec, bool learning)
