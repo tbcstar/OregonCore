@@ -27,6 +27,11 @@ void AddModuleScripts();
 
 //custom
 void AddSC_StockExchange();
+void AddSC_TowerDefenseMisc();
+void AddSC_TowerDefenseInstanceScript();
+void AddSC_player_mount();
+void AddSC_PlayerHousing();
+void AddSC_npc_player_house();
 
 //world
 void AddSC_areatrigger_scripts();
@@ -435,6 +440,11 @@ void AddScripts()
     //    AddSC_custom_example();
     //    AddSC_custom_gossip_codebox();
     //    AddSC_test();
+	AddSC_TowerDefenseMisc();
+	AddSC_TowerDefenseInstanceScript();
+	AddSC_player_mount();
+	AddSC_PlayerHousing();
+	AddSC_npc_player_house();
     AddModuleScripts();
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();
