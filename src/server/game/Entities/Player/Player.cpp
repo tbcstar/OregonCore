@@ -3906,7 +3906,6 @@ bool Player::ResetTalents(bool no_cost)
     }
 	_SaveTalents();
 	_SaveSpells();
-    }
 
     SetFreeTalentPoints(talentPointsForLevel);
 
@@ -3919,6 +3918,7 @@ bool Player::ResetTalents(bool no_cost)
     }
 
     return true;
+}
 
 bool Player::HasTalent(uint32 spell, uint8 spec) const
 {
