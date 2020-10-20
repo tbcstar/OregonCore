@@ -314,7 +314,7 @@ struct MonsterInfo
                   8                 9                10               11                12                 13                    14
             `creaturePower`, `creatureHealth`, `creatureSpeed`, `creatureRunning`, `creatureType`, `creatureAttackSpeed`, `creatureGround`)
         */
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_stats WHERE creatureEntry = '%u'", Entry))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_stats WHERE creatureEntry = '%u'", Entry))
         {
             Field* Fields = queryResult->Fetch();
             SetDamage(Fields[4].GetUInt32());        // Set the creature damage
@@ -332,7 +332,7 @@ struct MonsterInfo
 
     uint32 GetPathById()
     {
-        if (QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT pathId FROM custom_td_waves_data WHERE waveId = '%u' AND creatureEntry = '%u'", WaveId, Entry))
+        if (QueryResult* queryResult = CharacterDatabase.PQuery("SELECT pathId FROM custom_td_waves_data WHERE waveId = '%u' AND creatureEntry = '%u'", WaveId, Entry))
         {
             Field* Fields = queryResult->Fetch();
             return Fields[0].GetUInt32();
@@ -343,7 +343,7 @@ struct MonsterInfo
 
     Position GetWaypointData(uint32 pointId)
     {
-        if (QueryResult_AutoPtr queryResult = WorldDatabase.PQuery("SELECT position_x, position_y, position_z FROM waypoint_data WHERE id = '%u' AND point = '%u'", GetPathId(), pointId))
+        if (QueryResult* queryResult = WorldDatabase.PQuery("SELECT position_x, position_y, position_z FROM waypoint_data WHERE id = '%u' AND point = '%u'", GetPathId(), pointId))
         {
             Field* Fields = queryResult->Fetch();
             spawnPos.m_positionX = Fields[0].GetFloat();
@@ -358,7 +358,7 @@ struct MonsterInfo
 
     uint32 GetSpellIdByCastType(TDEventSpellCastType type)
     {
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_spells WHERE creatureEntry = '%u'", Entry))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_spells WHERE creatureEntry = '%u'", Entry))
         {
             Field* Fields = queryResult->Fetch();
             switch(type)
@@ -471,7 +471,7 @@ struct GuardInfo
 
     void LoadBaseStats(Creature* me)
     {
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_stats WHERE creatureEntry = '%u'", Entry))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_stats WHERE creatureEntry = '%u'", Entry))
         {
             Field* Fields = queryResult->Fetch();
             SetDamage(Fields[4].GetUInt32());
@@ -488,7 +488,7 @@ struct GuardInfo
 
     uint32 GetSpellIdByCastType(TDEventSpellCastType type)
     {
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_spells WHERE creatureEntry = '%u'", Entry))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_spells WHERE creatureEntry = '%u'", Entry))
         {
             Field* Fields = queryResult->Fetch();
             switch(type)
@@ -560,7 +560,7 @@ struct GuardInfo
         uint32 creatureLevel = 1;
         if(GetLevel() > 0) 
             creatureLevel = GetLevel()+1;
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT upgradeCost FROM custom_td_base_levels WHERE creatureEntry = '%u' AND creatureLevel = '%u'", Entry, creatureLevel))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT upgradeCost FROM custom_td_base_levels WHERE creatureEntry = '%u' AND creatureLevel = '%u'", Entry, creatureLevel))
         {
             uint32 newUpgradeCost = queryResult->Fetch()[0].GetUInt32();
             if(newUpgradeCost)

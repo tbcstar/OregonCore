@@ -340,7 +340,7 @@ public:
         {
             if(!guard)
                 return false;
-            if (QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT spellAOECastTarget FROM custom_td_base_spells WHERE creatureEntry = '%u'", guard->GetEntry()))
+            if (QueryResult* queryResult = CharacterDatabase.PQuery("SELECT spellAOECastTarget FROM custom_td_base_spells WHERE creatureEntry = '%u'", guard->GetEntry()))
                 return true;
             return false;
         }
@@ -865,7 +865,7 @@ public:
     {
         if(!player)
             return 0;
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT currentResources FROM custom_td_players WHERE playerGUID = '%u'", player->GetGUIDLow()))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT currentResources FROM custom_td_players WHERE playerGUID = '%u'", player->GetGUIDLow()))
         {
             Field* Fields = queryResult->Fetch();
             return Fields[0].GetUInt32();
@@ -880,7 +880,7 @@ public:
         if(!type)
             return;
         uint32 newRes = 0;
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT currentResources FROM custom_td_players WHERE playerGUID = '%u'", player->GetGUIDLow()))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT currentResources FROM custom_td_players WHERE playerGUID = '%u'", player->GetGUIDLow()))
         {
             Field* Fields = queryResult->Fetch();
             uint32 oldRes = Fields[0].GetUInt32();
