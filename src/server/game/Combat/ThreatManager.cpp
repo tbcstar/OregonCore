@@ -75,7 +75,7 @@ bool ThreatCalcHelper::isValidProcess(Unit* hatedUnit, Unit* hatingUnit, SpellEn
         return false;
 
     // not in same map or phase
-    if (!hatedUnit->IsInMap(hatingUnit))
+    if (!hatedUnit->IsInMap(hatingUnit) || !hatedUnit->InSamePhase(hatingUnit))
         return false;
 
     // spell not causing threat

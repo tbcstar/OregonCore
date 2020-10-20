@@ -119,7 +119,7 @@ public:
         std::string filter = cFilter ? cFilter : "";
         LoginDatabase.escape_string(filter);
 
-        QueryResult_AutoPtr result;
+        QueryResult* result;
 
         if (filter.empty())
         {
@@ -152,7 +152,7 @@ public:
 
         std::string filter = cFilter;
         LoginDatabase.escape_string(filter);
-        QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), filter.c_str());
+        QueryResult* result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), filter.c_str());
         if (!result)
         {
             handler->PSendSysMessage(LANG_BANLIST_NOCHARACTER);
@@ -170,7 +170,7 @@ public:
         std::string filter = cFilter ? cFilter : "";
         LoginDatabase.escape_string(filter);
 
-        QueryResult_AutoPtr result;
+        QueryResult* result;
 
         if (filter.empty())
         {
@@ -235,7 +235,7 @@ public:
         return true;
     }
 
-    static bool HandleBanListHelper(ChatHandler* handler, QueryResult_AutoPtr result)
+    static bool HandleBanListHelper(ChatHandler* handler, QueryResult* result)
     {
         handler->PSendSysMessage(LANG_BANLIST_MATCHINGACCOUNT);
 
@@ -247,7 +247,7 @@ public:
                 Field* fields = result->Fetch();
                 uint32 accountid = fields[0].GetUInt32();
 
-                QueryResult_AutoPtr banresult = LoginDatabase.PQuery("SELECT account.username FROM account,account_banned WHERE account_banned.id='%u' AND account_banned.id=account.id", accountid);
+                QueryResult* banresult = LoginDatabase.PQuery("SELECT account.username FROM account,account_banned WHERE account_banned.id='%u' AND account_banned.id=account.id", accountid);
                 if (banresult)
                 {
                     Field* fields2 = banresult->Fetch();
@@ -277,7 +277,7 @@ public:
                     sAccountMgr->GetName(account_id, account_name);
 
                 // No SQL injection. id is uint32.
-                QueryResult_AutoPtr banInfo = LoginDatabase.PQuery("SELECT bandate,unbandate,bannedby,banreason FROM account_banned WHERE id = %u ORDER BY unbandate", account_id);
+                QueryResult* banInfo = LoginDatabase.PQuery("SELECT bandate,unbandate,bannedby,banreason FROM account_banned WHERE id = %u ORDER BY unbandate", account_id);
                 if (banInfo)
                 {
                     Field* fields2 = banInfo->Fetch();
@@ -386,7 +386,7 @@ public:
         std::string IP = cIP;
 
         LoginDatabase.escape_string(IP);
-        QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT ip, FROM_UNIXTIME(bandate), FROM_UNIXTIME(unbandate), unbandate-UNIX_TIMESTAMP(), banreason,bannedby,unbandate-bandate FROM ip_banned WHERE ip = '%s'", IP.c_str());
+        QueryResult* result = LoginDatabase.PQuery("SELECT ip, FROM_UNIXTIME(bandate), FROM_UNIXTIME(unbandate), unbandate-UNIX_TIMESTAMP(), banreason,bannedby,unbandate-bandate FROM ip_banned WHERE ip = '%s'", IP.c_str());
         if (!result)
         {
             handler->PSendSysMessage(LANG_BANINFO_NOIP);
@@ -404,7 +404,7 @@ public:
 
     static bool HandleBanInfoHelper(ChatHandler* handler, uint32 accountid, char const* accountname)
     {
-        QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT FROM_UNIXTIME(bandate), unbandate-bandate, active, unbandate,banreason,bannedby FROM account_banned WHERE id = '%u' ORDER BY bandate ASC", accountid);
+        QueryResult* result = LoginDatabase.PQuery("SELECT FROM_UNIXTIME(bandate), unbandate-bandate, active, unbandate,banreason,bannedby FROM account_banned WHERE id = '%u' ORDER BY bandate ASC", accountid);
         if (!result)
         {
             handler->PSendSysMessage(LANG_BANINFO_NOACCOUNTBAN, accountname);

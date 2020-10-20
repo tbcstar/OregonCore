@@ -27,11 +27,11 @@
 #include "SystemConfig.h"
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
+#include "CliRunnable.h"
 #include "DBCStores.h"
 #include "RARunnable.h"
 #include "Utilities/Util.h"
 #include "TCSoap/TCSoap.h"
-#include "Console.h"
 #include "ObjectAccessor.h"
 #include "MapManager.h"
 #include "BattlegroundMgr.h"
@@ -50,6 +50,7 @@ extern int m_ServiceStatus;
 INSTANTIATE_SINGLETON_1(Master);
 
 volatile uint32 Master::m_masterLoopCounter = 0;
+volatile bool Master::m_handleSigvSignals = false;
 
 class FreezeDetectorRunnable : public ACE_Based::Runnable
 {
@@ -90,6 +91,9 @@ class FreezeDetectorRunnable : public ACE_Based::Runnable
                 else if (getMSTimeDiff(w_lastchange, curtime) > _delaytime)
                 {
                     sLog.outError("World Thread is stuck.  Terminating server!");
+	                signal(SIGSEGV, 0);
+	                Master::m_handleSigvSignals = false;        // disable anticrash
+	                *((uint32 volatile*)nullptr) = 0;              // bang crash
                     abort();
                 }
             }
@@ -109,11 +113,6 @@ Master::~Master()
 int Master::Run(bool runTests)
 {
     int defaultStderr = dup(2);
-
-    if (sConfig.GetBoolDefault("Console.Enable", true))
-        sConsole.Initialize();
-    sConsole.SetLoading(true);
-    sConsole.DrawLogo();
 
     // worldd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
@@ -138,25 +137,29 @@ int Master::Run(bool runTests)
     // set realmbuilds depend on OregonCore expected builds, and set server online
     std::string builds = AcceptableClientBuildsListStr();
     LoginDatabase.escape_string(builds);
-    LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%d'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
+    LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%d'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
 
-    sConsole.SetLoading(false);
+    //server loaded successfully => enable async DB requests
+    //this is done to forbid any async transactions during server startup!
+    CharacterDatabase.AllowAsyncTransactions();
+    WorldDatabase.AllowAsyncTransactions();
+    LoginDatabase.AllowAsyncTransactions();
+
 
     // Catch termination signals
     _HookSignals();
 
     ACE_Based::Thread* cliThread = NULL;
 
-    #ifdef _WIN32
+#ifdef WIN32
     if (sConfig.GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
-    #else
+#else
     if (sConfig.GetBoolDefault("Console.Enable", true))
-    #endif
+#endif
     {
-        // Launch CliRunnable thread
-        cliThread = new ACE_Based::Thread(new Console::CliRunnable);
+        ///- Launch CliRunnable thread
+        cliThread = new ACE_Based::Thread(new CliRunnable);
     }
-
 	sScriptMgr.OnStartup();
 
     ACE_Based::Thread rar_thread(new RARunnable);
@@ -292,7 +295,7 @@ int Master::Run(bool runTests)
     }
 
     // Set server offline in realmlist
-    LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realmID);
+    LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realmID);
 
     // when the main thread closes the singletons get unloaded
     // since MainLoop uses them, it will crash if unloaded after master
@@ -331,55 +334,93 @@ int Master::Run(bool runTests)
     return World::GetExitCode();
 }
 
-// Initialize connection to the databases
+
+bool StartDB(std::string name, DatabaseType& database)
+{
+    ///- Get database info from configuration file
+    std::string dbstring = sConfig.GetStringDefault((name + "Database.Info").c_str(), "");
+    int nConnections = sConfig.GetIntDefault((name + "Database.Connections").c_str(), 1);
+    int nAsyncConnections = sConfig.GetIntDefault((name + "Database.WorkerThreads").c_str(), 1);
+    if (dbstring.empty())
+    {
+        sLog.outError("%s database not specified in configuration file", name.c_str());
+        return false;
+    }
+
+    // Remove password from DB string for log output
+    // format: 127.0.0.1;3306;mangos;mangos;characters
+    // In a properly formatted string, token 4 is the password
+    std::string dbStringLog = dbstring;
+
+    if (std::count(dbStringLog.begin(), dbStringLog.end(), ';') == 4)
+    {
+        // Have correct number of tokens, can replace
+        std::string::iterator start = dbStringLog.end(), end = dbStringLog.end();
+
+        int occurrence = 0;
+        for (std::string::iterator itr = dbStringLog.begin(); itr != dbStringLog.end(); ++itr)
+        {
+            if (*itr == ';')
+                ++occurrence;
+
+            if (occurrence == 3 && start == dbStringLog.end())
+                start = ++itr;
+            else if (occurrence == 4 && end == dbStringLog.end())
+                end = itr;
+
+            if (start != dbStringLog.end() && end != dbStringLog.end())
+                break;
+        }
+
+        dbStringLog.replace(start, end, "*");
+    }
+    else
+    {
+        sLog.outError("Incorrectly formatted database connection string for database %s", name.c_str());
+        return false;
+    }
+
+    sLog.outString("%s Database: %s, sync threads: %i, workers: %i", name.c_str(), dbStringLog.c_str(), nConnections, nAsyncConnections);
+
+    ///- Initialise the world database
+    if (!database.Initialize(dbstring.c_str(), nConnections, nAsyncConnections))
+    {
+        sLog.outError("Cannot connect to world database %s", name.c_str());
+        return false;
+    }
+
+    return true;
+}
+/// Initialize connection to the databases
 void Master::_StartDB()
 {
-    sConsole.SetLoadingLabel("Connecting to databases...");
-
-    // Get world database info from configuration file
-    std::string dbstring = sConfig.GetStringDefault("WorldDatabaseInfo", "");
-    if (dbstring.empty())
-        sLog.outFatal("World database not specified in configuration file");
-
-    // Initialise the world database
-    if (!WorldDatabase.Initialize(dbstring.c_str()))
-        sLog.outFatal("Cannot connect to world database %s", dbstring.c_str());
-
-    // Get character database info from configuration file
-    dbstring = sConfig.GetStringDefault("CharacterDatabaseInfo", "");
-    if (dbstring.empty())
-        sLog.outFatal("Character database not specified in configuration file");
-
-    // Initialise the Character database
-    if (!CharacterDatabase.Initialize(dbstring.c_str()))
-        sLog.outFatal("Cannot connect to Character database %s", dbstring.c_str());
-
-    // Get login database info from configuration file
-    dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
-    if (dbstring.empty())
-        sLog.outFatal("Login database not specified in configuration file");
-
-    // Initialise the login database
-    if (!LoginDatabase.Initialize(dbstring.c_str()))
-        sLog.outFatal("Cannot connect to login database %s", dbstring.c_str());
-
-    // Get the realm Id from the configuration file
+    ///- Get the realm Id from the configuration file
     realmID = sConfig.GetIntDefault("RealmID", 0);
     if (!realmID)
-        sLog.outFatal("Realm ID not defined in configuration file");
+    {
+        sLog.outError("Realm ID not defined in configuration file");
+        return;
+    }
+
+    if (!StartDB("World", WorldDatabase) ||
+        !StartDB("Character", CharacterDatabase) ||
+        !StartDB("Login", LoginDatabase))
+    {
+        WorldDatabase.HaltDelayThread();
+        CharacterDatabase.HaltDelayThread();
+        LoginDatabase.HaltDelayThread();
+        return;
+    }
 
     sLog.outString("Realm running as realm ID %d", realmID);
 
-    // Clean the database before starting
+    ///- Clean the database before starting
     clearOnlineAccounts();
 
-    // Insert version info into DB
-    WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s'", _FULLVERSION, _REVISION);
-
-    sWorld.LoadDBVersion();
-
-    sLog.outString("Using World DB: %s", sWorld.GetDBVersion());
+    sLog.outString();
+    return;
 }
+
 
 // Clear 'online' status for all accounts with characters in this realm
 void Master::clearOnlineAccounts()
@@ -390,6 +431,12 @@ void Master::clearOnlineAccounts()
 }
 
 // Handle termination signals
+void Master::SigvSignalHandler()
+{
+    if (m_handleSigvSignals)
+        _OnSignal(SIGSEGV);
+    exit(1);
+}
 void Master::_OnSignal(int s)
 {
     switch (s)
@@ -413,19 +460,30 @@ void Master::_HookSignals()
 {
     signal(SIGINT, _OnSignal);
     signal(SIGTERM, _OnSignal);
+    signal(SIGSEGV, _OnSignal);
     #ifdef _WIN32
     signal(SIGBREAK, _OnSignal);
     #endif
+    ArmAnticrash();
 }
 
-// Unhook the signals before leaving
+void Master::ArmAnticrash()
+{
+    //signal(SIGSEGV, _OnSignal);
+    m_handleSigvSignals = true;
+}
+
+/// Unhook the signals before leaving
 void Master::_UnhookSignals()
 {
     signal(SIGINT, 0);
     signal(SIGTERM, 0);
+    signal(SIGSEGV, 0);
     #ifdef _WIN32
     signal(SIGBREAK, 0);
     #endif
+	m_handleSigvSignals = false;
+	
 }
 
 bool Master::RunRegressionTests()

@@ -414,7 +414,7 @@ void ReputationMgr::SetInactive(FactionState* faction, bool inactive)
     faction->needSave = true;
 }
 
-void ReputationMgr::LoadFromDB(QueryResult_AutoPtr result)
+void ReputationMgr::LoadFromDB(QueryResult* result)
 {
     // Set initial reputations (so everything is nifty before DB data load)
     Initialize();

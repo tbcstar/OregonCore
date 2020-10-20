@@ -63,6 +63,7 @@ public:
             { "demorph",        SEC_MODERATOR,      false, &HandleMODDeMorphCommand,                "" },
             { "morph",          SEC_MODERATOR,      false, &HandleMODMorphCommand,                  "" },
             { "gender",         SEC_ADMINISTRATOR,  false, &HandleMODGender,                        "" },
+            { "phase",          SEC_GAMEMASTER,     false, &HandleModifyPhaseCommand,         "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -70,6 +71,25 @@ public:
         };
         return commandTable;
     };
+
+
+    static bool HandleModifyPhaseCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        uint32 phasemask = (uint32)atoi((char*)args);
+
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+            target = handler->GetSession()->GetPlayer();
+
+
+        target->SetPhaseMask(phasemask, true, false);
+
+        return true;
+    }
+
 
     static bool HandleMODHPCommand(ChatHandler* handler, char const* args)
     {

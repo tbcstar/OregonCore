@@ -990,7 +990,7 @@ class Player : public Unit, public GridObject<Player>
 
         void Update(uint32 time) override;
 
-        static bool BuildEnumData(QueryResult_AutoPtr result, WorldPacket* data);
+        static bool BuildEnumData(QueryResult* result, WorldPacket* data);
 
         void SetInWater(bool apply);
 
@@ -1115,6 +1115,8 @@ class Player : public Unit, public GridObject<Player>
         Pet* GetPet() const;
         Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime);
         void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
+
+        uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
         void Say(const std::string& text, const uint32 language);
         void Yell(const std::string& text, const uint32 language);
@@ -1751,7 +1753,7 @@ class Player : public Unit, public GridObject<Player>
         void SendClearCooldown(uint32 spell_id, Unit* target);
         void RemoveArenaSpellCooldowns();
         void RemoveAllSpellCooldown();
-        void _LoadSpellCooldowns(QueryResult_AutoPtr result);
+        void _LoadSpellCooldowns(QueryResult* result);
         void _SaveSpellCooldowns();
 
         // global cooldown
@@ -2370,6 +2372,10 @@ class Player : public Unit, public GridObject<Player>
         bool CanUseBattlegroundObject(GameObject* gameobject);
         bool CanCaptureTowerPoint();
 
+        uint8 GetORace() { return m_oRace; }
+        void SetORace(uint8 OriginalRace) { m_oRace = OriginalRace; }
+        uint8 m_oRace;
+
         /*********************************************************/
         /***              OUTDOOR PVP SYSTEM                  ***/
         /*********************************************************/
@@ -2764,24 +2770,24 @@ class Player : public Unit, public GridObject<Player>
         /***                  LOAD SYSTEM                     ***/
         /*********************************************************/
 
-        void _LoadActions(QueryResult_AutoPtr result);
-        void _LoadAuras(QueryResult_AutoPtr result, uint32 timediff);
-        void _LoadBoundInstances(QueryResult_AutoPtr result);
-        void _LoadInventory(QueryResult_AutoPtr result, uint32 timediff);
-        void _LoadMailInit(QueryResult_AutoPtr resultUnread, QueryResult_AutoPtr resultDelivery);
+        void _LoadActions(QueryResult* result);
+        void _LoadAuras(QueryResult* result, uint32 timediff);
+        void _LoadBoundInstances(QueryResult* result);
+        void _LoadInventory(QueryResult* result, uint32 timediff);
+        void _LoadMailInit(QueryResult* resultUnread, QueryResult* resultDelivery);
         void _LoadMail();
         void _LoadMailedItems(Mail* mail);
-        void _LoadQuestStatus(QueryResult_AutoPtr result);
-        void _LoadDailyQuestStatus(QueryResult_AutoPtr result);
-        void _LoadGroup(QueryResult_AutoPtr result);
-        void _LoadSkills(QueryResult_AutoPtr result);
-        void _LoadSpells(QueryResult_AutoPtr result);
-        void _LoadTutorials(QueryResult_AutoPtr result);
-        void _LoadFriendList(QueryResult_AutoPtr result);
-        bool _LoadHomeBind(QueryResult_AutoPtr result);
-        void _LoadDeclinedNames(QueryResult_AutoPtr result);
-        void _LoadArenaTeamInfo(QueryResult_AutoPtr result);
-        void _LoadBGData(QueryResult_AutoPtr result);
+        void _LoadQuestStatus(QueryResult* result);
+        void _LoadDailyQuestStatus(QueryResult* result);
+        void _LoadGroup(QueryResult* result);
+        void _LoadSkills(QueryResult* result);
+        void _LoadSpells(QueryResult* result);
+        void _LoadTutorials(QueryResult* result);
+        void _LoadFriendList(QueryResult* result);
+        bool _LoadHomeBind(QueryResult* result);
+        void _LoadDeclinedNames(QueryResult* result);
+        void _LoadArenaTeamInfo(QueryResult* result);
+        void _LoadBGData(QueryResult* result);
 
         /*********************************************************/
         /***                  SAVE SYSTEM                     ***/
@@ -2819,7 +2825,6 @@ class Player : public Unit, public GridObject<Player>
         void outDebugValues() const;
         bool _removeSpell(uint16 spell_id);
         uint64 m_lootGuid;
-
         uint32 m_team;
         uint32 m_nextSave;
         time_t m_speakTime;

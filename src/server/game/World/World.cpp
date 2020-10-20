@@ -20,7 +20,6 @@
 #include "Configuration/Config.h"
 #include "SystemConfig.h"
 #include "Log.h"
-#include "Console.h"
 #include "Opcodes.h"
 #include "WorldSession.h"
 #include "WorldPacket.h"
@@ -100,7 +99,6 @@ World::World()
     m_startTime = m_gameTime;
     m_maxActiveSessionCount = 0;
     m_maxQueuedSessionCount = 0;
-    m_resultQueue = NULL;
     m_NextDailyQuestReset = 0;
     m_scheduledScripts = 0;
 
@@ -134,8 +132,6 @@ World::~World()
 
     VMAP::VMapFactory::clear();
     MMAP::MMapFactory::clear();
-
-    delete m_resultQueue;
 
     //TODO free addSessQueue
 }
@@ -407,7 +403,7 @@ Weather* World::AddWeather(uint32 zone_id)
 void World::LoadModuleConfig()
 {
 
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT `id`, `config`, `value` FROM module_config");
+    QueryResult* result = WorldDatabase.Query("SELECT `id`, `config`, `value` FROM module_config");
     uint64 count = 0;
 
     if (result)
@@ -981,6 +977,8 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_CHARDELETE_MIN_LEVEL] = sConfig.GetIntDefault("CharDelete.MinLevel", 0);
     m_configs[CONFIG_CHARDELETE_KEEP_DAYS] = sConfig.GetIntDefault("CharDelete.KeepDays", 30);
 
+    m_configs[CONFIG_UINT32_ASYNC_QUERIES_TICK_TIMEOUT] = sConfig.GetIntDefault("AsyncQueriesTickTimeout", 0);
+
     m_visibility_notify_periodOnContinents = sConfig.GetIntDefault("Visibility.Notify.Period.OnContinents", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
     m_visibility_notify_periodInInstances = sConfig.GetIntDefault("Visibility.Notify.Period.InInstances", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
     m_visibility_notify_periodInBGArenas = sConfig.GetIntDefault("Visibility.Notify.Period.InBGArenas", DEFAULT_VISIBILITY_NOTIFY_PERIOD);
@@ -1074,7 +1072,6 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_UI_QUESTLEVELS_IN_DIALOGS] = sConfig.GetBoolDefault("UI.ShowQuestLevelsInDialogs", false);
     m_configs[CONFIG_HEALTH_IN_PERCENTS] = sConfig.GetBoolDefault("HealthInPercents", true);
     m_configs[CONFIG_CREATEUPDATE_FILE] = sConfig.GetBoolDefault("CreateUpdateFile.Enabled", false);
-    m_configs[CONFIG_CONSOLE_RESTART_TIMER] = sConfig.GetIntDefault("Console.RestartTimer", 10);
 
     // Battleground
     m_configs[CONFIG_BATTLEGROUND_CAST_DESERTER] = sConfig.GetBoolDefault("Battleground.CastDeserter", true);
@@ -1163,7 +1160,7 @@ void World::LoadSQLUpdates()
         path += updates[i].path;
 
         // Get updates that were alraedy applied before
-        if (QueryResult_AutoPtr result = updates[i].db->Query("SELECT `update` FROM `updates`"))
+        if (QueryResult* result = updates[i].db->Query("SELECT `update` FROM `updates`"))
         {
             do
                 alreadyAppliedFiles.insert(result->Fetch()[0].GetString());
@@ -1201,7 +1198,7 @@ void World::LoadSQLUpdates()
         {
             label.str("");
             label << "Applying " << files[j].c_str() << " (" << (j + 1) << '/' << files.size() << ')';
-            sConsole.SetLoadingLabel(label.str().c_str());
+            sLog.outString(label.str().c_str());
 
             if (updates[i].db->ExecuteFile(files[j].c_str()))
             {
@@ -1312,7 +1309,7 @@ void World::LoadModSQLUpdates()
 
 
                     // Get updates that were alraedy applied before
-                    if (QueryResult_AutoPtr result = updates[i].db->Query("SELECT `update` FROM `updates`"))
+                    if (QueryResult* result = updates[i].db->Query("SELECT `update` FROM `updates`"))
                     {
                         do
                             alreadyAppliedFiles.insert(result->Fetch()[0].GetString());
@@ -1354,7 +1351,7 @@ void World::LoadModSQLUpdates()
                     {
                         label.str("");
                         label << "Applying " << files[j].c_str() << " (" << (j + 1) << '/' << files.size() << ')';
-                        sConsole.SetLoadingLabel(label.str().c_str());
+                        sLog.outString(label.str().c_str());
 
                         if (updates[i].db->ExecuteFile(files[j].c_str()))
                         {
@@ -1424,7 +1421,8 @@ void World::SetInitialWorldSettings()
         sLog.outError("Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map/*.vmtree/*.vmtile files in appropriate directories or correct the DataDir value in the oregoncore.conf file.", m_dataPath.c_str(), m_dataPath.c_str());
 
     // Loading strings. Getting no records means core load has to be canceled because no error message can be output.
-    sConsole.SetLoadingLabel("加载 Oregon strings...");
+
+    sLog.outString("加载 Oregon strings...");
     if (!sObjectMgr.LoadOregonStrings())
         exit(1);                                            // Error message displayed in function already
 
@@ -1441,13 +1439,13 @@ void World::SetInitialWorldSettings()
 
     if (getConfig(CONFIG_SQLUPDATER_ENABLED))
     {
-        sConsole.SetLoadingLabel("应用SQL更新...");
+        sLog.outString("应用SQL更新...");
         LoadSQLUpdates();
         LoadModSQLUpdates();
     }
 
     // Load the DBC files
-    sConsole.SetLoadingLabel("初始化 data stores...");
+    sLog.outString("初始化数据存储...");
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
 
@@ -1464,23 +1462,23 @@ void World::SetInitialWorldSettings()
 
     LoadM2Cameras(m_dataPath);
 
-    sConsole.SetLoadingLabel("加载 Script Names...");
+    sLog.outString("加载脚本名字...");
     sObjectMgr.LoadScriptNames();
 
-    sConsole.SetLoadingLabel("加载 Instance Template...");
+    sLog.outString("加载副本模板...");
     sObjectMgr.LoadInstanceTemplate();
 
-    sConsole.SetLoadingLabel("加载 SkillLineAbilityMultiMap Data...");
+    sLog.outString("加载SkillLineAbilityMultiMap数据...");
     sSpellMgr.LoadSkillLineAbilityMap();
 
     // Clean up and pack instances
-    sConsole.SetLoadingLabel("清理副本...");
+    sLog.outString("清理副本...");
     sInstanceSaveMgr.CleanupInstances();                // must be called before `creature_respawn`/`gameobject_respawn` tables
 
-    sConsole.SetLoadingLabel("Packing instances...");
+    sLog.outString("Packing instances...");
     sInstanceSaveMgr.PackInstances();
 
-    sConsole.SetLoadingLabel("加载本地化 strings...");
+    sLog.outString("Loading Localization strings...");
     sObjectMgr.LoadCreatureLocales();
     sObjectMgr.LoadGameObjectLocales();
     sObjectMgr.LoadItemLocales();
@@ -1489,7 +1487,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadPageTextLocales();
     sObjectMgr.LoadGossipMenuItemsLocales();
     sObjectMgr.SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
-    sConsole.SetLoadingLabel(">>> 本地化 strings 加载");
+    sLog.outString(">>> Localization strings loaded");
 	
 #ifdef ELUNA
     ///- Initialize Lua Engine
@@ -1497,270 +1495,270 @@ void World::SetInitialWorldSettings()
     Eluna::Initialize();
 #endif
 
-    sConsole.SetLoadingLabel("加载 Page Texts...");
+    sLog.outString("Loading Page Texts...");
     sObjectMgr.LoadPageTexts();
 
-    sConsole.SetLoadingLabel("加载 Game Object Templates...");     // must be after LoadPageTexts
+    sLog.outString("Loading Game Object Templates...");     // must be after LoadPageTexts
     sObjectMgr.LoadGameobjectInfo();
 
-    sConsole.SetLoadingLabel("加载 Spell Chain Data...");
+    sLog.outString("Loading Spell Chain Data...");
     sSpellMgr.LoadSpellChains();
 
-    sConsole.SetLoadingLabel("加载 Spell Required Data...");
+    sLog.outString("Loading Spell Required Data...");
     sSpellMgr.LoadSpellRequired();
 
-    sConsole.SetLoadingLabel("加载 Spell Group types...");
+    sLog.outString("Loading Spell Group types...");
     sSpellMgr.LoadSpellGroups();
 
-    sConsole.SetLoadingLabel("加载 Spell Learn Skills...");
+    sLog.outString("Loading Spell Learn Skills...");
     sSpellMgr.LoadSpellLearnSkills();                        // must be after LoadSpellChains
 
-    sConsole.SetLoadingLabel("加载 Spell Learn Spells...");
+    sLog.outString("Loading Spell Learn Spells...");
     sSpellMgr.LoadSpellLearnSpells();
 
-    sConsole.SetLoadingLabel("加载 Spell Proc Event conditions...");
+    sLog.outString("Loading Spell Proc Event conditions...");
     sSpellMgr.LoadSpellProcEvents();
 
-    sConsole.SetLoadingLabel("加载 Spell Dummy Conditions...");
+    sLog.outString("Loading Spell Dummy Conditions...");
     sSpellMgr.LoadSpellDummyCondition();
 
-    sConsole.SetLoadingLabel("加载 Aggro Spells Definitions...");
+    sLog.outString("Loading Aggro Spells Definitions...");
     sSpellMgr.LoadSpellThreats();
 
-    sConsole.SetLoadingLabel("加载 NPC Texts...");
+    sLog.outString("Loading NPC Texts...");
     sObjectMgr.LoadGossipText();
 
-    sConsole.SetLoadingLabel("加载 Spell Group Stack Rules...");
+    sLog.outString("Loading Spell Group Stack Rules...");
     sSpellMgr.LoadSpellGroupStackRules();
 
-    sConsole.SetLoadingLabel("加载 Enchant Spells Proc datas...");
+    sLog.outString("Loading Enchant Spells Proc datas...");
     sSpellMgr.LoadSpellEnchantProcData();
 
-    sConsole.SetLoadingLabel("加载 Item Random Enchantments Table...");
+    sLog.outString("Loading Item Random Enchantments Table...");
     LoadRandomEnchantmentsTable();
 
-    sConsole.SetLoadingLabel("加载 Items...");                     // must be after LoadRandomEnchantmentsTable and LoadPageTexts
+    sLog.outString("Loading Items...");                     // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr.LoadItemTemplates();
 
-    sConsole.SetLoadingLabel("加载 Item Texts...");
+    sLog.outString("Loading Item Texts...");
     sObjectMgr.LoadItemTexts();
 
-    sConsole.SetLoadingLabel("加载 Creature Model Based Info Data...");
+    sLog.outString("Loading Creature Model Based Info Data...");
     sObjectMgr.LoadCreatureModelInfo();
 
-    sConsole.SetLoadingLabel("加载 Equipment templates...");
+    sLog.outString("Loading Equipment templates...");
     sObjectMgr.LoadEquipmentTemplates();
 
-    sConsole.SetLoadingLabel("加载 Creature Base Stats...");
+    sLog.outString("Loading Creature Base Stats...");
     sObjectMgr.LoadCreatureClassLevelStats();
 
-    sConsole.SetLoadingLabel("加载 Creature templates...");
+    sLog.outString("Loading Creature templates...");
     sObjectMgr.LoadCreatureTemplates();
 
-    sConsole.SetLoadingLabel("加载 Creature Reputation OnKill Data...");
+    sLog.outString("Loading Creature Reputation OnKill Data...");
     sObjectMgr.LoadReputationOnKill();
 
-    sConsole.SetLoadingLabel("加载 Reputation Spillover Data...");
+    sLog.outString("Loading Reputation Spillover Data...");
     sObjectMgr.LoadReputationSpilloverTemplate();
 
-    sConsole.SetLoadingLabel("加载 Pet Create Spells...");
+    sLog.outString("Loading Pet Create Spells...");
     sObjectMgr.LoadPetCreateSpells();
 
-    sConsole.SetLoadingLabel("加载 Creature Data...");
+    sLog.outString("Loading Creature Data...");
     sObjectMgr.LoadCreatures();
 
-    sConsole.SetLoadingLabel("加载 Temporary Summon Data...");
+    sLog.outString("Loading Temporary Summon Data...");
     sObjectMgr.LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
 
-    sConsole.SetLoadingLabel("加载 Creature Linked Respawn...");
+    sLog.outString("Loading Creature Linked Respawn...");
     sObjectMgr.LoadCreatureLinkedRespawn();                     // must be after LoadCreatures()
 
-    sConsole.SetLoadingLabel("加载 Creature Addon Data...");
+    sLog.outString("Loading Creature Addon Data...");
     sObjectMgr.LoadCreatureAddons();                            // must be after LoadCreatureTemplates() and LoadCreatures()
 
-    sConsole.SetLoadingLabel("加载 Creature Respawn Data...");   // must be after PackInstances()
+    sLog.outString("Loading Creature Respawn Data...");   // must be after PackInstances()
     sObjectMgr.LoadCreatureRespawnTimes();
 
-    sConsole.SetLoadingLabel("加载 Gameobject Data...");
+    sLog.outString("Loading Gameobject Data...");
     sObjectMgr.LoadGameobjects();
 
-    sConsole.SetLoadingLabel("加载 Gameobject Respawn Data...");   // must be after PackInstances()
+    sLog.outString("Loading Gameobject Respawn Data...");   // must be after PackInstances()
     sObjectMgr.LoadGameobjectRespawnTimes();
 
-    sConsole.SetLoadingLabel("加载 Objects Pooling Data...");
+    sLog.outString("Loading Objects Pooling Data...");
     sPoolMgr.LoadFromDB();
 
-    sConsole.SetLoadingLabel("加载 Weather Data...");
+    sLog.outString("Loading Weather Data...");
     sObjectMgr.LoadWeatherZoneChances();
 
-    sConsole.SetLoadingLabel("加载 Disables");
+    sLog.outString("Loading Disables");
     sDisableMgr.LoadDisables();                             // must be before loading quests
 
-    sConsole.SetLoadingLabel("加载 Quests...");
+    sLog.outString("Loading Quests...");
     sObjectMgr.LoadQuests();                                    // must be loaded after DBCs, creature_template, item_template, gameobject tables
 
-    sConsole.SetLoadingLabel("检查 任务 禁用");
+    sLog.outString("Checking Quest Disables");
     sDisableMgr.CheckQuestDisables();                       // must be after loading quests
 
-    sConsole.SetLoadingLabel("加载 Quests Starters and Enders...");
+    sLog.outString("Loading Quests Starters and Enders...");
     sObjectMgr.LoadQuestStartersAndEnders();                    // must be after quest load
 
-    sConsole.SetLoadingLabel("加载 Quest Pooling Data...");
+    sLog.outString("Loading Quest Pooling Data...");
     sPoolMgr.LoadQuestPools();
 
-    sConsole.SetLoadingLabel("加载 Game Event Data...");           // must be after loading pools fully
+    sLog.outString("Loading Game Event Data...");           // must be after loading pools fully
     sGameEventMgr.LoadFromDB();
 
-    sConsole.SetLoadingLabel("加载 AreaTrigger definitions...");
+    sLog.outString("Loading AreaTrigger definitions...");
     sObjectMgr.LoadAreaTriggerTeleports();
 
-    sConsole.SetLoadingLabel("加载 Access Requirements...");
+    sLog.outString("Loading Access Requirements...");
     sObjectMgr.LoadAccessRequirements();                        // must be after item template load
 
-    sConsole.SetLoadingLabel("加载 Quest Area Triggers...");
+    sLog.outString("Loading Quest Area Triggers...");
     sObjectMgr.LoadQuestAreaTriggers();                         // must be after LoadQuests
 
-    sConsole.SetLoadingLabel("加载 Tavern Area Triggers...");
+    sLog.outString("Loading Tavern Area Triggers...");
     sObjectMgr.LoadTavernAreaTriggers();
 
-    sConsole.SetLoadingLabel("加载 AreaTrigger script names...");
+    sLog.outString("Loading AreaTrigger script names...");
     sObjectMgr.LoadAreaTriggerScripts();
 
-    sConsole.SetLoadingLabel("加载 Graveyard-zone links...");
+    sLog.outString("Loading Graveyard-zone links...");
     sObjectMgr.LoadGraveyardZones();
 
-    sConsole.SetLoadingLabel("加载 Spell target coordinates...");
+    sLog.outString("Loading Spell target coordinates...");
     sSpellMgr.LoadSpellTargetPositions();
 
-    sConsole.SetLoadingLabel("加载 SpellAffect definitions...");
+    sLog.outString("Loading SpellAffect definitions...");
     sSpellMgr.LoadSpellAffects();
 
-    sConsole.SetLoadingLabel("加载 spell pet auras...");
+    sLog.outString("Loading spell pet auras...");
     sSpellMgr.LoadSpellPetAuras();
 
-    sConsole.SetLoadingLabel("加载 spell extra attributes...");
+    sLog.outString("Loading spell extra attributes...");
     sSpellMgr.LoadSpellCustomAttr();
 
     sLog.outString("加载 GameObject models...");
     LoadGameObjectModelList();
 
-    sConsole.SetLoadingLabel("加载 linked spells...");
+    sLog.outString("Loading linked spells...");
     sSpellMgr.LoadSpellLinked();
 
-    sConsole.SetLoadingLabel("加载 custom spell cooldowns...");
+    sLog.outString("Loading custom spell cooldowns...");
     sSpellMgr.LoadSpellCustomCooldowns();
 
-    sConsole.SetLoadingLabel("加载 Player Create Data...");
+    sLog.outString("Loading Player Create Data...");
     sObjectMgr.LoadPlayerInfo();
 
-    sConsole.SetLoadingLabel("加载 Exploration BaseXP Data...");
+    sLog.outString("Loading Exploration BaseXP Data...");
     sObjectMgr.LoadExplorationBaseXP();
 
-    sConsole.SetLoadingLabel("加载 Pet Name Parts...");
+    sLog.outString("Loading Pet Name Parts...");
     sObjectMgr.LoadPetNames();
 
-    sConsole.SetLoadingLabel("加载 the max pet number...");
+    sLog.outString("Loading the max pet number...");
     sObjectMgr.LoadPetNumber();
 
-    sConsole.SetLoadingLabel("加载 pet level stats...");
+    sLog.outString("Loading pet level stats...");
     sObjectMgr.LoadPetLevelInfo();
 
-    sConsole.SetLoadingLabel("加载 Player Corpses...");
+    sLog.outString("Loading Player Corpses...");
     sObjectMgr.LoadCorpses();
 
-    sConsole.SetLoadingLabel("加载 Loot Tables...");
+    sLog.outString("Loading Loot Tables...");
     LoadLootTables();
 
-    sConsole.SetLoadingLabel("加载 Skill Discovery Table...");
+    sLog.outString("Loading Skill Discovery Table...");
     LoadSkillDiscoveryTable();
 
-    sConsole.SetLoadingLabel("加载 Skill Extra Item Table...");
+    sLog.outString("Loading Skill Extra Item Table...");
     LoadSkillExtraItemTable();
 
-    sConsole.SetLoadingLabel("加载 Skill Fishing base level requirements...");
+    sLog.outString("Loading Skill Fishing base level requirements...");
     sObjectMgr.LoadFishingBaseSkillLevel();
 
     // Load dynamic data tables from the database
-    sConsole.SetLoadingLabel("加载 Item Auctions...");
+    sLog.outString("Loading Item Auctions...");
     sAuctionMgr->LoadAuctionItems();
-    sConsole.SetLoadingLabel("加载 Auctions...");
+    sLog.outString("Loading Auctions...");
     sAuctionMgr->LoadAuctions();
 
-    sConsole.SetLoadingLabel("加载 Guilds...");
+    sLog.outString("Loading Guilds...");
     sObjectMgr.LoadGuilds();
 
-    sConsole.SetLoadingLabel("加载 ArenaTeams...");
+    sLog.outString("Loading ArenaTeams...");
     sObjectMgr.LoadArenaTeams();
 
-    sConsole.SetLoadingLabel("加载 Groups...");
+    sLog.outString("Loading Groups...");
     sObjectMgr.LoadGroups();
 
-    sConsole.SetLoadingLabel("加载 ReservedNames...");
+    sLog.outString("Loading ReservedNames...");
     sObjectMgr.LoadReservedPlayersNames();
 
-    sConsole.SetLoadingLabel("加载 GameObjects for quests...");
+    sLog.outString("Loading GameObjects for quests...");
     sObjectMgr.LoadGameObjectForQuests();
 
-    sConsole.SetLoadingLabel("加载 BattleMasters...");
+    sLog.outString("Loading BattleMasters...");
     sObjectMgr.LoadBattleMastersEntry();
 
-    sConsole.SetLoadingLabel("加载 GameTeleports...");
+    sLog.outString("Loading GameTeleports...");
     sObjectMgr.LoadGameTele();
 
-    sConsole.SetLoadingLabel("加载 Npc Text Id...");
+    sLog.outString("Loading Npc Text Id...");
     sObjectMgr.LoadNpcTextId();                                 // must be after load Creature and NpcText
 
-    sConsole.SetLoadingLabel("加载 Gossip scripts...");
+    sLog.outString("Loading Gossip scripts...");
     sObjectMgr.LoadGossipScripts();                             // must be before gossip menu options
 
-    sConsole.SetLoadingLabel("加载 Gossip menu...");
+    sLog.outString("Loading Gossip menu...");
     sObjectMgr.LoadGossipMenu();
 
-    sConsole.SetLoadingLabel("加载 Gossip menu options...");
+    sLog.outString("Loading Gossip menu options...");
     sObjectMgr.LoadGossipMenuItems();
 
-    sConsole.SetLoadingLabel("加载 Vendors...");
+    sLog.outString("Loading Vendors...");
     sObjectMgr.LoadVendors();                                   // must be after load CreatureTemplate and ItemTemplate
 
-    sConsole.SetLoadingLabel("加载 Trainers...");
+    sLog.outString("Loading Trainers...");
     sObjectMgr.LoadTrainerSpell();                              // must be after load CreatureTemplate
 
-    sConsole.SetLoadingLabel("加载 Waypoints...");
+    sLog.outString("Loading Waypoints...");
     sWaypointMgr->Load();
 
-    sConsole.SetLoadingLabel("加载 SmartAI Waypoints...");
+    sLog.outString("Loading SmartAI Waypoints...");
     sSmartWaypointMgr->LoadFromDB();
 
-    sConsole.SetLoadingLabel("加载 Creature Formations...");
+    sLog.outString("Loading Creature Formations...");
     sFormationMgr.LoadCreatureFormations();
 
-    sConsole.SetLoadingLabel("加载 Conditions...");
+    sLog.outString("Loading Conditions...");
     sConditionMgr.LoadConditions();
 
-    sConsole.SetLoadingLabel("加载 GM tickets...");
+    sLog.outString("Loading GM tickets...");
     ticketmgr.LoadGMTickets();
 
-    sConsole.SetLoadingLabel("加载 GM surveys...");
+    sLog.outString("Loading GM surveys...");
     ticketmgr.LoadGMSurveys();
 
     // Handle outdated emails (delete/return)
-    sConsole.SetLoadingLabel("Returning old mails...");
+    sLog.outString("Returning old mails...");
     sObjectMgr.ReturnOrDeleteOldMails(false);
 
-    sConsole.SetLoadingLabel("加载 Autobroadcasts...");
+    sLog.outString("Loading Autobroadcasts...");
     LoadAutobroadcasts();
 
-    sConsole.SetLoadingLabel("加载 Ip2nation...");
+    sLog.outString("Loading Ip2nation...");
     LoadIp2nation();
 
-    sConsole.SetLoadingLabel("加载 Refer-A-Friend...");
+    sLog.outString("Loading Refer-A-Friend...");
     sObjectMgr.LoadReferredFriends();
 
-    sConsole.SetLoadingLabel("加载 Opcode Protection...");
+    sLog.outString("Loading Opcode Protection...");
     LoadOpcodeProtection();
 
     // Load and initialize scripts
-    sConsole.SetLoadingLabel("加载 Scripts...");
+    sLog.outString("Loading Scripts...");
     sObjectMgr.LoadQuestStartScripts();                         // must be after load Creature/Gameobject(Template/Data) and QuestTemplate
     sObjectMgr.LoadQuestEndScripts();                           // must be after load Creature/Gameobject(Template/Data) and QuestTemplate
     sObjectMgr.LoadSpellScripts();                              // must be after load Creature/Gameobject(Template/Data)
@@ -1768,31 +1766,31 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadEventScripts();                              // must be after load Creature/Gameobject(Template/Data)
     sObjectMgr.LoadWaypointScripts();
 
-    sConsole.SetLoadingLabel("加载 Scripts text locales...");      // must be after Load*Scripts calls
+    sLog.outString("Loading Scripts text locales...");      // must be after Load*Scripts calls
     sObjectMgr.LoadDbScriptStrings();
 
-    sConsole.SetLoadingLabel("加载 CreatureEventAI Texts...");
+    sLog.outString("Loading CreatureEventAI Texts...");
     CreatureEAI_Mgr.LoadCreatureEventAI_Texts(false);       // false, will checked in LoadCreatureEventAI_Scripts
 
-    sConsole.SetLoadingLabel("加载 CreatureEventAI Summons...");
+    sLog.outString("Loading CreatureEventAI Summons...");
     CreatureEAI_Mgr.LoadCreatureEventAI_Summons(false);     // false, will checked in LoadCreatureEventAI_Scripts
 
-    sConsole.SetLoadingLabel("加载 CreatureEventAI Scripts...");
+    sLog.outString("Loading CreatureEventAI Scripts...");
     CreatureEAI_Mgr.LoadCreatureEventAI_Scripts();
 
-    sConsole.SetLoadingLabel("加载 Creature Texts...");
+    sLog.outString("Loading Creature Texts...");
     sCreatureTextMgr->LoadCreatureTexts();
 
-    sConsole.SetLoadingLabel("加载 Creature Text Locales...");
+    sLog.outString("Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
 
-    sConsole.SetLoadingLabel("加载 SmartAI scripts...");
+    sLog.outString("Loading SmartAI scripts...");
     sSmartScriptMgr->LoadSmartAIFromDB();
 
-    sConsole.SetLoadingLabel("初始化 Scripts...");
+    sLog.outString("Initializing Scripts...");
     sScriptMgr.ScriptsInit();
 
-	sConsole.SetLoadingLabel("加载 ScriptLoader Module WorldScripts...");
+	sLog.outString("Loading ScriptLoader Module WorldScripts...");
 	sScriptMgr.OnLoadCustomDatabaseTable();
 
     // Initialize game time and timers
@@ -1839,43 +1837,43 @@ void World::SetInitialWorldSettings()
     Player::InitVisibleBits();
 
     // Initialize MapManager
-    sConsole.SetLoadingLabel("启动 Map System");
+    sLog.outString("Starting Map System");
     MapManager::Instance().Initialize();
 
-    sConsole.SetLoadingLabel("启动 Game Event system...");
+    sLog.outString("Starting Game Event system...");
     uint32 nextGameEvent = sGameEventMgr.Initialize();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
     // Load Warden Data
-    sConsole.SetLoadingLabel("加载 Warden Data...");
+    sLog.outString("Loading Warden Data...");
     WardenDataStorage.Init();
 
     // Initialize Battlegrounds
-    sConsole.SetLoadingLabel("启动 Battleground System");
+    sLog.outString("Starting Battleground System");
     sBattlegroundMgr.CreateInitialBattlegrounds();
     sBattlegroundMgr.InitAutomaticArenaPointDistribution();
 
     // Initialize outdoor pvp
-    sConsole.SetLoadingLabel("启动 Outdoor PvP System");
+    sLog.outString("Starting Outdoor PvP System");
     sOutdoorPvPMgr.InitOutdoorPvP();
 
     //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
-    sConsole.SetLoadingLabel("加载 Transports...");
+    sLog.outString("Loading Transports...");
     MapManager::Instance().LoadTransports();
 
-    sConsole.SetLoadingLabel("加载 Transports Events...");
+    sLog.outString("Loading Transports Events...");
     sObjectMgr.LoadTransportEvents();
 
-    sConsole.SetLoadingLabel("删除 失效的禁用...", false);
+    sLog.outString("Deleting expired bans...", false);
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate <= UNIX_TIMESTAMP() AND unbandate<>bandate");
 
-    sConsole.SetLoadingLabel("启动 objects Pooling system...", false);
+    sLog.outString("Starting objects Pooling system...", false);
     sPoolMgr.Initialize();
 
-    sConsole.SetLoadingLabel("计算下一个每日任务重置时间...", false);
+    sLog.outString("Calculate next daily quest reset time...", false);
     InitDailyQuestResetTime();
 
-    sConsole.SetLoadingLabel("初始化 AuctionHouseBot...", false);
+    sLog.outString("Initialize AuctionHouseBot...", false);
     auctionbot.Initialize();
 
 #ifdef ELUNA
@@ -1889,7 +1887,7 @@ void World::SetInitialWorldSettings()
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
 
-    sConsole.SetLoadingLabel("WORLD: World 初始化");
+    sLog.outString("WORLD: World initialized");
 
     // Print startup time
     uint32 uStartInterval = getMSTimeDiff(uStartTime, getMSTime());
@@ -1964,7 +1962,7 @@ void World::LoadAutobroadcasts()
 {
     m_Autobroadcasts.clear();
 
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT text FROM autobroadcast");
+    QueryResult* result = WorldDatabase.Query("SELECT text FROM autobroadcast");
 
     if (!result)
     {
@@ -1990,7 +1988,7 @@ void World::LoadAutobroadcasts()
 
 void World::LoadIp2nation()
 {
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT count(c.code) FROM ip2nationCountries c, ip2nation i WHERE c.code = i.country");
+    QueryResult* result = WorldDatabase.Query("SELECT count(c.code) FROM ip2nationCountries c, ip2nation i WHERE c.code = i.country");
     uint32 count = 0;
 
     if (result)
@@ -2004,7 +2002,7 @@ void World::LoadIp2nation()
 
 void World::LoadOpcodeProtection()
 {
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT `opcode`, `threshold`, `interval`, `penalty` FROM opcode_protection");
+    QueryResult* result = WorldDatabase.Query("SELECT `opcode`, `threshold`, `interval`, `penalty` FROM opcode_protection");
     uint64 count = 0;
 
     if (result)
@@ -2041,13 +2039,13 @@ bool World::GetModuleBoolConfig(std::string conf, bool value)
 {
     auto it = _moduleConfig.find(conf.c_str());
 
-    ModuleConfig Mod = it->second;
-
     // If we can not find the config at all then use value
     if (it == _moduleConfig.end())
         return value;
     else
     {
+        ModuleConfig Mod = it->second;
+
         const char* str = Mod.value.c_str();
         if (strcmp(str, "true") == 0 || strcmp(str, "TRUE") == 0 ||
             strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
@@ -2062,24 +2060,28 @@ std::string World::GetModuleStringConfig(std::string conf, std::string value)
 {
     auto it = _moduleConfig.find(conf.c_str());
 
-    ModuleConfig Mod = it->second;
-
     if (it == _moduleConfig.end())
         return value.c_str();
     else
+    {
+        ModuleConfig Mod = it->second;
         return Mod.value.c_str();
+    }
+
 }
 
 int32 World::GetModuleIntConfig(std::string conf, uint32 value)
 {
     auto it = _moduleConfig.find(conf.c_str());
 
-    ModuleConfig Mod = it->second;
-
     if (it == _moduleConfig.end())
         return value;
     else
+    {
+        ModuleConfig Mod = it->second;
         return (uint32)atoi(Mod.value.c_str());
+    }
+        
 }
 
 // Update the World !
@@ -2510,7 +2512,7 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, std::string dura
     LoginDatabase.escape_string(safe_author);
 
     uint32 duration_secs = TimeStringToSecs(duration);
-    QueryResult_AutoPtr resultAccounts = QueryResult_AutoPtr(NULL);                     //used for kicking
+    QueryResult* resultAccounts = nullptr;                     //used for kicking
 
     // Update the database with ban information
     switch (mode)
@@ -2802,13 +2804,14 @@ void World::InvalidatePlayerDataToAllClient(uint64 guid) const
 
 void World::InitResultQueue()
 {
-    m_resultQueue = new SqlResultQueue;
-    CharacterDatabase.SetResultQueue(m_resultQueue);
 }
 
 void World::UpdateResultQueue()
 {
-    m_resultQueue->Update();
+    //process async result queues
+    CharacterDatabase.ProcessResultQueue(getConfig(CONFIG_UINT32_ASYNC_QUERIES_TICK_TIMEOUT));
+    WorldDatabase.ProcessResultQueue(getConfig(CONFIG_UINT32_ASYNC_QUERIES_TICK_TIMEOUT));
+    LoginDatabase.ProcessResultQueue(getConfig(CONFIG_UINT32_ASYNC_QUERIES_TICK_TIMEOUT));
 }
 
 void World::UpdateRealmCharCount(uint32 accountId)
@@ -2817,15 +2820,16 @@ void World::UpdateRealmCharCount(uint32 accountId)
         "SELECT COUNT(guid) FROM characters WHERE account = '%u'", accountId);
 }
 
-void World::_UpdateRealmCharCount(QueryResult_AutoPtr resultCharCount, uint32 accountId)
+void World::_UpdateRealmCharCount(QueryResult* resultCharCount, uint32 accountId)
 {
     if (resultCharCount)
     {
         Field* fields = resultCharCount->Fetch();
         uint32 charCount = fields[0].GetUInt32();
-
+        LoginDatabase.BeginTransaction();
         LoginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid= '%d' AND realmid = '%d'", accountId, realmID);
         LoginDatabase.PExecute("INSERT INTO realmcharacters (numchars, acctid, realmid) VALUES (%u, %u, %u)", charCount, accountId, realmID);
+        LoginDatabase.CommitTransaction();
     }
 }
 
@@ -2833,7 +2837,7 @@ void World::InitDailyQuestResetTime()
 {
     time_t mostRecentQuestTime;
 
-    QueryResult_AutoPtr result = CharacterDatabase.Query("SELECT MAX(time) FROM character_queststatus_daily");
+    QueryResult* result = CharacterDatabase.Query("SELECT MAX(time) FROM character_queststatus_daily");
     if (result)
     {
         Field* fields = result->Fetch();
@@ -2868,7 +2872,7 @@ void World::InitDailyQuestResetTime()
 
 void World::UpdateAllowedSecurity()
 {
-    QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT allowedSecurityLevel from realmlist WHERE id = '%d'", realmID);
+    QueryResult* result = LoginDatabase.PQuery("SELECT allowedSecurityLevel from realmlist WHERE id = '%d'", realmID);
     if (result)
     {
         m_allowedSecurityLevel = AccountTypes(result->Fetch()->GetUInt16());
@@ -2901,7 +2905,7 @@ void World::UpdateMaxSessionCounters()
 
 void World::LoadDBVersion()
 {
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT db_version FROM version LIMIT 1");
+    QueryResult* result = WorldDatabase.Query("SELECT db_version FROM version LIMIT 1");
     if (result)
     {
         Field* fields = result->Fetch();

@@ -134,7 +134,7 @@ public:
             return false;
         }
 
-        QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT spell FROM npc_trainer WHERE reqlevel BETWEEN 1 AND %i AND entry = %i", level, trainerID);
+        QueryResult* result = WorldDatabase.PQuery("SELECT spell FROM npc_trainer WHERE reqlevel BETWEEN 1 AND %i AND entry = %i", level, trainerID);
 
         if (!result)
         {

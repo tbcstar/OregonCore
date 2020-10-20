@@ -51,6 +51,7 @@
 #include "MovementGenerator.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
+#include "ScriptMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -660,7 +661,7 @@ void Unit::resetAttackTimer(WeaponAttackType type)
 
 bool Unit::IsWithinCombatRange(const Unit* obj, float dist2compare) const
 {
-    if (!obj || !IsInMap(obj))
+    if (!obj || !IsInMap(obj) || !InSamePhase(obj))
         return false;
 
     float dx = GetPositionX() - obj->GetPositionX();
@@ -676,7 +677,7 @@ bool Unit::IsWithinCombatRange(const Unit* obj, float dist2compare) const
 
 bool Unit::IsWithinMeleeRange(Unit* obj, float dist) const
 {
-    if (!obj || !IsInMap(obj))
+    if (!obj || !IsInMap(obj) || !InSamePhase(obj))
         return false;
 
     float dx = GetPositionX() - obj->GetPositionX();
@@ -1090,6 +1091,8 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             victim->ToCreature()->SetPlayerDamaged(true);
     }
 
+    sScriptMgr.OnDealDamage(this, damage);
+
     if (health <= damage)
     {
         DEBUG_LOG("DealDamage: victim just died");
@@ -1215,7 +1218,6 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             he->DuelComplete(DUEL_WON);
         }
     }
-
     DEBUG_LOG("DealDamageEnd returned %d damage", damage);
 
     return damage;
@@ -9660,7 +9662,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellEntry const* bySpell, W
             else if (!obj)
             {
                 // ignore stealth for aoe spells. Ignore stealth if target is player and unit in combat with same player
-                bool const ignoreStealthCheck = target->GetTypeId() == TYPEID_PLAYER && target->HasStealthAura();
+                bool const ignoreStealthCheck = target->ToCreature() ? true : false;
 
                 if (!CanSeeOrDetect(target, ignoreStealthCheck))
                     return false;
@@ -9688,42 +9690,50 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellEntry const* bySpell, W
     // CvC case - can attack each other only when one of them is hostile
     if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
         return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
-
-    // PvP, PvC, CvP case
-    // can't attack friendly targets
+    
+   // PvC, CvP case
+   // can't attack friendly targets
     ReputationRank repThisToTarget = GetReactionTo(target);
     ReputationRank repTargetToThis;
-
-    if (repThisToTarget > REP_NEUTRAL
-        || (repTargetToThis = target->GetReactionTo(this)) > REP_NEUTRAL)
-        return false; 
-
-    // Not all neutral creatures can be attacked (even some unfriendly faction does not react aggresive to you, like Sporaggar)
-    if (repThisToTarget == REP_NEUTRAL &&
-        repTargetToThis <= REP_NEUTRAL)
+    if (target && target->ToCreature())
     {
-        Player const* owner = GetAffectingPlayer();
-        const Unit* const thisUnit = owner ? owner : this;
 
-        if (!(target->GetTypeId() == TYPEID_PLAYER && thisUnit->GetTypeId() == TYPEID_PLAYER) &&
-            !(target->GetTypeId() == TYPEID_UNIT && thisUnit->GetTypeId() == TYPEID_UNIT))
+        if (repThisToTarget > REP_NEUTRAL
+            || (repTargetToThis = target->GetReactionTo(this)) > REP_NEUTRAL)
+            return false;
+
+        // Not all neutral creatures can be attacked (even some unfriendly faction does not react aggresive to you, like Sporaggar)
+        if (repThisToTarget == REP_NEUTRAL &&
+            repTargetToThis <= REP_NEUTRAL)
         {
-            Player const* player = target->GetTypeId() == TYPEID_PLAYER ? target->ToPlayer() : thisUnit->ToPlayer();
-            Unit const* creature = target->GetTypeId() == TYPEID_UNIT ? target : thisUnit;
+            Player const* owner = GetAffectingPlayer();
+            const Unit* const thisUnit = owner ? owner : this;
 
-            if (FactionTemplateEntry const* factionTemplate = creature->GetFactionTemplateEntry())
+            if (!(target->GetTypeId() == TYPEID_PLAYER && thisUnit->GetTypeId() == TYPEID_PLAYER) &&
+                !(target->GetTypeId() == TYPEID_UNIT && thisUnit->GetTypeId() == TYPEID_UNIT))
             {
-                if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
-                    if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionTemplate->faction))
-                        if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
-                            if (!(repState->Flags & FACTION_FLAG_AT_WAR))
-                                return false;
+                Player const* player = target->GetTypeId() == TYPEID_PLAYER ? target->ToPlayer() : thisUnit->ToPlayer();
+                Unit const* creature = target->GetTypeId() == TYPEID_UNIT ? target : thisUnit;
 
+                if (FactionTemplateEntry const* factionTemplate = creature->GetFactionTemplateEntry())
+                {
+                    if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
+                        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionTemplate->faction))
+                            if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
+                                if (!(repState->Flags & FACTION_FLAG_AT_WAR))
+                                    return false;
+
+                }
             }
-        }
 
+        }
     }
 
+    Unit* owner = this->GetOwner();
+    if (target == owner)
+        return false;
+
+    //PvP 
     Player const* playerAffectingAttacker = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) ? GetAffectingPlayer() : NULL;
     Player const* playerAffectingTarget = target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) ? target->GetAffectingPlayer() : NULL;
 
@@ -12210,7 +12220,7 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
 {
     std::list<Unit* > targets;
     Oregon::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
-    Oregon::UnitListSearcher<Oregon::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+    Oregon::UnitListSearcher<Oregon::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
     VisitNearbyObject(dist, searcher);
 
     // remove current target
@@ -12251,7 +12261,7 @@ Player* Unit::SelectNearestPlayer(float distance) const
 
     {
         Oregon::NearestPlayerInObjectRangeCheck creature_check(*this, distance);
-        Oregon::PlayerSearcher<Oregon::NearestPlayerInObjectRangeCheck> searcher(pPlayer, creature_check);
+        Oregon::PlayerSearcher<Oregon::NearestPlayerInObjectRangeCheck> searcher(this, pPlayer, creature_check);
 
         TypeContainerVisitor<Oregon::PlayerSearcher<Oregon::NearestPlayerInObjectRangeCheck>, WorldTypeMapContainer> world_player_searcher(searcher);
         TypeContainerVisitor<Oregon::PlayerSearcher<Oregon::NearestPlayerInObjectRangeCheck>, GridTypeMapContainer> grid_player_searcher(searcher);
@@ -13682,6 +13692,47 @@ void Unit::AddAura(uint32 spellId, Unit* target)
             }
         }
     }
+}
+
+void Unit::RestorePhase()
+{
+    uint32 newPhase = 0;
+    AuraList const& phases = GetAurasByType(SPELL_AURA_PHASE);
+
+    if (!phases.empty())
+        for (AuraList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+            newPhase |= (*itr)->GetMiscValue();
+
+    if (!newPhase)
+        newPhase = PHASEMASK_NORMAL;
+
+    SetPhaseMask(newPhase, false, false);
+}
+
+void Unit::SetPhaseMask(uint32 newPhaseMask, bool update, bool individual)
+{
+    if (newPhaseMask == GetPhaseMask())
+        return;
+
+    // Phase player, dont update
+    WorldObject::SetPhaseMask(newPhaseMask, false, individual);
+
+    // Phase pets and summons
+    if (IsInWorld())
+    {
+        for (ControlList::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+            if ((*itr)->GetTypeId() == TYPEID_UNIT)
+                (*itr)->SetPhaseMask(newPhaseMask, true, individual);
+
+        for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+            if (m_SummonSlot[i])
+                if (Creature* summon = GetMap()->GetCreature(m_SummonSlot[i]))
+                    summon->SetPhaseMask(newPhaseMask, true, individual);
+    }
+
+    // Update visibility after phasing pets and summons so they wont despawn
+    if (update)
+        UpdateObjectVisibility();
 }
 
 void Unit::UpdateObjectVisibility(bool forced)

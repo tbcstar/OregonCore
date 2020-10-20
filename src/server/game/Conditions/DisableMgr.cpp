@@ -37,7 +37,7 @@ void DisableMgr::LoadDisables()
         itr->second.clear();
     m_DisableMap.clear();
 
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT sourceType,entry,flags,params_0,params_1 FROM disables");
+    QueryResult* result = WorldDatabase.Query("SELECT sourceType,entry,flags,params_0,params_1 FROM disables");
 
     uint32 total_count = 0;
 

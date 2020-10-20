@@ -357,10 +357,10 @@ class Guild
             return m_accountsNumber;
         }
 
-        bool LoadGuildFromDB(QueryResult_AutoPtr guildDataResult);
+        bool LoadGuildFromDB(QueryResult* guildDataResult);
         bool CheckGuildStructure();
-        bool LoadRanksFromDB(QueryResult_AutoPtr guildRanksResult);
-        bool LoadMembersFromDB(QueryResult_AutoPtr guildMembersResult);
+        bool LoadRanksFromDB(QueryResult* guildRanksResult);
+        bool LoadMembersFromDB(QueryResult* guildMembersResult);
 
         bool FillPlayerData(uint64 guid, MemberSlot* memslot);
         void LoadPlayerStatsByGuid(uint64 guid);
@@ -476,7 +476,7 @@ class Guild
         uint32 GetBankMoneyPerDay(uint32 rankId);
         uint32 GetBankSlotPerDay(uint32 rankId, uint8 TabId);
         // rights per day
-        bool   LoadBankRightsFromDB(QueryResult_AutoPtr guildBankTabRightsResult);
+        bool   LoadBankRightsFromDB(QueryResult* guildBankTabRightsResult);
         // logs
         void   LoadGuildBankEventLogFromDB();
         void   UnloadGuildBankEventLog();

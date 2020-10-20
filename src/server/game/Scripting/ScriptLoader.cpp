@@ -790,7 +790,7 @@ void AddScripts()
     AddSC_hellfire_peninsula();
     AddSC_nagrand();
     AddSC_netherstorm();
-    AddSC_shadowmoon_valley();
+    AddSC_shadowmoon_valley();//stuck
     AddSC_shattrath_city();
     AddSC_terokkar_forest();
     AddSC_zangarmarsh();

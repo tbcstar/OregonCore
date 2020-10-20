@@ -1536,7 +1536,7 @@ void Player::setDeathState(DeathState s)
     }
 }
 
-bool Player::BuildEnumData(QueryResult_AutoPtr result, WorldPacket*  p_data)
+bool Player::BuildEnumData(QueryResult* result, WorldPacket*  p_data)
 {
     Field* fields = result->Fetch();
     uint32 guid = fields[0].GetUInt32();
@@ -2461,10 +2461,12 @@ void Player::SetGameMaster(bool on)
 
         getHostileRefManager().setOnlineOfflineState(false);
         CombatStopWithPets();
+        SetPhaseMask(uint32(PHASEMASK_ANYWHERE), false, false);    // see and visible in all phases
         m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
     else
     {
+        RestorePhase();
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
         setFactionForRace(getRace());
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
@@ -3716,11 +3718,11 @@ uint32 Player::GetHighestLearnedRankOf(uint32 spellid) const
     return i;
 }
 
-void Player::_LoadSpellCooldowns(QueryResult_AutoPtr result)
+void Player::_LoadSpellCooldowns(QueryResult* result)
 {
     m_spellCooldowns.clear();
 
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT spell,item,time FROM character_spell_cooldown WHERE guid = '%u'",GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT spell,item,time FROM character_spell_cooldown WHERE guid = '%u'",GetGUIDLow());
 
     if (result)
     {
@@ -4230,7 +4232,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     }
 
     // the player was uninvited already on logout so just remove from group
-    QueryResult_AutoPtr resultGroup = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", guid);
+    QueryResult* resultGroup = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", guid);
     if (resultGroup)
     {
         uint64 leaderGuid = MAKE_NEW_GUID((*resultGroup)[0].GetUInt32(), 0, HIGHGUID_PLAYER);
@@ -4248,7 +4250,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     case CHAR_DELETE_REMOVE:
         {
             // return back all mails with COD and Item                        0  1           2              3      4       5          6     7
-            QueryResult_AutoPtr resultMail = CharacterDatabase.PQuery("SELECT id,messageType,mailTemplateId,sender,subject,itemTextId,money,has_items FROM mail WHERE receiver='%u' AND has_items<>0 AND cod<>0", guid);
+            QueryResult* resultMail = CharacterDatabase.PQuery("SELECT id,messageType,mailTemplateId,sender,subject,itemTextId,money,has_items FROM mail WHERE receiver='%u' AND has_items<>0 AND cod<>0", guid);
             if (resultMail)
             {
                 do
@@ -4283,7 +4285,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                     if (has_items)
                     {
                         // data needs to be at first place for Item::LoadFromDB
-                        QueryResult_AutoPtr resultItems = CharacterDatabase.PQuery("SELECT itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, itemTextId, item_guid, item_template FROM mail_items JOIN item_instance ON item_guid = guid WHERE mail_id='%u'", mail_id);
+                        QueryResult* resultItems = CharacterDatabase.PQuery("SELECT itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, itemTextId, item_guid, item_template FROM mail_items JOIN item_instance ON item_guid = guid WHERE mail_id='%u'", mail_id);
                         if (resultItems)
                         {
                             do
@@ -4325,18 +4327,19 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
 
             // NOW we can finally clear other DB data related to character
             CharacterDatabase.BeginTransaction();
-            if (QueryResult_AutoPtr resultPets = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u'", guid))
+            if (QueryResult* resultPets = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u'", guid))
             {
                 do
                 {
                     uint32 petguidlow = (*resultPets)[0].GetUInt32();
-                    Pet::DeleteFromDB(petguidlow);
+                    //do not create separate transaction for pet delete otherwise we will get fatal error!
+                    Pet::DeleteFromDB(petguidlow, false);
                 }
                 while (resultPets->NextRow());
             }
 
             // Delete character from social list of online chars
-            if (QueryResult_AutoPtr resultFriends = CharacterDatabase.PQuery("SELECT DISTINCT guid FROM character_social WHERE friend = '%u'", guid))
+            if (QueryResult* resultFriends = CharacterDatabase.PQuery("SELECT DISTINCT guid FROM character_social WHERE friend = '%u'", guid))
             {
                 do
                 {
@@ -4417,7 +4420,7 @@ void Player::DeleteOldCharacters(uint32 keepDays)
 {
     sLog.outString("Player::DeleteOldChars: Removing characters older than %u day(s)", keepDays);
 
-    QueryResult_AutoPtr resultChars = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Account FROM characters WHERE deleteDate IS NOT NULL AND deleteDate < " UI64FMTD "", uint64(time(NULL) - time_t(keepDays * DAY)));
+    QueryResult* resultChars = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Account FROM characters WHERE deleteDate IS NOT NULL AND deleteDate < " UI64FMTD "", uint64(time(NULL) - time_t(keepDays * DAY)));
     if (resultChars)
     {
         sLog.outString("Player::DeleteOldChars: " UI64FMTD " character(s) to remove", resultChars->GetRowCount());
@@ -6563,7 +6566,7 @@ uint32 Player::GetGuildIdFromDB(uint64 guid)
 {
     std::ostringstream ss;
     ss << "SELECT guildid FROM guild_member WHERE guid='" << guid << "'";
-    QueryResult_AutoPtr result = CharacterDatabase.Query(ss.str().c_str());
+    QueryResult* result = CharacterDatabase.Query(ss.str().c_str());
     if (result)
     {
         uint32 v = result->Fetch()[0].GetUInt32();
@@ -6577,7 +6580,7 @@ uint32 Player::GetRankFromDB(uint64 guid)
 {
     std::ostringstream ss;
     ss << "SELECT rank FROM guild_member WHERE guid='" << guid << "'";
-    QueryResult_AutoPtr result = CharacterDatabase.Query(ss.str().c_str());
+    QueryResult* result = CharacterDatabase.Query(ss.str().c_str());
     if (result)
     {
         uint32 v = result->Fetch()[0].GetUInt32();
@@ -6589,7 +6592,7 @@ uint32 Player::GetRankFromDB(uint64 guid)
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", GUID_LOPART(guid), type);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", GUID_LOPART(guid), type);
     if (!result)
         return 0;
 
@@ -6602,7 +6605,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
     std::ostringstream ss;
 
     ss << "SELECT zone FROM characters WHERE guid='" << GUID_LOPART(guid) << "'";
-    QueryResult_AutoPtr result = CharacterDatabase.Query(ss.str().c_str());
+    QueryResult* result = CharacterDatabase.Query(ss.str().c_str());
     if (!result)
         return 0;
     Field* fields = result->Fetch();
@@ -6634,7 +6637,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
 
 uint32 Player::GetLevelFromDB(uint64 guid)
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT level FROM characters WHERE guid='%u'", GUID_LOPART(guid));
+    QueryResult* result = CharacterDatabase.PQuery("SELECT level FROM characters WHERE guid='%u'", GUID_LOPART(guid));
     if (!result)
         return 0;
 
@@ -6689,7 +6692,7 @@ void Player::UpdateZone(uint32 newZone)
             Weather::SendFineWeatherUpdateToPlayer(this);
     }
 
-
+    sScriptMgr.OnPlayerUpdateZone(this, newZone, GetAreaId());
 #ifdef ELUNA
     // used by eluna
     sEluna->OnUpdateZone(this, newZone, GetAreaId());
@@ -6813,6 +6816,7 @@ void Player::DuelComplete(DuelCompleteType type)
     }
 
  
+    sScriptMgr.OnPlayerDuelEnd(duel->opponent, this, type);
 #ifdef ELUNA
    // used by eluna
     sEluna->OnDuelEnd(duel->opponent, this, type);
@@ -7187,18 +7191,18 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType att
     UnitMods unitMod = UNIT_MOD_END;
     switch (attackType)
     {
-        case BASE_ATTACK:   unitMod = UNIT_MOD_DAMAGE_MAINHAND; break;
-        case OFF_ATTACK:    unitMod = UNIT_MOD_DAMAGE_OFFHAND;  break;
-        case RANGED_ATTACK: unitMod = UNIT_MOD_DAMAGE_RANGED;   break;
-        default: return;
+    case BASE_ATTACK:   unitMod = UNIT_MOD_DAMAGE_MAINHAND; break;
+    case OFF_ATTACK:    unitMod = UNIT_MOD_DAMAGE_OFFHAND;  break;
+    case RANGED_ATTACK: unitMod = UNIT_MOD_DAMAGE_RANGED;   break;
+    default: return;
     }
 
     UnitModifierType unitModType = TOTAL_VALUE;
     switch (modifier->m_auraname)
     {
-        case SPELL_AURA_MOD_DAMAGE_DONE:         unitModType = TOTAL_VALUE; break;
-        case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE: unitModType = TOTAL_PCT;   break;
-        default: return;
+    case SPELL_AURA_MOD_DAMAGE_DONE:         unitModType = TOTAL_VALUE; break;
+    case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE: unitModType = TOTAL_PCT;   break;
+    default: return;
     }
 
     if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
@@ -7209,7 +7213,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType att
             if (aura->GetAmount() > 0)
                 ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, aura->GetModifierValue(), apply);
             else
-                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG, aura->GetModifierValue(), apply); 
+                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG, aura->GetModifierValue(), apply);
         }
 
         // For show in client
@@ -13612,6 +13616,8 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, Object* questGiver,
     }
 
     SetCanDelayTeleport(false);
+
+    sScriptMgr.OnPlayerCompleteQuest(this, pQuest);
 }
 
 void Player::FailQuest(uint32 questId)
@@ -14730,7 +14736,7 @@ void Player::Initialize(uint32 guid)
     Object::_Create(guid, 0, HIGHGUID_PLAYER);
 }
 
-void Player::_LoadDeclinedNames(QueryResult_AutoPtr result)
+void Player::_LoadDeclinedNames(QueryResult* result)
 {
     if (!result)
         return;
@@ -14743,7 +14749,7 @@ void Player::_LoadDeclinedNames(QueryResult_AutoPtr result)
         m_declinedname->name[i] = fields[i].GetCppString();
 }
 
-void Player::_LoadArenaTeamInfo(QueryResult_AutoPtr result)
+void Player::_LoadArenaTeamInfo(QueryResult* result)
 {
     // arenateamid, played_week, played_season, personal_rating
     memset((void*)&m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1], 0, sizeof(uint32) * 18);
@@ -14779,7 +14785,7 @@ void Player::_LoadArenaTeamInfo(QueryResult_AutoPtr result)
 }
 
 
-void Player::_LoadBGData(QueryResult_AutoPtr result)
+void Player::_LoadBGData(QueryResult* result)
 {
     if (!result)
         return;
@@ -14801,7 +14807,7 @@ void Player::_LoadBGData(QueryResult_AutoPtr result)
 
 bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, uint64 guid)
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,taxi_path FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
+    QueryResult* result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,taxi_path FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
     if (!result)
         return false;
 
@@ -14819,7 +14825,7 @@ bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, flo
 
 bool Player::LoadValuesArrayFromDB(Tokens& data, uint64 guid)
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT data FROM characters WHERE guid='%u'", GUID_LOPART(guid));
+    QueryResult* result = CharacterDatabase.PQuery("SELECT data FROM characters WHERE guid='%u'", GUID_LOPART(guid));
     if (!result)
         return false;
 
@@ -14868,7 +14874,7 @@ bool Player::LoadFromDB(uint32 guid, SqlQueryHolder* holder)
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk,"
     // 50      51         52         53          54           55             56           57
     //"health, powerMana, powerRage, powerFocus, powerEnergy, powerHapiness, instance_id, grantableLevels FROM characters WHERE guid = '%u'", guid);
-    QueryResult_AutoPtr result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
+    QueryResult* result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
     if (!result)
     {
@@ -15540,11 +15546,11 @@ bool Player::isAllowedToLoot(const Creature* creature)
     return false;
 }
 
-void Player::_LoadActions(QueryResult_AutoPtr result)
+void Player::_LoadActions(QueryResult* result)
 {
     m_actionButtons.clear();
 
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT button,action,type,misc FROM character_action WHERE guid = '%u' ORDER BY button",GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT button,action,type,misc FROM character_action WHERE guid = '%u' ORDER BY button",GetGUIDLow());
 
     if (result)
     {
@@ -15562,7 +15568,7 @@ void Player::_LoadActions(QueryResult_AutoPtr result)
     }
 }
 
-void Player::_LoadAuras(QueryResult_AutoPtr result, uint32 timediff)
+void Player::_LoadAuras(QueryResult* result, uint32 timediff)
 {
     //m_Auras.clear();
     for (int i = 0; i < TOTAL_AURAS; i++)
@@ -15572,7 +15578,7 @@ void Player::_LoadAuras(QueryResult_AutoPtr result, uint32 timediff)
     for (int i = UNIT_FIELD_AURA; i <= UNIT_FIELD_AURASTATE; ++i)
         SetUInt32Value(i, 0);
 
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT caster_guid,spell,effect_index,stackcount,amount,maxduration,remaintime,remaincharges FROM character_aura WHERE guid = '%u'",GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT caster_guid,spell,effect_index,stackcount,amount,maxduration,remaintime,remaincharges FROM character_aura WHERE guid = '%u'",GetGUIDLow());
 
     if (result)
     {
@@ -15673,9 +15679,9 @@ void Player::LoadCorpse()
     }
 }
 
-void Player::_LoadInventory(QueryResult_AutoPtr result, uint32 timediff)
+void Player::_LoadInventory(QueryResult* result, uint32 timediff)
 {
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, itemTextId, bag, slot, item, item_template FROM character_inventory JOIN item_instance ON character_inventory.item = item_instance.guid WHERE character_inventory.guid = '%u' ORDER BY bag,slot", GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, itemTextId, bag, slot, item, item_template FROM character_inventory JOIN item_instance ON character_inventory.item = item_instance.guid WHERE character_inventory.guid = '%u' ORDER BY bag,slot", GetGUIDLow());
     std::map<uint64, Bag*> bagMap;                          // fast guid lookup for bags
     //NOTE: the "order by `bag`" is important because it makes sure
     //the bagMap is filled before items in the bags are loaded
@@ -15834,7 +15840,7 @@ void Player::_LoadInventory(QueryResult_AutoPtr result, uint32 timediff)
 // load mailed item which should receive current player
 void Player::_LoadMailedItems(Mail* mail)
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, itemTextId, item_guid, item_template FROM mail_items JOIN item_instance ON item_guid = guid WHERE mail_id='%u'", mail->messageID);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, itemTextId, item_guid, item_template FROM mail_items JOIN item_instance ON item_guid = guid WHERE mail_id='%u'", mail->messageID);
     if (!result)
         return;
 
@@ -15872,10 +15878,10 @@ void Player::_LoadMailedItems(Mail* mail)
     while (result->NextRow());
 }
 
-void Player::_LoadMailInit(QueryResult_AutoPtr resultUnread, QueryResult_AutoPtr resultDelivery)
+void Player::_LoadMailInit(QueryResult* resultUnread, QueryResult* resultDelivery)
 {
     //set a count of unread mails
-    //QueryResult_AutoPtr resultMails = CharacterDatabase.PQuery("SELECT COUNT(id) FROM mail WHERE receiver = '%u' AND (checked & 1)=0 AND deliver_time <= '" UI64FMTD "'", GUID_LOPART(playerGuid),(uint64)cTime);
+    //QueryResult* resultMails = CharacterDatabase.PQuery("SELECT COUNT(id) FROM mail WHERE receiver = '%u' AND (checked & 1)=0 AND deliver_time <= '" UI64FMTD "'", GUID_LOPART(playerGuid),(uint64)cTime);
     if (resultUnread)
     {
         Field* fieldMail = resultUnread->Fetch();
@@ -15895,7 +15901,7 @@ void Player::_LoadMail()
 {
     m_mail.clear();
     //mails are in right order                                    0  1           2      3        4       5          6         7           8            9     10  11      12         13
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT id,messageType,sender,receiver,subject,itemTextId,has_items,expire_time,deliver_time,money,cod,checked,stationery,mailTemplateId FROM mail WHERE receiver = '%u' ORDER BY id DESC", GetGUIDLow());
+    QueryResult* result = CharacterDatabase.PQuery("SELECT id,messageType,sender,receiver,subject,itemTextId,has_items,expire_time,deliver_time,money,cod,checked,stationery,mailTemplateId FROM mail WHERE receiver = '%u' ORDER BY id DESC", GetGUIDLow());
     if (result)
     {
         do
@@ -15946,7 +15952,7 @@ void Player::LoadPet()
         {
             // Even if the pet is not in the active slot and will not be loaded into the world, update it's status
             // Need to fetch pet's current health value from the DB, to find out if the pet is dead or alive
-            if (QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT curhealth FROM character_pet WHERE owner = '%u'", GetGUIDLow()))
+            if (QueryResult* result = CharacterDatabase.PQuery("SELECT curhealth FROM character_pet WHERE owner = '%u'", GetGUIDLow()))
                 SetPetStatus((result->Fetch()->GetUInt32() != 0) ? PET_STATUS_DISMISSED : PET_STATUS_DEAD_AND_REMOVED);
 
             delete pet;
@@ -15956,14 +15962,14 @@ void Player::LoadPet()
     }
 }
 
-void Player::_LoadQuestStatus(QueryResult_AutoPtr result)
+void Player::_LoadQuestStatus(QueryResult* result)
 {
     mQuestStatus.clear();
 
     uint32 slot = 0;
 
     //                                                              0      1       2         3         4      5          6          7          8          9           10          11          12
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3, itemcount4 FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3, itemcount4 FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
 
     if (result)
     {
@@ -16062,12 +16068,12 @@ void Player::_LoadQuestStatus(QueryResult_AutoPtr result)
         SetQuestSlot(i, 0);
 }
 
-void Player::_LoadDailyQuestStatus(QueryResult_AutoPtr result)
+void Player::_LoadDailyQuestStatus(QueryResult* result)
 {
     for (uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
         SetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1 + quest_daily_idx, 0);
 
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT quest,time FROM character_queststatus_daily WHERE guid = '%u'", GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT quest,time FROM character_queststatus_daily WHERE guid = '%u'", GetGUIDLow());
 
     if (result)
     {
@@ -16111,7 +16117,7 @@ void Player::LearnSpellHighestRank(uint32 spellid)
         LearnSpellHighestRank(next);
 }
 
-void Player::_LoadSkills(QueryResult_AutoPtr result)
+void Player::_LoadSkills(QueryResult* result)
 {
     //                                                           0      1      2
     // SetPQuery(PLAYER_LOGIN_QUERY_LOADSKILLS,          "SELECT skill, value, max FROM character_skills WHERE guid = '%u'", GUID_LOPART(m_guid));
@@ -16185,11 +16191,32 @@ void Player::_LoadSkills(QueryResult_AutoPtr result)
     }
 }
 
-void Player::_LoadSpells(QueryResult_AutoPtr result)
+uint32 Player::GetPhaseMaskForSpawn() const
+{
+    uint32 phase = PHASEMASK_NORMAL;
+    if (!IsGameMaster())
+        phase = GetPhaseMask();
+    else
+    {
+        AuraList const& phases = GetAurasByType(SPELL_AURA_PHASE);
+        if (phases.empty())
+            phase = GetPhaseMask();
+        else
+            phase = phases.front()->GetMiscValue();
+    }
+
+    // some aura phases include 1 normal map in addition to phase itself
+    if (uint32 n_phase = phase & ~PHASEMASK_NORMAL)
+        return n_phase;
+
+    return PHASEMASK_NORMAL;
+}
+
+void Player::_LoadSpells(QueryResult* result)
 {
     m_spells.clear();
 
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT spell,active,disabled FROM character_spell WHERE guid = '%u'",GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT spell,active,disabled FROM character_spell WHERE guid = '%u'",GetGUIDLow());
 
     if (result)
     {
@@ -16203,9 +16230,9 @@ void Player::_LoadSpells(QueryResult_AutoPtr result)
     }
 }
 
-void Player::_LoadTutorials(QueryResult_AutoPtr result)
+void Player::_LoadTutorials(QueryResult* result)
 {
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7 FROM character_tutorial WHERE account = '%u' AND realmid = '%u'", GetAccountId(), realmid);
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7 FROM character_tutorial WHERE account = '%u' AND realmid = '%u'", GetAccountId(), realmid);
 
     if (result)
     {
@@ -16222,9 +16249,9 @@ void Player::_LoadTutorials(QueryResult_AutoPtr result)
     m_TutorialsChanged = false;
 }
 
-void Player::_LoadGroup(QueryResult_AutoPtr result)
+void Player::_LoadGroup(QueryResult* result)
 {
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", GetGUIDLow());
     if (result)
     {
         uint64 leaderGuid = MAKE_NEW_GUID((*result)[0].GetUInt32(), 0, HIGHGUID_PLAYER);
@@ -16242,14 +16269,14 @@ void Player::_LoadGroup(QueryResult_AutoPtr result)
     }
 }
 
-void Player::_LoadBoundInstances(QueryResult_AutoPtr result)
+void Player::_LoadBoundInstances(QueryResult* result)
 {
     for (uint8 i = 0; i < TOTAL_DIFFICULTIES; i++)
         m_boundInstances[i].clear();
 
     Group* group = GetGroup();
 
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT id, permanent, map, difficulty, resettime FROM character_instance LEFT JOIN instance ON instance = id WHERE guid = '%u'", GUID_LOPART(m_guid));
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT id, permanent, map, difficulty, resettime FROM character_instance LEFT JOIN instance ON instance = id WHERE guid = '%u'", GUID_LOPART(m_guid));
     if (result)
     {
         do
@@ -16625,7 +16652,7 @@ bool Player::CheckInstanceValidity(bool /*isLogin*/)
     return true;
 }
 
-bool Player::_LoadHomeBind(QueryResult_AutoPtr result)
+bool Player::_LoadHomeBind(QueryResult* result)
 {
     PlayerInfo const* info = sObjectMgr.GetPlayerInfo(getRace(), getClass());
     if (!info)
@@ -16635,7 +16662,7 @@ bool Player::_LoadHomeBind(QueryResult_AutoPtr result)
     }
 
     bool ok = false;
-    //QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT map,zone,position_x,position_y,position_z FROM character_homebind WHERE guid = '%u'", GUID_LOPART(playerGuid));
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT map,zone,position_x,position_y,position_z FROM character_homebind WHERE guid = '%u'", GUID_LOPART(playerGuid));
     if (result)
     {
         Field* fields = result->Fetch();
@@ -16692,7 +16719,7 @@ void Player::SaveToDB()
     uint32 mapid = IsBeingTeleported() ? GetTeleportDest().GetMapId() : GetMapId();
     const MapEntry* me = sMapStore.LookupEntry(mapid);
     // players aren't saved on arena maps
-    if (!me || me->IsBattleArena() || me->IsBattleground())
+    if (!me || me->IsBattleArena())
         return;
 
     int is_save_resting = HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0;
@@ -16740,7 +16767,7 @@ void Player::SaveToDB()
        << GetGUIDLow() << ", "
        << GetSession()->GetAccountId() << ", '"
        << sql_name << "', "
-       << uint32(getRace()) << ", "
+       << uint32(GetORace()) << ", "
        << uint32(getClass()) << ", "
        << uint32(getGender()) << ", "
        << uint32(getLevel()) << ", "
@@ -17232,7 +17259,7 @@ void Player::_SaveTutorials()
 
     uint32 Rows = 0;
     // it's better than rebuilding indexes multiple times
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT count(*) AS r FROM character_tutorial WHERE account = '%u' AND realmid = '%u'", GetSession()->GetAccountId(), realmID);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT count(*) AS r FROM character_tutorial WHERE account = '%u' AND realmid = '%u'", GetSession()->GetAccountId(), realmID);
     if (result)
         Rows = result->Fetch()[0].GetUInt32();
 
@@ -17560,6 +17587,7 @@ void Player::UpdateDuelFlag(time_t currTime)
     if (!duel || duel->startTimer == 0 || currTime < duel->startTimer + 3)
         return;
 
+    sScriptMgr.OnPlayerDuelStart(this, duel->opponent);
 
 #ifdef ELUNA
     // used by eluna
@@ -18120,7 +18148,7 @@ void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
 
 void Player::RemovePetitionsAndSigns(uint64 guid, uint32 type)
 {
-    QueryResult_AutoPtr result = QueryResult_AutoPtr(NULL);
+    QueryResult* result = nullptr;
     if (type == 10)
         result = CharacterDatabase.PQuery("SELECT ownerguid,petitionguid FROM petition_sign WHERE playerguid = '%u'", GUID_LOPART(guid));
     else

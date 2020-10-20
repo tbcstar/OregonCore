@@ -224,7 +224,7 @@ public:
     static bool HandleAccountOnlineListCommand(ChatHandler* handler, const char* /*args*/)
     {
         // Get the list of accounts ID logged to the realm
-        QueryResult_AutoPtr resultDB = CharacterDatabase.Query("SELECT name,account FROM characters WHERE online > 0");
+        QueryResult* resultDB = CharacterDatabase.Query("SELECT name,account FROM characters WHERE online > 0");
         if (!resultDB)
             return true;
 
@@ -242,7 +242,7 @@ public:
 
             // Get the username, last IP and GM level of each account
             // No SQL injection. account is uint32.
-            QueryResult_AutoPtr resultLogin =
+            QueryResult* resultLogin =
                 LoginDatabase.PQuery("SELECT a.username, a.last_ip, aa.gmlevel, a.expansion "
                     "FROM account a "
                     "LEFT JOIN account_access aa "

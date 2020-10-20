@@ -8,6 +8,7 @@
 #define GLOBALMETHODS_H
 
 #include "BindingMap.h"
+#include "Database/DatabaseEnv.h"
 
 /***
  * These functions can be used anywhere at any time, including at start-up.
@@ -1194,8 +1195,12 @@ namespace LuaGlobalFunctions
             return 1;
         }
 
-        QueryResult* queryResult = new QueryResult(result, fields, rowCount, fieldCount);
-
+#ifdef DO_POSTGRESQL 
+        DatabasePostgre* queryResult = new DatabasePostgre(result, fields, rowCount, fieldCount);
+#else
+        QueryResultMysql* queryResult = new QueryResultMysql(result, fields, rowCount, fieldCount);
+#endif
+       
         queryResult->NextRow();
 
         if (queryResult)
@@ -1247,7 +1252,11 @@ namespace LuaGlobalFunctions
             return 1;
         }
 
-        QueryResult* queryResult = new QueryResult(result, fields, rowCount, fieldCount);
+#ifdef DO_POSTGRESQL 
+        DatabasePostgre* queryResult = new DatabasePostgre(result, fields, rowCount, fieldCount);
+#else
+        QueryResultMysql* queryResult = new QueryResultMysql(result, fields, rowCount, fieldCount);
+#endif
 
         queryResult->NextRow();
 
@@ -1300,7 +1309,11 @@ namespace LuaGlobalFunctions
             return 1;
         }
 
-        QueryResult* queryResult = new QueryResult(result, fields, rowCount, fieldCount);
+#ifdef DO_POSTGRESQL 
+        DatabasePostgre* queryResult = new DatabasePostgre(result, fields, rowCount, fieldCount);
+#else
+        QueryResultMysql* queryResult = new QueryResultMysql(result, fields, rowCount, fieldCount);
+#endif
 
         queryResult->NextRow();
 
@@ -1445,14 +1458,14 @@ namespace LuaGlobalFunctions
                 }
 
                 Creature* pCreature = new Creature;
-                if (!pCreature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, entry, team, x, y, z, o))
+                if (!pCreature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, PHASEMASK_NORMAL, entry, team, x, y, z, o))
                 {
                     delete pCreature;
                     Eluna::Push(L);
                     return 1;
                 }
 
-                pCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()));
+                pCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), PHASEMASK_NORMAL);
 
                 uint32 db_guid = pCreature->GetDBTableGUIDLow();
 
@@ -1480,7 +1493,7 @@ namespace LuaGlobalFunctions
                 }
 
                 TempSummon* pCreature = map->SummonCreature(entry, pos, NULL, durorresptime);
-                if (!pCreature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, entry, team, x, y, z, o))
+                if (!pCreature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, PHASEMASK_NORMAL, entry, team, x, y, z, o))
                 {
                     delete pCreature;
                     {
@@ -1520,7 +1533,7 @@ namespace LuaGlobalFunctions
                 }
 
                 GameObject* pGameObj = new GameObject;
-                if (!pGameObj->Create(db_lowGUID, gInfo->id, map, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
+                if (!pGameObj->Create(db_lowGUID, gInfo->id, map, PHASEMASK_NORMAL, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
                 {
                     delete pGameObj;
                     Eluna::Push(L);
@@ -1531,7 +1544,7 @@ namespace LuaGlobalFunctions
                     pGameObj->SetRespawnTime(durorresptime);
 
                 // fill the gameobject data and save to the db
-                pGameObj->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()));
+                pGameObj->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), PHASEMASK_NORMAL);
 
                 delete pGameObj;
 
@@ -1554,7 +1567,7 @@ namespace LuaGlobalFunctions
             {
                 GameObject* pGameObj = new GameObject;
 
-                if (!pGameObj->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
+                if (!pGameObj->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, PHASEMASK_NORMAL, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
                 {
                     delete pGameObj;
                     Eluna::Push(L);

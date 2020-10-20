@@ -18,12 +18,12 @@
 #include "Common.h"
 #include "Log.h"
 #include "Configuration/Config.h"
-#include "Console.h"
 #include "Utilities/Util.h"
 
 #include <fstream>
 #include <stdarg.h>
 #include <stdio.h>
+#include "ace/OS.h"
 
 extern uint32 realmID;
 
@@ -298,22 +298,6 @@ void Log::InitColors(const std::string& str)
 /// Sets color for upcoming output
 void Log::SetColor(ColorTypes color)
 {
-    if (sConsole.IsEnabled())
-    {
-        fputc(0xFF, stderr);
-		#if defined(__PDCURSES__) && !defined(PDC_RGB)
-		// BGR mode, convert from RGB then
-		int clr = int(color);
-		int rgb = (clr & 0x07);
-		clr &= ~0x07;
-		clr |= (rgb & 0x1) << 2; // red
-		clr |= (rgb & 0x2);      // green
-		clr |= (rgb & 0x4) >> 2; // blue
-		color = ColorTypes(clr);
-		#endif
-        fputc((char) color, stderr);
-        return;
-    }
 
     #if PLATFORM == PLATFORM_WINDOWS
     static WORD WinColorFG[MAX_COLORS] =
@@ -378,11 +362,6 @@ void Log::SetColor(ColorTypes color)
 /// Resets output color to normal
 void Log::ResetColor()
 {
-    if (sConsole.IsEnabled())
-    {
-        fputc(0xFE, stderr);
-        return;
-    }
 
     #if PLATFORM == PLATFORM_WINDOWS
     SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
@@ -405,8 +384,8 @@ std::string Log::GetTimestampStr()
 
 void Log::outDB(LogTypes type, const char* str)
 {
-    if (!LoginDatabase.IsConnected())
-        return;
+    //if (!LoginDatabase.IsConnected())
+    //    return;
 
     std::string new_str(str);
     LoginDatabase.escape_string(new_str);
@@ -505,9 +484,6 @@ void Log::outFatal(const char* err, ...)
     m_logMask |= LOG_TYPE_ERROR;
     outError("%s", buffer);
 
-    if (sConsole.IsEnabled())
-        sConsole.FatalError(buffer);
-
     exit (EXIT_FAILURE);
 }
 
@@ -542,6 +518,20 @@ void Log::outCharDump(const char* str, uint32 account_id, uint32 guid, const cha
         fflush(m_logFiles[LOG_TYPE_CHAR]);
     }
 }
+
+void Log::WaitBeforeContinueIfNeed()
+{
+    int mode = sConfig.GetIntDefault("WaitAtStartupError",0);
+
+    printf("\nWait %d secs for continue.\n", mode);
+
+    for (int i = 0; i < mode; ++i)
+    {
+        ACE_OS::sleep(1);
+        
+    }
+}
+
 
 #define logFunctionImpl(name, type, newline, prefix)                  \
             void Log::name(const char* fmt, ...)                      \

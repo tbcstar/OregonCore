@@ -77,32 +77,26 @@ public:
             checkTimer += uiDiff;
             DespawnTimer += uiDiff;
 
-            if (DespawnTimer >= 3 * MINUTE*IN_MILLISECONDS || (target && !target->IsAlive()))
+            if (DespawnTimer >= 3 * MINUTE * IN_MILLISECONDS || (target && !target->IsAlive()))
             {
                 me->Kill(me, false);
                 me->ForcedDespawn(12000);
             }
 
-            if (checkTimer >= 1000 && me->IsAlive())
+            if (checkTimer >= 1000)
             {
                 checkTimer = 0;
-                
-                if (me->SelectNearestHostileUnitInAggroRange(true))
-                    target = me->SelectNearestHostileUnitInAggroRange(true);
-                else if (target = me->GetCharmerOrOwner()->ToPlayer()->getAttackerForHelper())
-                    if (!me->canAttack(target))
-                        target = nullptr;
-                if (target)
+                if (Unit* target = me->SelectNearestTarget(30.0f))
                 {
                     me->GetMotionMaster()->MoveChase(target);
                     if (me->GetDistance(target) < 3.0f)
                     {
                         me->CastSpell(me, SPELL_EXPLOSIVE_SHEEP, false);
                         me->Kill(me, false);
-                        me->ForcedDespawn(12000);
+                        me->DespawnOrUnsummon(12000);
                     }
                 }
-                else if (!me->HasUnitState(FOLLOW_MOTION_TYPE))
+                else if (!me->HasUnitState(UNIT_STATE_FOLLOW))
                 {
                     if (Unit* owner = me->GetCharmerOrOwner())
                     {
@@ -111,7 +105,6 @@ public:
                 }
             }
         }
-
     };
 
     CreatureAI* GetAI(Creature* pCreature) const

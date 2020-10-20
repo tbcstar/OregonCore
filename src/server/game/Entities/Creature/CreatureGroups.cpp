@@ -80,7 +80,7 @@ void FormationMgr::LoadCreatureFormations()
     CreatureGroupMap.clear();
 
     //Get group data
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT leaderGUID, memberGUID, dist, angle, groupAI, point_1, point_2 FROM creature_formations ORDER BY leaderGUID");
+    QueryResult* result = WorldDatabase.Query("SELECT leaderGUID, memberGUID, dist, angle, groupAI, point_1, point_2 FROM creature_formations ORDER BY leaderGUID");
 
     if (!result)
     {

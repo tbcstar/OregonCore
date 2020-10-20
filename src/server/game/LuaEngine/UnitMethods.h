@@ -1019,7 +1019,7 @@ namespace LuaUnit
 
         std::list<Unit*> list;
         Oregon::AnyFriendlyUnitInObjectRangeCheck checker(unit, unit, range);
-        Oregon::UnitListSearcher<Oregon::AnyFriendlyUnitInObjectRangeCheck> searcher(list, checker);
+        Oregon::UnitListSearcher<Oregon::AnyFriendlyUnitInObjectRangeCheck> searcher(unit, list, checker);
         unit->VisitNearbyObject(range, searcher);
         ElunaUtil::ObjectGUIDCheck guidCheck(unit->GET_GUID());
         list.remove_if(guidCheck);
@@ -1051,7 +1051,7 @@ namespace LuaUnit
 
         std::list<Unit*> list;
         Oregon::AnyUnfriendlyUnitInObjectRangeCheck checker(unit, unit, range);
-        Oregon::UnitListSearcher<Oregon::AnyUnfriendlyUnitInObjectRangeCheck> searcher(list, checker);
+        Oregon::UnitListSearcher<Oregon::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unit, list, checker);
         unit->VisitNearbyObject(range, searcher);
         ElunaUtil::ObjectGUIDCheck guidCheck(unit->GET_GUID());
         list.remove_if(guidCheck);

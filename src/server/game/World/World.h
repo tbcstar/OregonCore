@@ -108,6 +108,7 @@ enum WorldConfigs
     CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND,
     CONFIG_ALLOW_TWO_SIDE_TRADE,
     CONFIG_STRICT_PLAYER_NAMES,
+    CONFIG_UINT32_ASYNC_QUERIES_TICK_TIMEOUT,
     CONFIG_STRICT_CHARTER_NAMES,
     CONFIG_STRICT_PET_NAMES,
     CONFIG_CHARACTERS_CREATING_DISABLED,
@@ -801,7 +802,7 @@ class World
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
-        void _UpdateRealmCharCount(QueryResult_AutoPtr resultCharCount, uint32 accountId);
+        void _UpdateRealmCharCount(QueryResult* resultCharCount, uint32 accountId);
 
         void InitDailyQuestResetTime();
         void ResetDailyQuests();
@@ -856,7 +857,6 @@ class World
 
         // CLI command holder to be thread safe
         ACE_Based::LockedQueue<CliCommandHolder*, ACE_Thread_Mutex> cliCmdQueue;
-        SqlResultQueue* m_resultQueue;
 
         // next daily quests reset time
         time_t m_NextDailyQuestReset;

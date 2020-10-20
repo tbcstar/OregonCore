@@ -69,6 +69,7 @@ public:
             { "movetype",       SEC_ADMINISTRATOR,   false, &HandleNpcSetMoveTypeCommand,        "" },
             { "spawntime",      SEC_ADMINISTRATOR,   false, &HandleNpcSetSpawnTimeCommand,       "" },
             { "flag",           SEC_ADMINISTRATOR,   false, &HandleNpcSetFlagCommand,            "" },
+            { "setphase",       SEC_GAMEMASTER,      false, HandleNpcSetPhaseCommand,            "" },
             { "faction",        SEC_ADMINISTRATOR,   false, nullptr,                             "", npcFactionCommandTable },
         };
 
@@ -308,6 +309,36 @@ public:
 
         return true;
     }
+
+    static bool HandleNpcSetPhaseCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        uint32 phasemask = (uint32)atoi((char*)args);
+        if (phasemask == 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Creature* pCreature = handler->getSelectedCreature();
+        if (!pCreature)
+        {
+            handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        pCreature->SetPhaseMask(phasemask, true, false);
+
+        if (!pCreature->IsPet())
+            pCreature->SaveToDB();
+
+        return true;
+    }
+
 
     static bool HandleNpcSetFlagCommand(ChatHandler* handler, const char* args)
     {
@@ -728,7 +759,7 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2))"
+        QueryResult* result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2))"
             "AS order_ FROM creature WHERE map = '%u' AND (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) <= '%f' ORDER BY order_",
             player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), distance * distance);
 
@@ -952,12 +983,19 @@ public:
         if (!charID)
             return false;
 
+        char* phaseMask = strtok(NULL, " ");
         char* team = strtok(NULL, " ");
         int32 teamval = 0;
+        int32 phase = 1;
+
         if (team)
             teamval = atoi(team);
+
         if (teamval < 0)
             teamval = 0;
+
+        if (phaseMask)
+            phase = atoi(phaseMask);
 
         uint32 id = atoi(charID);
 
@@ -969,13 +1007,13 @@ public:
         Map* map = chr->GetMap();
 
         Creature* creature = new Creature;
-        if (!creature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, id, (uint32)teamval, x, y, z, o))
+        if (!creature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, phase, id, (uint32)teamval, x, y, z, o))
         {
             delete creature;
             return false;
         }
 
-        creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()));
+        creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), phase);
 
         uint32 db_guid = creature->GetDBTableGUIDLow();
 

@@ -1191,7 +1191,7 @@ public:
             {
                 std::string itemName = citemName + 1;
                 WorldDatabase.escape_string(itemName);
-                QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT entry FROM item_template WHERE name = '%s'", itemName.c_str());
+                QueryResult* result = WorldDatabase.PQuery("SELECT entry FROM item_template WHERE name = '%s'", itemName.c_str());
                 if (!result)
                 {
                     handler->PSendSysMessage(LANG_COMMAND_COULDNOTFIND, citemName + 1);
@@ -1308,7 +1308,7 @@ public:
         sLog.outDetail(handler->GetOregonString(LANG_ADDITEMSET), itemsetId);
 
         bool found = false;
-        for (uint32 id = 0; id < sItemStorage.MaxEntry; id++)
+        for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
         {
             ItemTemplate const* pProto = sItemStorage.LookupEntry<ItemTemplate>(id);
             if (!pProto)
@@ -1542,7 +1542,7 @@ public:
         // get additional information from DB
         else
         {
-            QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT totaltime, level, money, account, race, class FROM characters WHERE guid = '%u'", GUID_LOPART(targetGUID));
+            QueryResult* result = CharacterDatabase.PQuery("SELECT totaltime, level, money, account, race, class FROM characters WHERE guid = '%u'", GUID_LOPART(targetGUID));
             if (!result)
             {
                 handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -1564,7 +1564,7 @@ public:
         uint32 security = 0;
         std::string last_login = handler->GetOregonString(LANG_ERROR);
 
-        QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT a.username,aa.gmlevel,a.email,a.last_ip,a.last_login "
+        QueryResult* result = LoginDatabase.PQuery("SELECT a.username,aa.gmlevel,a.email,a.last_ip,a.last_login "
             "FROM account a "
             "LEFT JOIN account_access aa "
             "ON (a.id = aa.id) "
@@ -1589,7 +1589,7 @@ public:
                 EndianConvertReverse(ip);
 #endif
 
-                if (QueryResult_AutoPtr result2 = WorldDatabase.PQuery("SELECT c.country FROM ip2nationCountries c, ip2nation i WHERE "
+                if (QueryResult* result2 = WorldDatabase.PQuery("SELECT c.country FROM ip2nationCountries c, ip2nation i WHERE "
                     "i.ip < %u AND c.code = i.country ORDER BY i.ip DESC LIMIT 0,1", ip))
                 {
                     Field* fields2 = result2->Fetch();
@@ -1750,7 +1750,7 @@ public:
         cell.SetNoCreate();
 
         Oregon::RespawnDo u_do;
-        Oregon::WorldObjectWorker<Oregon::RespawnDo> worker(u_do);
+        Oregon::WorldObjectWorker<Oregon::RespawnDo> worker(pl, u_do);
 
         TypeContainerVisitor<Oregon::WorldObjectWorker<Oregon::RespawnDo>, GridTypeMapContainer > obj_worker(worker);
         cell.Visit(p, obj_worker, *pl->GetMap(), *pl, pl->GetGridActivationRange());
@@ -3086,7 +3086,7 @@ public:
             if (TargetName)
             {
                 //check for offline players
-                QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT characters.guid FROM characters WHERE characters.name = '%s'", name.c_str());
+                QueryResult* result = CharacterDatabase.PQuery("SELECT characters.guid FROM characters WHERE characters.name = '%s'", name.c_str());
                 if (!result)
                 {
                     handler->SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
@@ -3113,7 +3113,7 @@ public:
     static bool HandleListFreezeCommand(ChatHandler* handler, const char* /*args*/)
     {
         //Get names from DB
-        QueryResult_AutoPtr result = CharacterDatabase.Query("SELECT characters.name FROM characters LEFT JOIN character_aura ON (characters.guid = character_aura.guid) WHERE character_aura.spell = 9454");
+        QueryResult* result = CharacterDatabase.Query("SELECT characters.name FROM characters LEFT JOIN character_aura ON (characters.guid = character_aura.guid) WHERE character_aura.spell = 9454");
         if (!result)
         {
             handler->SendSysMessage(LANG_COMMAND_NO_FROZEN_PLAYERS);

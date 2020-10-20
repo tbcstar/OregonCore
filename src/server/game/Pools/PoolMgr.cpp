@@ -425,7 +425,7 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
     // load state from db
     if (!triggerFrom)
     {
-        QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT quest_id FROM pool_quest_save WHERE pool_id = %u", poolId);
+        QueryResult* result = CharacterDatabase.PQuery("SELECT quest_id FROM pool_quest_save WHERE pool_id = %u", poolId);
         if (result)
         {
             do
@@ -531,7 +531,7 @@ PoolMgr::PoolMgr() { }
 
 void PoolMgr::LoadFromDB()
 {
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT MAX(entry) FROM pool_template");
+    QueryResult* result = WorldDatabase.Query("SELECT MAX(entry) FROM pool_template");
     if (!result)
     {
         sLog.outString(">> 加载 0个 object pools. DB table `pool_template` is empty.");
@@ -763,7 +763,7 @@ void PoolMgr::LoadFromDB()
 
 void PoolMgr::LoadQuestPools()
 {
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT entry, pool_entry FROM pool_quest");
+    QueryResult* result = WorldDatabase.Query("SELECT entry, pool_entry FROM pool_quest");
 
     mQuestSearchMap.clear();
     mPoolQuestGroups.resize(max_pool_id + 1);
@@ -852,7 +852,7 @@ void PoolMgr::LoadQuestPools()
 // The initialize method will spawn all pools not in an event and not in another pool, this is why there is 2 left joins with 2 null checks
 void PoolMgr::Initialize()
 {
-    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT DISTINCT pool_template.entry, pool_pool.pool_id, pool_pool.mother_pool FROM pool_template LEFT JOIN game_event_pool ON pool_template.entry=game_event_pool.pool_entry LEFT JOIN pool_pool ON pool_template.entry=pool_pool.pool_id WHERE game_event_pool.pool_entry IS NULL");
+    QueryResult* result = WorldDatabase.Query("SELECT DISTINCT pool_template.entry, pool_pool.pool_id, pool_pool.mother_pool FROM pool_template LEFT JOIN game_event_pool ON pool_template.entry=game_event_pool.pool_entry LEFT JOIN pool_pool ON pool_template.entry=pool_pool.pool_id WHERE game_event_pool.pool_entry IS NULL");
     uint32 count = 0;
     if (result)
     {

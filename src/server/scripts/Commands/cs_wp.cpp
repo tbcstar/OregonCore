@@ -46,7 +46,7 @@ public:
                 pathid = target->GetWaypointPath();
             else
             {
-                QueryResult_AutoPtr result = WorldDatabase.Query("SELECT MAX(id) FROM waypoint_data");
+                QueryResult* result = WorldDatabase.Query("SELECT MAX(id) FROM waypoint_data");
                 uint32 maxpathid = result->Fetch()->GetInt32();
                 pathid = maxpathid + 1;
                 sLog.outDebug("DEBUG: HandleWpAddCommand - New path started.");
@@ -68,7 +68,7 @@ public:
 
         sLog.outDebug("DEBUG: HandleWpAddCommand - point == 0");
 
-        QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT MAX(point) FROM waypoint_data WHERE id = '%u'", pathid);
+        QueryResult* result = WorldDatabase.PQuery("SELECT MAX(point) FROM waypoint_data WHERE id = '%u'", pathid);
 
         if (result)
             point = (*result)[0].GetUInt32();
@@ -104,7 +104,7 @@ public:
 
             if (id)
             {
-                QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT id FROM waypoint_scripts WHERE guid = %u", id);
+                QueryResult* result = WorldDatabase.PQuery("SELECT id FROM waypoint_scripts WHERE guid = %u", id);
 
                 if (!result)
                 {
@@ -116,7 +116,7 @@ public:
             }
             else
             {
-                QueryResult_AutoPtr result = WorldDatabase.Query("SELECT MAX(guid) FROM waypoint_scripts");
+                QueryResult* result = WorldDatabase.Query("SELECT MAX(guid) FROM waypoint_scripts");
                 id = result->Fetch()->GetUInt32();
                 WorldDatabase.PExecute("INSERT INTO waypoint_scripts(guid)VALUES(%u)", id + 1);
                 handler->PSendSysMessage("%s%s%u|r", "|cff00ff00", "Wp Event: New waypoint event added: |r|cff00ffff", id + 1);
@@ -139,7 +139,7 @@ public:
             float a8, a9, a10, a11;
             char const* a7;
 
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT guid, delay, command, datalong, datalong2, dataint, x, y, z, o FROM waypoint_scripts WHERE id = %u", id);
+            QueryResult* result = WorldDatabase.PQuery("SELECT guid, delay, command, datalong, datalong2, dataint, x, y, z, o FROM waypoint_scripts WHERE id = %u", id);
 
             if (!result)
             {
@@ -171,7 +171,7 @@ public:
         {
             id = atoi(arg_id);
 
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT guid FROM waypoint_scripts WHERE guid = %u", id);
+            QueryResult* result = WorldDatabase.PQuery("SELECT guid FROM waypoint_scripts WHERE guid = %u", id);
 
             if (result)
             {
@@ -240,7 +240,7 @@ public:
             }
             else
             {
-                QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT id FROM waypoint_scripts WHERE guid='%u'", id);
+                QueryResult* result = WorldDatabase.PQuery("SELECT id FROM waypoint_scripts WHERE guid='%u'", id);
 
                 if (!result)
                 {
@@ -355,7 +355,7 @@ public:
         // Check the creature
         if (wpCreature->GetEntry() == VISUAL_WAYPOINT)
         {
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT id, point FROM waypoint_data WHERE wpguid = %u", wpGuid);
+            QueryResult* result = WorldDatabase.PQuery("SELECT id, point FROM waypoint_data WHERE wpguid = %u", wpGuid);
 
             if (!result)
             {
@@ -444,14 +444,14 @@ public:
                     wpCreature->AddObjectToRemoveList();
                     // re-create
                     Creature* wpCreature2 = new Creature;
-                    if (!wpCreature2->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, VISUAL_WAYPOINT, 0, chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation()))
+                    if (!wpCreature2->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, PHASEMASK_NORMAL, VISUAL_WAYPOINT, 0, chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation()))
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
                         delete wpCreature2;
                         return false;
                     }
 
-                    wpCreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()));
+                    wpCreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
                     // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                     //TODO: Should we first use "Create" then use "LoadFromDB"?
                     if (!wpCreature2->LoadCreatureFromDB(wpCreature2->GetDBTableGUIDLow(), map))
@@ -559,7 +559,7 @@ public:
                 return false;
             }
 
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT id, point, delay, move_type, action, action_chance FROM waypoint_data WHERE wpguid = %u", target->GetGUIDLow());
+            QueryResult* result = WorldDatabase.PQuery("SELECT id, point, delay, move_type, action, action_chance FROM waypoint_data WHERE wpguid = %u", target->GetGUIDLow());
 
             if (!result)
             {
@@ -590,7 +590,7 @@ public:
 
         if (show == "on")
         {
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT point, position_x,position_y,position_z FROM waypoint_data WHERE id = '%u'", pathid);
+            QueryResult* result = WorldDatabase.PQuery("SELECT point, position_x,position_y,position_z FROM waypoint_data WHERE id = '%u'", pathid);
 
             if (!result)
             {
@@ -602,7 +602,7 @@ public:
             handler->PSendSysMessage("|cff00ff00DEBUG: wp on, PathID: |cff00ffff%u|r", pathid);
 
             // Delete all visuals for this NPC
-            QueryResult_AutoPtr result2 = WorldDatabase.PQuery("SELECT wpguid FROM waypoint_data WHERE id = '%u' and wpguid <> 0", pathid);
+            QueryResult* result2 = WorldDatabase.PQuery("SELECT wpguid FROM waypoint_data WHERE id = '%u' and wpguid <> 0", pathid);
 
             if (result2)
             {
@@ -651,7 +651,7 @@ public:
                 float o = chr->GetOrientation();
 
                 Creature* wpCreature = new Creature;
-                if (!wpCreature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, id, 0, x, y, z, o))
+                if (!wpCreature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
                 {
                     handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
                     delete wpCreature;
@@ -662,7 +662,7 @@ public:
                 // set "wpguid" column to the visual waypoint
                 WorldDatabase.PExecuteLog("UPDATE waypoint_data SET wpguid = '%u' WHERE id = '%u' and point = '%u'", wpCreature->GetGUIDLow(), pathid, point);
 
-                wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()));
+                wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
                 if (!wpCreature->LoadCreatureFromDB(wpCreature->GetDBTableGUIDLow(), map))
                 {
                     handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
@@ -685,7 +685,7 @@ public:
         {
             handler->PSendSysMessage("|cff00ff00DEBUG: wp first, GUID: %u|r", pathid);
 
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT position_x,position_y,position_z,orientation FROM waypoint_data WHERE point='1' AND id = '%u'", pathid);
+            QueryResult* result = WorldDatabase.PQuery("SELECT position_x,position_y,position_z,orientation FROM waypoint_data WHERE point='1' AND id = '%u'", pathid);
             if (!result)
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_NOTFOUND, pathid);
@@ -704,14 +704,14 @@ public:
             Map* map = chr->GetMap();
 
             Creature* creature = new Creature;
-            if (!creature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, id, 0, x, y, z, o))
+            if (!creature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
                 delete creature;
                 return false;
             }
 
-            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()));
+            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
             if (!creature->LoadCreatureFromDB(creature->GetDBTableGUIDLow(), map))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
@@ -732,7 +732,7 @@ public:
         {
             handler->PSendSysMessage("|cff00ff00DEBUG: wp last, PathID: |r|cff00ffff%u|r", pathid);
 
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT MAX(point) FROM waypoint_data WHERE id = '%u'", pathid);
+            QueryResult* result = WorldDatabase.PQuery("SELECT MAX(point) FROM waypoint_data WHERE id = '%u'", pathid);
             if (result)
                 Maxpoint = (*result)[0].GetUInt32();
             else
@@ -756,14 +756,14 @@ public:
             Map* map = chr->GetMap();
 
             Creature* creature = new Creature;
-            if (!creature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, id, 0, x, y, z, o))
+            if (!creature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);
                 delete creature;
                 return false;
             }
 
-            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()));
+            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
             if (!creature->LoadCreatureFromDB(creature->GetDBTableGUIDLow(), map))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);
@@ -782,7 +782,7 @@ public:
 
         if (show == "off")
         {
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id = '%u'", 1);
+            QueryResult* result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id = '%u'", 1);
             if (!result)
             {
                 handler->SendSysMessage(LANG_WAYPOINT_VP_NOTFOUND);

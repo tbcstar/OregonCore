@@ -168,7 +168,7 @@ public:
                 cell.SetNoCreate();
 
                 Oregon::AllFriendlyCreaturesInGrid check(me);
-                Oregon::CreatureListSearcher<Oregon::AllFriendlyCreaturesInGrid> searcher(templist, check);
+                Oregon::CreatureListSearcher<Oregon::AllFriendlyCreaturesInGrid> searcher(me,templist, check);
                 TypeContainerVisitor<Oregon::CreatureListSearcher<Oregon::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
                 cell.Visit(pair, cSearcher, *(me->GetMap()), *me, me->GetGridActivationRange());
 

@@ -245,7 +245,7 @@ public:
                 cell.SetNoCreate();
 
                 Oregon::AllCreaturesOfEntryInRange check(me, MOB_EGG, 100);
-                Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange> searcher(templist, check);
+                Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange> searcher(me, templist, check);
                 TypeContainerVisitor<Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
                 cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
             }
@@ -276,7 +276,7 @@ public:
                 cell.SetNoCreate();
 
                 Oregon::AllCreaturesOfEntryInRange check(me, MOB_FIRE_BOMB, 100);
-                Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange> searcher(templist, check);
+                Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange> searcher(me, templist, check);
                 TypeContainerVisitor<Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
                 cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
             }
@@ -536,7 +536,7 @@ public:
                 cell.SetNoCreate();
 
                 Oregon::AllCreaturesOfEntryInRange check(me, 23817, 50);
-                Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange> searcher(templist, check);
+                Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange> searcher(me, templist, check);
                 TypeContainerVisitor<Oregon::CreatureListSearcher<Oregon::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
                 cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
             }

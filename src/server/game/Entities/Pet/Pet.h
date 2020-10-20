@@ -171,12 +171,12 @@ class Pet : public Guardian
 
         bool IsPermanentPetFor(Player* owner);              // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
-        bool Create (uint32 guidlow, Map* map, uint32 Entry, uint32 pet_number);
+        bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number);
         bool CreateBaseAtCreature(Creature* creature);
         bool LoadPetFromDB(Player* owner, uint32 petentry = 0, uint32 petnumber = 0, bool current = false);
         void SavePetToDB(PetSaveMode mode);
         void Remove(PetSaveMode mode, bool returnreagent = false);
-        static void DeleteFromDB(uint32 guidlow);
+        static void DeleteFromDB(uint32 guidlow, bool separate_transaction = true);
 
         void setDeathState(DeathState s) override;                   // overwrite virtual Creature::setDeathState and Unit::setDeathState
         void Update(uint32 diff) override;                           // overwrite virtual Creature::Update and Unit::Update
@@ -309,7 +309,7 @@ class Pet : public Guardian
         using Creature::SaveToDB;
         using Creature::DeleteFromDB;
         
-        void SaveToDB(uint32, uint8) override                        // overwrited of Creature::SaveToDB     - don't must be called
+        void SaveToDB(uint32, uint8, uint32) override                        // overwrited of Creature::SaveToDB     - don't must be called
         {
             assert(false);
         }

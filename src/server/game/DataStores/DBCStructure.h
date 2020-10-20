@@ -426,7 +426,8 @@ struct ItemEntry
 struct ItemDisplayInfoEntry
 {
     uint32      ID;
-    uint32      randomPropertyChance;
+    //uint32      randomPropertyChance;
+    char* inventoryIcon;
 };
 
 //struct ItemCondExtCostsEntry

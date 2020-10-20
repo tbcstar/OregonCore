@@ -73,7 +73,7 @@ public:
 
         LoginDatabase.escape_string(ip);
 
-        QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE last_ip = '%s'", ip.c_str());
+        QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE last_ip = '%s'", ip.c_str());
 
         return LookupPlayerSearchCommand(handler, result, limit);
     }
@@ -92,12 +92,12 @@ public:
 
         LoginDatabase.escape_string(account);
 
-        QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE username = '%s'", account.c_str());
+        QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE username = '%s'", account.c_str());
 
         return LookupPlayerSearchCommand(handler, result, limit);
     }
 
-    static bool LookupPlayerSearchCommand(ChatHandler* handler, QueryResult_AutoPtr result, int32 limit)
+    static bool LookupPlayerSearchCommand(ChatHandler* handler, QueryResult* result, int32 limit)
     {
         if (!result)
         {
@@ -121,7 +121,7 @@ public:
             uint32 acc_id = fields[0].GetUInt32();
             std::string acc_name = fields[1].GetCppString();
 
-            QueryResult_AutoPtr chars = CharacterDatabase.PQuery("SELECT guid,name FROM characters WHERE account = '%u'", acc_id);
+            QueryResult* chars = CharacterDatabase.PQuery("SELECT guid,name FROM characters WHERE account = '%u'", acc_id);
             if (chars)
             {
                 handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, acc_name.c_str(), acc_id);
@@ -157,7 +157,7 @@ public:
 
         LoginDatabase.escape_string(email);
 
-        QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE email = '%s'", email.c_str());
+        QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE email = '%s'", email.c_str());
 
         return LookupPlayerSearchCommand(handler, result, limit);
     }
@@ -255,7 +255,7 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld.getConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        for (uint32 id = 0; id < sCreatureStorage.MaxEntry; ++id)
+        for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
         {
             CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(id);
             if (!cInfo)
@@ -596,7 +596,7 @@ public:
         uint32 maxResults = sWorld.getConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in item_template
-        for (uint32 id = 0; id < sItemStorage.MaxEntry; id++)
+        for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
         {
             ItemTemplate const* pProto = sItemStorage.LookupEntry<ItemTemplate >(id);
             if (!pProto)
@@ -750,7 +750,7 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld.getConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-        for (uint32 id = 0; id < sGOStorage.MaxEntry; id++)
+        for (uint32 id = 0; id < sGOStorage.GetMaxEntry(); id++)
         {
             GameObjectInfo const* gInfo = sGOStorage.LookupEntry<GameObjectInfo>(id);
             if (!gInfo)

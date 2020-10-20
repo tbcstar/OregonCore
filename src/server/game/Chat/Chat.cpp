@@ -53,7 +53,7 @@ std::vector<ChatCommand> const& ChatHandler::getCommandTable()
         std::vector<ChatCommand> cmds = sScriptMgr.GetChatCommands();
         commandTableCache.swap(cmds);
 
-        QueryResult_AutoPtr result = WorldDatabase.Query("SELECT name,security,help FROM command");
+        QueryResult* result = WorldDatabase.Query("SELECT name,security,help FROM command");
         if (result)
         {
             do
@@ -182,9 +182,9 @@ void ChatHandler::PSendSysMessage(int32 entry, ...)
 {
     const char* format = GetOregonString(entry);
     va_list ap;
-    char str[1024];
+    char str [2048];
     va_start(ap, entry);
-    vsnprintf(str, 1024, format, ap);
+    vsnprintf(str, 2048, format, ap);
     va_end(ap);
     SendSysMessage(str);
 }
@@ -192,9 +192,9 @@ void ChatHandler::PSendSysMessage(int32 entry, ...)
 void ChatHandler::PSendSysMessage(const char* format, ...)
 {
     va_list ap;
-    char str[1024];
+    char str [2048];
     va_start(ap, format);
-    vsnprintf(str, 1024, format, ap);
+    vsnprintf(str, 2048, format, ap);
     va_end(ap);
     SendSysMessage(str);
 }
@@ -1205,7 +1205,7 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
         Cell cell(p);
 
         Oregon::GameObjectWithDbGUIDCheck go_check(*pl, lowguid);
-        Oregon::GameObjectSearcher<Oregon::GameObjectWithDbGUIDCheck> checker(obj, go_check);
+        Oregon::GameObjectSearcher<Oregon::GameObjectWithDbGUIDCheck> checker(pl, obj, go_check);
 
         TypeContainerVisitor<Oregon::GameObjectSearcher<Oregon::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
         cell.Visit(p, object_checker, *pl->GetMap(), *pl, pl->GetGridActivationRange());

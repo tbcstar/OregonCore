@@ -24,7 +24,6 @@
 #include "UnixDebugger.h"
 #include "SystemConfig.h"
 #include "Log.h"
-#include "Console.h"
 
 #include <sys/resource.h>
 #include <sys/types.h>
@@ -532,9 +531,6 @@ void UnixDebugger::DumpDebugInfo(const char* sig, const char* reason)
             // sLog was already destroyed ("Dead Reference" exception)
         }
     }
-
-    // safely end curses (restore terminal)
-    sConsole.Restore();
 
     // We always use classic stdio instead of streams for output
     fprintf(stdout, "%s\n", ss.str().c_str());

@@ -23,6 +23,7 @@ public:
             { "move",           SEC_GAMEMASTER,     false, HandleMoveObjectCommand,          "" },
             { "near",           SEC_ADMINISTRATOR,  false, HandleNearObjectCommand,          "" },
             { "activate",       SEC_GAMEMASTER,     false, HandleActivateObjectCommand,      "" },
+            { "setphase",       SEC_GAMEMASTER,     false, HandleGOPhaseCommand,             "" },
             { "addtemp",        SEC_GAMEMASTER,     false, HandleTempGameObjectCommand,      "" }
         };
 
@@ -69,7 +70,7 @@ public:
         GameObject* pGameObj = new GameObject;
         uint32 db_lowGUID = sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
-        if (!pGameObj->Create(db_lowGUID, gInfo->id, map, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
+        if (!pGameObj->Create(db_lowGUID, gInfo->id, map, PHASEMASK_NORMAL, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
         {
             delete pGameObj;
             return false;
@@ -83,7 +84,7 @@ public:
         }
 
         // fill the gameobject data and save to the db
-        pGameObj->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()));
+        pGameObj->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
         delete pGameObj;
 
         pGameObj = new GameObject();
@@ -153,7 +154,7 @@ public:
     static bool HandleTargetObjectCommand(ChatHandler* handler, const char* args)
     {
         Player* pl = handler->GetSession()->GetPlayer();
-        QueryResult_AutoPtr result;
+        QueryResult* result;
         GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr.GetActiveEventList();
         if (*args)
         {
@@ -384,7 +385,7 @@ public:
         uint32 count = 0;
 
         Player* pl = handler->GetSession()->GetPlayer();
-        QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
+        QueryResult* result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
             "(POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ "
             "FROM gameobject WHERE map='%u' AND (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) <= '%f' ORDER BY order_",
             pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(),
@@ -487,6 +488,43 @@ public:
 
         player->SummonGameObject(objectId, x, y, z, ang, 0, 0, rot2, rot3, spawntm);
 
+        return true;
+    }
+
+    static bool HandleGOPhaseCommand(ChatHandler* handler, const char* args)
+    {
+        // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+        char* cId = handler->extractKeyFromLink((char*)args, "Hgameobject");
+        if (!cId)
+            return false;
+
+        uint32 lowguid = atoi(cId);
+        if (!lowguid)
+            return false;
+
+        GameObject* obj = NULL;
+        // by DB guid
+        if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+            obj = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(lowguid, go_data->id);
+
+        if (!obj)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        char* phaseStr = strtok(NULL, " ");
+        uint32 phasemask = phaseStr ? atoi(phaseStr) : 0;
+        if (phasemask == 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        obj->SetPhaseMask(phasemask, true, false);
+        obj->SaveToDB();
         return true;
     }
 };

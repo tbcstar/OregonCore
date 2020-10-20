@@ -1,201 +1,274 @@
 /*
- * This file is part of the OregonCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
+ * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
+ * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "Util.h"
 #include "DatabaseEnv.h"
 #include "Configuration/Config.h"
-
-#include "Common.h"
-#include "UpdateFields.h"
-
-#include "Utilities/Util.h"
-#include "Platform/Define.h"
-#include "Platform/CompilerDefs.h"
-#include "Threading.h"
-#include "Database/SqlDelayThread.h"
 #include "Database/SqlOperations.h"
-#include "Timer.h"
 
 #include <ctime>
 #include <iostream>
 #include <fstream>
-#if PLATFORM == PLATFORM_UNIX
-#include <sys/file.h>
-#endif
+#include <memory>
 
-static const my_bool my_true = 1;
+#define MIN_CONNECTION_POOL_SIZE 1
+#define MAX_CONNECTION_POOL_SIZE 16
 
-size_t Database::db_count = 0;
-
-Database::Database() : mMysql(NULL), m_connected(false)
+//////////////////////////////////////////////////////////////////////////
+SqlPreparedStatement* SqlConnection::CreateStatement(std::string const& fmt)
 {
-    // before first connection
-    if (db_count++ == 0)
-    {
-        // Mysql Library Init
-        mysql_library_init(-1, NULL, NULL);
-
-        if (!mysql_thread_safe())
-            sLog.outFatal("FATAL ERROR: Used MySQL library isn't thread-safe.");
-    }
+    return new SqlPlainPreparedStatement(fmt, *this);
 }
 
-Database::~Database()
+void SqlConnection::FreePreparedStatements()
 {
-    if (m_delayThread)
-        HaltDelayThread();
+    SqlConnection::Lock guard(this);
 
-    for (PreparedStatementsMap::iterator it = m_preparedStatements.begin(); it != m_preparedStatements.end(); ++it)
-    {
-        mysql_stmt_close(it->second->stmt);
-        delete it->second;
-    }
+    size_t nStmts = m_holder.size();
+    for (size_t i = 0; i < nStmts; ++i)
+        delete m_holder[i];
 
-    if (mMysql)
-        mysql_close(mMysql);
-
-    // Free Mysql library pointers for last ~DB
-    if (--db_count == 0)
-        mysql_library_end();
+    m_holder.clear();
 }
 
-bool Database::Initialize(const char* infoString)
+SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
 {
-    // Enable logging of SQL commands (usally only GM commands)
-    // (See method: PExecuteLog)
-    m_logSQL = sConfig.GetBoolDefault("LogSQL", false);
-    m_logsDir = sConfig.GetStringDefault("LogsDir", "");
-    if (!m_logsDir.empty())
+    if(nIndex < 0)
+        return nullptr;
+
+    //resize stmt container
+    if(m_holder.size() <= nIndex)
+        m_holder.resize(nIndex + 1, nullptr);
+
+    SqlPreparedStatement* pStmt = nullptr;
+
+    //create stmt if needed
+    if(m_holder[nIndex] == nullptr)
     {
-        if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
-            m_logsDir.append("/");
+        //obtain SQL request string
+        std::string fmt = m_db.GetStmtString(nIndex);
+        ASSERT(fmt.length());
+        //allocate SQlPreparedStatement object
+        pStmt = CreateStatement(fmt);
+        //prepare statement
+        if(!pStmt->prepare())
+        {
+            //ASSERT(false && "Unable to prepare SQL statement");
+            sLog.outError("Can't prepare %s, statement not executed!", fmt.c_str());
+            return nullptr;
+        }
+
+        //save statement in internal registry
+        m_holder[nIndex] = pStmt;
     }
+    else
+        pStmt = m_holder[nIndex];
 
-    tranThread = NULL;
-    MYSQL* mysqlInit;
-    mysqlInit = mysql_init(NULL);
-    if (!mysqlInit)
-    {
-        sLog.outError("Could not initialize Mysql connection");
-        return false;
-    }
+    return pStmt;
+}
 
-    InitDelayThread();
-
+bool SqlConnection::Initialize(char const* infoString)
+{
     Tokens tokens = StrSplit(infoString, ";");
 
     Tokens::iterator iter;
 
-    std::string host, port_or_socket, user, password, database;
-    int port;
-    char const* unix_socket;
-
     iter = tokens.begin();
 
+    m_use_socket = false;
     if (iter != tokens.end())
-        host = *iter++;
+    {
+        m_host = *iter++;
+        if (m_host == ".")
+        {
+            m_host = "localhost";
+            m_use_socket = true;
+        }
+    }
     if (iter != tokens.end())
-        port_or_socket = *iter++;
+    {
+        m_port_or_socket = *iter++;
+        m_port = atoi(m_port_or_socket.c_str());
+    }
     if (iter != tokens.end())
-        user = *iter++;
+        m_user = *iter++;
     if (iter != tokens.end())
-        password = *iter++;
+        m_password = *iter++;
     if (iter != tokens.end())
-        database = *iter++;
+        m_database = *iter++;
 
-    mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, "utf8");
-    #ifdef _WIN32
-    if (host == ".")                                         // named pipe use option (Windows)
-    {
-        unsigned int opt = MYSQL_PROTOCOL_PIPE;
-        mysql_options(mysqlInit, MYSQL_OPT_PROTOCOL, (char const*)&opt);
-        port = 0;
-        unix_socket = 0;
-    }
-    else                                                    // generic case
-    {
-        port = atoi(port_or_socket.c_str());
-        unix_socket = 0;
-    }
-    #else
-    if (host == ".")                                         // socket use option (Unix/Linux)
-    {
-        unsigned int opt = MYSQL_PROTOCOL_SOCKET;
-        mysql_options(mysqlInit, MYSQL_OPT_PROTOCOL, (char const*)&opt);
-        host = "localhost";
-        port = 0;
-        unix_socket = port_or_socket.c_str();
-    }
-    else                                                    // generic case
-    {
-        port = atoi(port_or_socket.c_str());
-        unix_socket = 0;
-    }
-    #endif
+    return OpenConnection(false);
+}
 
-    mMysql = mysql_real_connect(mysqlInit, host.c_str(), user.c_str(),
-                                password.c_str(), database.c_str(), port, unix_socket, 0);
-
-    if (mMysql)
-    {
-        sLog.outDetail("Connected to MySQL database at %s", host.c_str());
-        sLog.outDebug("MySQL client library: %s", mysql_get_client_info());
-        sLog.outDebug("MySQL server ver: %s ", mysql_get_server_info( mMysql));
-
-        if (!mysql_autocommit(mMysql, 1))
-            sLog.outDebug("AUTOCOMMIT SUCCESSFULLY SET TO 1");
-        else
-            sLog.outDebug("AUTOCOMMIT NOT SET TO 1");
-
-        // set connection properties to UTF8 to properly handle locales for different
-        // server configs - core sends data in UTF8, so MySQL must expect UTF8 too
-        // mysql_set_character_set is just like SET NAMES, but also sets encoding in client library
-        // which enforces mysql_real_escape_string to be safe
-        mysql_set_character_set(mMysql, "utf8");
-        Execute("SET CHARACTER SET `utf8`");
-
-        #if MYSQL_VERSION_ID >= 50003
-        my_bool my_true = (my_bool)1;
-        if (mysql_options(mMysql, MYSQL_OPT_RECONNECT, &my_true))
-            sLog.outDebug("Failed to turn on MYSQL_OPT_RECONNECT.");
-        else
-            sLog.outDebug("Successfully turned on MYSQL_OPT_RECONNECT.");
-        #else
-#warning "Your mySQL client lib version does not support reconnecting after a timeout.\nIf this causes you any trouble we advice you to upgrade your mySQL client libs to at least mySQL 5.0.13 to resolve this problem."
-        #endif
-        
-        m_connected = true;
-        return true;
-    }
-    else
-    {
-        sLog.outError("Could not connect to MySQL database at %s: %s", host.c_str(), mysql_error(mysqlInit));
-        mysql_close(mysqlInit);
+bool SqlConnection::ExecuteStmt(int nIndex, SqlStmtParameters const& id)
+{
+    if(nIndex == -1)
         return false;
+
+    //get prepared statement object
+    if (SqlPreparedStatement* pStmt = GetStmt(nIndex))
+    {
+        //bind parameters
+        pStmt->bind(id);
+        //execute statement
+        return pStmt->execute();
     }
+    return false;
+}
+
+//////////////////////////////////////////////////////////////////////////
+Database::~Database()
+{
+    StopServer();
+}
+
+bool Database::Initialize(char const* infoString, int nConns /*= 1*/, int nWorkers)
+{
+    // Enable logging of SQL commands (usually only GM commands)
+    // (See method: PExecuteLog)
+    m_logSQL = sConfig.GetBoolDefault("LogSQL", false);
+    m_logsDir = sConfig.GetStringDefault("LogsDir","");
+    if(!m_logsDir.empty())
+    {
+        if((m_logsDir.at(m_logsDir.length()-1)!='/') && (m_logsDir.at(m_logsDir.length()-1)!='\\'))
+            m_logsDir.append("/");
+    }
+
+    m_pingIntervallms = sConfig.GetIntDefault ("MaxPingTime", 30) * (MINUTE * 1000);
+
+    //create DB connections
+
+    //setup connection pool size
+    if(nConns < MIN_CONNECTION_POOL_SIZE)
+        m_nQueryConnPoolSize = MIN_CONNECTION_POOL_SIZE;
+    else if(nConns > MAX_CONNECTION_POOL_SIZE)
+        m_nQueryConnPoolSize = MAX_CONNECTION_POOL_SIZE;
+    else
+        m_nQueryConnPoolSize = nConns;
+
+    //create connection pool for sync requests
+    for (int i = 0; i < m_nQueryConnPoolSize; ++i)
+    {
+        SqlConnection* pConn = CreateConnection();
+        if(!pConn->Initialize(infoString))
+        {
+            delete pConn;
+            return false;
+        }
+
+        m_pQueryConnections.push_back(pConn);
+    }
+
+    //create and initialize connection for async requests
+    m_pResultQueue = new SqlResultQueue;
+    m_pAsyncConn = CreateConnection();
+    if(!m_pAsyncConn->Initialize(infoString))
+        return false;
+
+    m_numAsyncWorkers = nWorkers;
+    m_threadsBodies   = new SqlDelayThread*[m_numAsyncWorkers];
+    m_delayThreads    = new ACE_Based::Thread*[m_numAsyncWorkers];
+    m_serialDelayQueue = new SqlQueue*[m_numAsyncWorkers];
+    for (int i = 0; i < nWorkers; ++i)
+        if (!InitDelayThread(i, infoString))
+            return false;
+
+    return true;
+}
+
+void Database::StopServer()
+{
+    HaltDelayThread();
+
+    /*Delete objects*/
+    if (m_pResultQueue)
+    {
+        // Delete queued queries
+        m_pResultQueue->CancelAll();
+        delete m_pResultQueue;
+        m_pResultQueue = nullptr;
+    }
+
+    if (m_pAsyncConn)
+    {
+        delete m_pAsyncConn;
+        m_pAsyncConn = nullptr;
+    }
+
+    for (size_t i = 0; i < m_pQueryConnections.size(); ++i)
+        delete m_pQueryConnections[i];
+
+    m_pQueryConnections.clear();
+
+}
+
+bool Database::InitDelayThread(int i, std::string const& infoString)
+{
+    //New delay thread for delay execute
+
+    SqlConnection* threadConnection = CreateConnection();
+    if(!threadConnection->Initialize(infoString.c_str()))
+        return false;
+    m_threadsBodies[i] = new SqlDelayThread(this, threadConnection, i);
+    m_threadsBodies[i]->incReference();
+    m_delayThreads[i] = new ACE_Based::Thread(m_threadsBodies[i]);
+
+    m_serialDelayQueue[i] = new SqlQueue();
+
+    return true;
+}
+
+void Database::HaltDelayThread()
+{
+    if (!m_delayThreads || !m_threadsBodies)
+        return;
+
+    for (uint32 i = 0; i < m_numAsyncWorkers; ++i)
+    {
+        m_threadsBodies[i]->Stop();
+        m_delayThreads[i]->wait();
+        delete m_delayThreads[i];
+        m_threadsBodies[i]->decReference();
+    }
+    delete[] m_threadsBodies;
+    delete[] m_delayThreads;
+    delete[] m_serialDelayQueue;
+    m_delayThreads = nullptr;
+    m_threadsBodies = nullptr;
+    m_serialDelayQueue = nullptr;
+    m_numAsyncWorkers = 0;
 }
 
 void Database::ThreadStart()
 {
-    mysql_thread_init();
 }
 
 void Database::ThreadEnd()
 {
-    mysql_thread_end();
+}
+
+void Database::ProcessResultQueue(uint32 maxTime)
+{
+    if (m_pResultQueue)
+        m_pResultQueue->Update(maxTime);
 }
 
 void Database::escape_string(std::string& str)
@@ -203,22 +276,44 @@ void Database::escape_string(std::string& str)
     if (str.empty())
         return;
 
-    char* buf = new char[str.size() * 2 + 1];
-    escape_string(buf, str.c_str(), str.size());
+    int bufSize = str.size() * 2 + 1;
+    char* buf = new char[bufSize + 1];
+    //we don't care what connection to use - escape string will be the same
+    m_pQueryConnections[0]->escape_string(buf, str.c_str(), str.size());
+    buf[bufSize] = 0;
     str = buf;
     delete[] buf;
 }
 
-unsigned long Database::escape_string(char* to, const char* from, unsigned long length)
+SqlConnection* Database::getQueryConnection()
 {
-    if (!mMysql || !to || !from || !length)
-        return 0;
+    int nCount = 0;
 
-    return (mysql_real_escape_string(mMysql, to, from, length));
+    if(m_nQueryCounter == long(1 << 31))
+        m_nQueryCounter = 0;
+    else
+        nCount = ++m_nQueryCounter;
+
+    return m_pQueryConnections[nCount % m_nQueryConnPoolSize];
 }
 
+void Database::Ping()
+{
+    char const* sql = "SELECT 1";
 
-bool Database::PExecuteLog(const char* format, ...)
+    {
+        SqlConnection::Lock guard(m_pAsyncConn);
+        delete guard->Query(sql);
+    }
+
+    for (int i = 0; i < m_nQueryConnPoolSize; ++i)
+    {
+        SqlConnection::Lock guard(m_pQueryConnections[i]);
+        delete guard->Query(sql);
+    }
+}
+
+bool Database::PExecuteLog(char const* format,...)
 {
     if (!format)
         return false;
@@ -229,178 +324,49 @@ bool Database::PExecuteLog(const char* format, ...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res == -1)
+    if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
         return false;
     }
 
-    sLog.outSQL("%s", szQuery);
-    return Execute(szQuery);
-}
-
-bool Database::PreparedExecuteLog(const char* sql, const char* format, ...)
-{
-    if (format)
+    if(m_logSQL)
     {
-        PreparedValues values(strlen(format));
+        time_t curr;
+        tm local;
+        time(&curr);                                        // get current time_t value
+        local=*(localtime(&curr));                          // dereference and assign
+        char fName[128];
+        sprintf(fName, "%04d-%02d-%02d_logSQL.sql", local.tm_year+1900, local.tm_mon+1, local.tm_mday);
 
-        va_list ap;
-        va_start(ap, format);
-        _ConvertValistToPreparedValues(ap, values, format);
-        va_end(ap);
-
-        return PreparedExecuteLog(sql, values);
-    }
- 
-    PreparedValues values(0);
-    return PreparedExecuteLog(sql, values);
-}
-
-bool Database::PreparedExecuteLog(const char* sql, PreparedValues& values)
-{
-    std::string query(sql);
-    std::stringstream ss;
-    size_t pos = 0, i = 0;
-
-    while ((pos = query.find("?", pos)) != std::string::npos)
-    {
-        switch (values[i].type)
+        FILE* log_file;
+        std::string logsDir_fname = m_logsDir+fName;
+        log_file = fopen(logsDir_fname.c_str(), "a");
+        if (log_file)
         {
-            case ARG_TYPE_STRING:
-            case ARG_TYPE_STRING_ALT:
-                {
-                    std::string safeStr(values[i].data.string);
-                    escape_string(safeStr);
-                    safeStr += '\'';
-                    safeStr.insert(0, "'");
-                    query.replace(pos, 1, safeStr);
-                }
-                break;
-            case ARG_TYPE_BINARY:
-            case ARG_TYPE_BINARY_ALT:
-                ss << "0x" << std::hex;
-                for (size_t j = 0; j < values[i].data.length; ++j)
-                    ss << *reinterpret_cast<const char*>(values[i].data.binary);
-                ss.clear();
-                break;
-            case ARG_TYPE_FLOAT:
-                ss << values[i].data.float_;
-                query.replace(pos, 1, ss.str());
-                ss.clear();
-                break;
-            case ARG_TYPE_DOUBLE:
-                ss << values[i].data.double_;
-                query.replace(pos, 1, ss.str());
-                ss.clear();
-                break;
-            case ARG_TYPE_NUMBER:
-            case ARG_TYPE_NUMBER_ALT:
-                ss << values[i].data.number;
-                query.replace(pos, 1, ss.str());
-                ss.clear();
-                break;
-            case ARG_TYPE_UNSIGNED_NUMBER:
-                ss << values[i].data.unsignedNumber;
-                query.replace(pos, 1, ss.str());
-                ss.clear();
-                break;
-            case ARG_TYPE_LARGE_NUMBER:
-            case ARG_TYPE_LARGE_NUMBER_ALT:
-                ss << values[i].data.largeNumber;
-                query.replace(pos, 1, ss.str());
-                ss.clear();
-                break;
-            case ARG_TYPE_LARGE_UNSIGNED_NUMBER:
-                ss << values[i].data.unsignedLargeNumber;
-                query.replace(pos, 1, ss.str());
-                ss.clear();
-                break;
-        }
-
-        ++i;
-    }
-
-    sLog.outSQL("%s", query.c_str());
-
-    if (values.size())
-        return PreparedExecute(sql, values);
-    else
-        return PreparedExecute(sql);
-}
-
-void Database::SetResultQueue(SqlResultQueue* queue)
-{
-    m_queryQueues[ACE_Based::Thread::current()] = queue;
-}
-
-bool Database::_Query(const char* sql, MYSQL_RES** pResult, MYSQL_FIELD** pFields, uint64* pRowCount, uint32* pFieldCount)
-{
-    if (!mMysql)
-        return 0;
-
-    {
-        // guarded block for thread-safe mySQL request
-        ACE_Guard<ACE_Thread_Mutex> query_connection_guard(mMutex);
-        #ifdef OREGON_DEBUG
-        uint32 _s = getMSTime();
-        #endif
-        if (mysql_query(mMysql, sql))
-        {
-            sLog.outErrorDb("SQL: %s", sql);
-            sLog.outErrorDb("query ERROR: %s", mysql_error(mMysql));
-            return false;
+            fprintf(log_file, "%s;\n", szQuery);
+            fclose(log_file);
         }
         else
         {
-            #ifdef OREGON_DEBUG
-            // prevent recursive death
-            unsigned long oldMask = sLog.GetDBLogMask();
-            sLog.SetDBLogMask(oldMask & ~(1 << LOG_TYPE_DEBUG));
-            sLog.outDebug("[%u ms] SQL: %s", getMSTimeDiff(_s, getMSTime()), sql);
-            sLog.SetDBLogMask(oldMask);
-            #endif
+            // The file could not be opened
+            sLog.outError("SQL-Logging is disabled - Log file for the SQL commands could not be openend: %s",fName);
         }
-
-        *pResult = mysql_store_result(mMysql);
-        *pRowCount = mysql_affected_rows(mMysql);
-        *pFieldCount = mysql_field_count(mMysql);
     }
 
-    if (!*pResult )
-        return false;
+    return Execute(szQuery);
+}
 
-    if (!*pRowCount)
-    {
-        mysql_free_result(*pResult);
-        return false;
-    }
 
-    *pFields = mysql_fetch_fields(*pResult);
+bool Database::ExecuteFile(const char* file)
+{
+    //TBD
     return true;
 }
 
-QueryResult_AutoPtr Database::Query(const char* sql)
+QueryResult* Database::PQuery(char const* format,...)
 {
-    MYSQL_RES* result = NULL;
-    MYSQL_FIELD* fields = NULL;
-    uint64 rowCount = 0;
-    uint32 fieldCount = 0;
-
-    if (!_Query(sql, &result, &fields, &rowCount, &fieldCount))
-        return QueryResult_AutoPtr(NULL);
-
-    QueryResult* queryResult = new QueryResult(result, fields, rowCount, fieldCount);
-
-    queryResult->NextRow();
-
-    return QueryResult_AutoPtr(queryResult);
-}
-
-QueryResult_AutoPtr Database::PQuery(const char* format, ...)
-{
-    if (!format)
-        return QueryResult_AutoPtr(NULL);
+    if(!format) return nullptr;
 
     va_list ap;
     char szQuery [MAX_QUERY_LEN];
@@ -408,37 +374,59 @@ QueryResult_AutoPtr Database::PQuery(const char* format, ...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res == -1)
+    if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
-        return QueryResult_AutoPtr(NULL);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        return nullptr;
     }
 
     return Query(szQuery);
 }
 
-bool Database::Execute(const char* sql)
+QueryNamedResult* Database::PQueryNamed(char const* format,...)
 {
-    if (!mMysql)
+    if(!format) return nullptr;
+
+    va_list ap;
+    char szQuery [MAX_QUERY_LEN];
+    va_start(ap, format);
+    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
+    va_end(ap);
+
+    if(res==-1)
+    {
+        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        return nullptr;
+    }
+
+    return QueryNamed(szQuery);
+}
+
+bool Database::Execute(char const* sql)
+{
+    if (!m_pAsyncConn)
         return false;
 
-    // don't use queued execution if it has not been initialized
-    if (!m_threadBody)
-        return DirectExecute(sql);
-
-    nMutex.acquire();
-    tranThread = ACE_Based::Thread::current();              // owner of this transaction
-    TransactionQueues::iterator i = m_tranQueues.find(tranThread);
-    if (i != m_tranQueues.end() && i->second != NULL)
-        i->second->DelayExecute(sql);                       // Statement for transaction
+    SqlTransaction * pTrans = m_TransStorage->get();
+    if(pTrans)
+    {
+        //add SQL request to trans queue
+        pTrans->DelayExecute(new SqlPlainRequest(sql));
+    }
     else
-        m_threadBody->Delay(new SqlStatement(sql));         // Simple sql statement
+    {
+        //if async execution is not available
+        if(!m_bAllowAsyncTransactions)
+            return DirectExecute(sql);
 
-    nMutex.release();
+        // Simple sql statement
+        AddToDelayQueue(new SqlPlainRequest(sql));
+    }
+
     return true;
 }
 
-bool Database::PExecute(const char* format, ...)
+bool Database::PExecute(char const* format,...)
 {
     if (!format)
         return false;
@@ -449,52 +437,16 @@ bool Database::PExecute(const char* format, ...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res == -1)
+    if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
         return false;
     }
 
     return Execute(szQuery);
 }
 
-bool Database::DirectExecute(bool lock, const char* sql)
-{
-    if (!mMysql)
-        return false;
-
-    if (lock)
-        mMutex.acquire();
-
-    #ifdef OREGON_DEBUG
-    uint32 _s = getMSTime();
-    #endif
-    if (mysql_query(mMysql, sql))
-    {
-        sLog.outErrorDb("SQL: %s", sql);
-        sLog.outErrorDb("SQL ERROR: %s", mysql_error(mMysql));
-        if (lock)
-            mMutex.release();
-        return false;
-    }
-    else
-    {
-        #ifdef OREGON_DEBUG
-        // prevent recursive death
-        unsigned long oldMask = sLog.GetDBLogMask();
-        sLog.SetDBLogMask(oldMask & ~(1 << LOG_TYPE_DEBUG));
-        sLog.outDebug("[%u ms] SQL: %s", getMSTimeDiff(_s, getMSTime()), sql);
-        sLog.SetDBLogMask(oldMask);
-        #endif
-    }
-
-    if (lock)
-        mMutex.release();
-
-    return true;
-}
-
-bool Database::DirectPExecute(const char* format, ...)
+bool Database::DirectPExecute(char const* format,...)
 {
     if (!format)
         return false;
@@ -505,621 +457,290 @@ bool Database::DirectPExecute(const char* format, ...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res == -1)
+    if(res==-1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
         return false;
     }
 
     return DirectExecute(szQuery);
 }
 
-bool Database::_TransactionCmd(const char* sql)
+bool Database::BeginTransaction(uint32 serialId)
 {
-    if (mysql_query(mMysql, sql))
-    {
-        sLog.outError("SQL: %s", sql);
-        sLog.outError("SQL ERROR: %s", mysql_error(mMysql));
+    if (!m_pAsyncConn)
         return false;
-    }
-    #if OREGON_DEBUG
-    else
-        DEBUG_LOG("SQL: %s", sql);
-    #endif
+    //ASSERT(!m_TransStorage->get());
+    if (m_TransStorage->get())
+        return false;
 
+    //initiate transaction on current thread
+    m_TransStorage->init(serialId);
     return true;
 }
 
-bool Database::BeginTransaction()
+bool Database::InTransaction()
 {
-    if (!mMysql)
-        return false;
+    return m_TransStorage->get() != nullptr;
+}
 
-    nMutex.acquire();
-    tranThread = ACE_Based::Thread::current();              // owner of this transaction
-    TransactionQueues::iterator i = m_tranQueues.find(tranThread);
-    if (i != m_tranQueues.end() && i->second != NULL)
-        // If for thread exists queue and also contains transaction
-        // delete that transaction (not allow trans in trans)
-        delete i->second;
+uint32 Database::GetTransactionSerialId()
+{
+    if (SqlTransaction *trans = m_TransStorage->get())
+        return trans->GetSerialId();
 
-    m_tranQueues[tranThread] = new SqlTransaction();
-    nMutex.release();
-    return true;
+    return 0;
 }
 
 bool Database::CommitTransaction()
 {
-    if (!mMysql)
+    if (!m_pAsyncConn)
         return false;
 
-    bool _res = false;
+    //check if we have pending transaction
+    //ASSERT(m_TransStorage->get());
+    if (!m_TransStorage->get())
+        return false;
 
-    nMutex.acquire();
-    tranThread = ACE_Based::Thread::current();
-    TransactionQueues::iterator i = m_tranQueues.find(tranThread);
-    if (i != m_tranQueues.end() && i->second != NULL)
-    {
-        m_threadBody->Delay(i->second);
-        m_tranQueues.erase(i);
-        _res = true;
-    }
-    nMutex.release();
-    return _res;
+    //if async execution is not available
+    if(!m_bAllowAsyncTransactions)
+        return CommitTransactionDirect();
+
+    //add SqlTransaction to the async queue
+    // if serial ID > 0, add to the serial delay queue
+    SqlTransaction *trans = m_TransStorage->detach();
+    if (trans->GetSerialId() > 0)
+        AddToSerialDelayQueue(trans);
+    else
+        AddToDelayQueue(trans);
+    return true;
+}
+
+bool Database::CommitTransactionDirect()
+{
+    if (!m_pAsyncConn)
+        return false;
+
+    //check if we have pending transaction
+    ASSERT (m_TransStorage->get());
+
+    //directly execute SqlTransaction
+    SqlTransaction * pTrans = m_TransStorage->detach();
+    pTrans->Execute(m_pAsyncConn);
+    delete pTrans;
+
+    return true;
 }
 
 bool Database::RollbackTransaction()
 {
-    if (!mMysql)
+    if (!m_pAsyncConn)
         return false;
 
-    nMutex.acquire();
-    tranThread = ACE_Based::Thread::current();
-    TransactionQueues::iterator i = m_tranQueues.find(tranThread);
-    if (i != m_tranQueues.end() && i->second != NULL)
-    {
-        delete i->second;
-        i->second = NULL;
-        m_tranQueues.erase(i);
-    }
-    nMutex.release();
+    if(!m_TransStorage->get())
+        return false;
+
+    //remove scheduled transaction
+    m_TransStorage->reset();
+
     return true;
 }
 
-/**
-  * @brief Atomically executed SqlTransaction.
-  * Don't call this directly, use \ref BeginTransaction and \ref CommitTransaction instead.
-  */
-bool Database::ExecuteTransaction(SqlTransaction* transaction)
+void Database::AddToSerialDelayQueue(SqlOperation* op)
 {
-    SqlTransaction::QueuedItem item;
-
-    ACE_Guard<ACE_Thread_Mutex> connection_guard(mMutex);
-    ACE_Guard<ACE_Thread_Mutex> transaction_guard(transaction->mutex);
-
-    if (transaction->queue.empty())
-        return true;
-
-    if (mysql_autocommit(mMysql, 0))
-        return false;
-
-    if (mysql_real_query(mMysql, "START TRANSACTION", sizeof("START TRANSACTION")-1))
-        return false;
-    
-    while (!transaction->queue.empty())
+    if (op->GetSerialId() == 0 || m_numAsyncWorkers == 0)
     {
-        item = transaction->queue.front();
-
-        bool ok = (item.isStmt) ? _ExecutePreparedStatement(item.stmt, item.values, NULL, false) : DirectExecute(false, item.sql);
-        if (!ok)
-        {
-            transaction->queue.pop();
-            mysql_rollback(mMysql);
-            mysql_autocommit(mMysql, 1);
-            return false;
-        }
-
-        if (!item.isStmt)
-            free (item.sql);
-        else
-            delete item.values;
-        transaction->queue.pop();
-    }
-
-    if (mysql_commit(mMysql))
-        return false;
-
-    mysql_autocommit(mMysql, 1);
-    return true;
-}
-
-void Database::InitDelayThread()
-{
-    assert(!m_delayThread);
-
-    //New delay thread for delay execute
-    m_threadBody = new SqlDelayThread(this);              // will deleted at m_delayThread delete
-    m_delayThread = new ACE_Based::Thread(m_threadBody);
-}
-
-void Database::HaltDelayThread()
-{
-    if (!m_threadBody || !m_delayThread)
+        AddToDelayQueue(op);
         return;
+    }
 
-    m_threadBody->Stop();                                   //Stop event
-    m_delayThread->wait();                                  //Wait for flush to DB
-    delete m_delayThread;                                   //This also deletes m_threadBody
-    m_delayThread = NULL;
-    m_threadBody = NULL;
+    // This is a very naive way of doing this. No load balancing.
+    // TODO: Load balance, must maintain mapping of serial ID so queries are
+    // executed sequentially, however
+    int worker = op->GetSerialId() % m_numAsyncWorkers;
+    m_serialDelayQueue[worker]->add(op);
 }
 
-bool Database::ExecuteFile(const char* file)
+bool Database::NextSerialDelayedOperation(int workerId, SqlOperation*& op)
 {
-    if (!mMysql)
+    if (workerId >= m_numAsyncWorkers)
         return false;
 
-    if (mysql_set_server_option(mMysql, MYSQL_OPTION_MULTI_STATEMENTS_ON))
+    return m_serialDelayQueue[workerId]->next(op);
+}
+
+bool Database::HasAsyncQuery()
+{
+    bool hasQuery = !m_delayQueue->empty_unsafe();
+
+    for (int i = 0; i < m_numAsyncWorkers && m_serialDelayQueue && !hasQuery; ++i)
+        hasQuery = !m_serialDelayQueue[i]->empty_unsafe();
+
+    return hasQuery;
+}
+
+bool Database::CheckRequiredMigrations(char const** migrations)
+{
+    std::set<std::string> appliedMigrations;
+
+    QueryResult* result = Query("SELECT * FROM `migrations`");
+
+    if (result)
     {
-        sLog.outErrorDb("Cannot turn multi-statements on: %s", mysql_error(mMysql));
-        return false;
-    }
-
-    mysql_autocommit(mMysql, 0);
-    if (mysql_real_query(mMysql, "START TRANSACTION", sizeof("START TRANSACTION")-1))
-    {
-        sLog.outErrorDb("Couldn't start transaction for db update file: %s", file);
-        return false;
-    }
-
-    bool in_transaction = true;
-    bool success = false;
-
-    if (FILE* fp = ACE_OS::fopen(file, "rb"))
-    {
-        #if PLATFORM == PLATFORM_UNIX
-        flock(fileno(fp), LOCK_SH);
-        #endif
-        //------
-        
-        struct stat info;
-        fstat(fileno(fp), &info);
-
-        // if less than 1MB allocate on stack, else on heap
-        char* contents = (info.st_size > 1024*1024) ? new char[info.st_size] : (char*) alloca(info.st_size);
-
-        if (ACE_OS::fread(contents, info.st_size, 1, fp) == 1)
+        do
         {
-            if (mysql_real_query(mMysql, contents, info.st_size))
-            {
-                sLog.outErrorDb("Cannot execute file %s, size: %lu: %s", file, info.st_size, mysql_error(mMysql));
-            }
-            else
-            {
-                do
-                {
-                    if (mysql_field_count(mMysql))
-                        if (MYSQL_RES* result = mysql_use_result(mMysql))
-                            mysql_free_result(result);
-                }
-                while (0 == mysql_next_result(mMysql));
+            appliedMigrations.insert(result->Fetch()[0].GetString());
+        } while (result->NextRow());
+        delete result;
+    }
 
-                // check whether the last mysql_next_result ended with an error
-                if (*mysql_error(mMysql))
-                {
-                    success = false;
-                    sLog.outErrorDb("Cannot execute file %s, size: %lu: %s", file, info.st_size, mysql_error(mMysql));
-                    if (mysql_rollback(mMysql))
-                        sLog.outErrorDb("ExecuteFile(): Rollback ended with an error!");
-                    else
-                        in_transaction = false;
-                }
-                else
-                {
-                    if (mysql_commit(mMysql))
-                        sLog.outErrorDb("mysql_commit() failed. Update %s will not be applied!", file);
-                    else
-                        in_transaction = false;
-                success = true;
-            }
-        }
+    std::set<std::string> missingMigrations;
+
+    while (migrations && *migrations)
+    {
+        std::set<std::string>::iterator it = appliedMigrations.find(*migrations);
+
+        if (it == appliedMigrations.end())
+            missingMigrations.insert(*migrations);
+        else
+            appliedMigrations.erase(it);
+
+        migrations++;
+    }
+
+    result = Query("SELECT DATABASE()");
+
+    if (!result)
+        return false;
+
+    std::string dbName = result->Fetch()[0].GetString();
+    delete result;
+
+    if (!missingMigrations.empty())
+    {
+        sLog.outErrorDb("Database `%s` is missing the following migrations:", dbName.c_str());
+
+        for (std::set<std::string>::const_iterator it = missingMigrations.begin(); it != missingMigrations.end(); it++)
+            sLog.outErrorDb("\t%s", (*it).c_str());
+
+        return false;
+    }
+
+    if (!appliedMigrations.empty())
+    {
+        sLog.outErrorDb("WARNING! Database `%s` has the following extra migrations:", dbName.c_str());
+
+        for (std::set<std::string>::const_iterator it = appliedMigrations.begin(); it != appliedMigrations.end(); it++)
+            sLog.outErrorDb("\t%s", (*it).c_str());
+    }
+
+    return true;
+}
+
+bool Database::ExecuteStmt(SqlStatementID const& id, SqlStmtParameters* params)
+{
+    if (!m_pAsyncConn)
+        return false;
+
+    SqlTransaction * pTrans = m_TransStorage->get();
+    if(pTrans)
+    {
+        //add SQL request to trans queue
+        pTrans->DelayExecute(new SqlPreparedRequest(id.ID(), params));
+    }
+    else
+    {
+        //if async execution is not available
+        if(!m_bAllowAsyncTransactions)
+            return DirectExecuteStmt(id, params);
+
+        // Simple sql statement
+        AddToDelayQueue(new SqlPreparedRequest(id.ID(), params));
+    }
+
+    return true;
+}
+
+bool Database::DirectExecuteStmt(SqlStatementID const& id, SqlStmtParameters* params)
+{
+    ASSERT(params);
+    std::unique_ptr<SqlStmtParameters> p(params);
+    //execute statement
+    SqlConnection::Lock _guard(getAsyncConnection());
+    return _guard->ExecuteStmt(id.ID(), *params);
+}
+
+SqlStatement Database::CreateStatement(SqlStatementID& index, char const* fmt)
+{
+    int nId = -1;
+    //check if statement ID is initialized
+    if(!index.initialized())
+    {
+        //convert to lower register
+        std::string szFmt(fmt);
+        //count input parameters
+        int nParams = std::count(szFmt.begin(), szFmt.end(), '?');
+        //find existing or add a new record in registry
+        LOCK_GUARD _guard(m_stmtGuard);
+        PreparedStmtRegistry::const_iterator iter = m_stmtRegistry.find(szFmt);
+        if(iter == m_stmtRegistry.end())
+        {
+            nId = ++m_iStmtIndex;
+            m_stmtRegistry[szFmt] = nId;
         }
         else
-        {
-           sLog.outErrorDb("Couldn't read file %s, size: %lu", file, info.st_size);
-           return false;
-        }
+            nId = iter->second;
 
-        // if allocated on heap, free memory
-        if (info.st_size > 1024*1024)
-            delete [] contents;
-
-        //------
-        #if PLATFORM == PLATFORM_UNIX
-        flock(fileno(fp), LOCK_UN);
-        #endif
-        ACE_OS::fclose(fp);
+        //save initialized statement index info
+        index.init(nId, nParams);
     }
 
-    mysql_set_server_option(mMysql, MYSQL_OPTION_MULTI_STATEMENTS_OFF);
-    mysql_autocommit(mMysql, 1);
-    if (in_transaction)
-        mysql_rollback(mMysql);
-    return success;
+    return SqlStatement(index, *this);
 }
 
-PreparedStatement* Database::_GetOrMakePreparedStatement(const char* query, const char* format, PreparedValues* values)
+std::string Database::GetStmtString(int const stmtId) const
 {
-    ACE_Guard<ACE_Thread_Mutex> guardian(pMutex);
-    PreparedStatementsMap::iterator it = m_preparedStatements.find(query);
+    LOCK_GUARD _guard(m_stmtGuard);
 
-    if (it != m_preparedStatements.end())
-        return it->second; // found, ok
- 
-    MYSQL_STMT* stmt = mysql_stmt_init(mMysql);
+    if(stmtId == -1 || stmtId > m_iStmtIndex)
+        return std::string();
 
-    if (!stmt)
+    PreparedStmtRegistry::const_iterator iter_last = m_stmtRegistry.end();
+    for(PreparedStmtRegistry::const_iterator iter = m_stmtRegistry.begin(); iter != iter_last; ++iter)
     {
-        sLog.outError("mysql_stmt_init() failed: %s", mysql_error(mMysql));
-        return 0;
+        if(iter->second == stmtId)
+            return iter->first;
     }
 
-    {
-        // set prefetch rows to maximum, thus making results buffered
-        unsigned long rows = (unsigned long) -1;
-        if (mysql_stmt_attr_set(stmt, STMT_ATTR_PREFETCH_ROWS, &rows))
-            sLog.outError("mysql_stmt_attr_set() failed.");
-
-        if (mysql_stmt_attr_set(stmt, STMT_ATTR_UPDATE_MAX_LENGTH, &my_true))
-            sLog.outError("mysql_stmt_attr_set() failed.");
-    }
-
-    PreparedStatement* prepStmt = new PreparedStatement;
-    prepStmt->stmt = stmt;
-    
-    if (format)
-    {
-        prepStmt->types = format;
-        
-        for (const char* it = format; *it != '\0'; ++it)
-        {
-            switch (*it)
-            {
-                case ARG_TYPE_STRING:
-                case ARG_TYPE_STRING_ALT:
-                case ARG_TYPE_NUMBER:
-                case ARG_TYPE_NUMBER_ALT:
-                case ARG_TYPE_UNSIGNED_NUMBER:
-                case ARG_TYPE_LARGE_NUMBER:
-                case ARG_TYPE_LARGE_NUMBER_ALT:
-                case ARG_TYPE_LARGE_UNSIGNED_NUMBER:
-                case ARG_TYPE_FLOAT:
-                case ARG_TYPE_DOUBLE:
-                case ARG_TYPE_BINARY:
-                case ARG_TYPE_BINARY_ALT:
-                    break;
-                default:
-                    sLog.outError("Unknown format type '%c' for prepared statement (%s)", *it, query);
-                    delete prepStmt;
-                    return 0;
-            }
-        }
-    }
-    else if (values)
-    {
-        for (size_t i = 0; i < values->m_values.size(); ++i)
-            prepStmt->types.append(1, static_cast<char>(values->m_values[i].type));
-    }
-
-    {
-        if (mysql_stmt_prepare(stmt, query, strlen(query)))
-        {
-            sLog.outErrorDb("mysql_stmt_prepare() failed: %s, sql: %s", mysql_stmt_error(stmt), query);
-            delete prepStmt;
-            return 0;
-        }
-    }
-
-    return m_preparedStatements.insert(std::pair<std::string, PreparedStatement*>(query, prepStmt)).first->second;
+    return std::string();
 }
 
-bool Database::_ExecutePreparedStatement(PreparedStatement* ps, PreparedValues* values, va_list* args, bool resultset)
+//HELPER CLASSES AND FUNCTIONS
+Database::TransHelper::~TransHelper()
 {
-    size_t paramCount = mysql_stmt_param_count(ps->stmt);
-    MYSQL_BIND* binding = NULL;
-    bool myValues = false;
-
-    if (paramCount)
-    {
-        if (args)
-        {
-            if (paramCount != ps->types.size())
-            {
-                sLog.outErrorDb("Count of parameters passed doesn't equal to count of parameters in prepared statement!");
-                delete[] binding;
-                return false;
-            }
-
-            if (!values)
-            {
-                values = new PreparedValues(paramCount);
-                myValues = true;
-            }
-
-            _ConvertValistToPreparedValues(*args, *values, ps->types.c_str());
-        }
-        else
-        {
-            ASSERT (values);
-
-            if (paramCount != values->m_values.size())
-            {
-                sLog.outErrorDb("Count of parameters passed doesn't equal to count of parameters in prepared statement!");
-                delete[] binding;
-                return false;
-            }
-        }
-
-        binding = new MYSQL_BIND[paramCount];
-        memset(binding, 0, sizeof(MYSQL_BIND)*paramCount);
-
-        for (size_t i = 0; i < paramCount; ++i)
-        {
-            switch ((*values)[i].type)
-            {
-                case ARG_TYPE_STRING:
-                case ARG_TYPE_STRING_ALT:
-                    binding[i].buffer_type = MYSQL_TYPE_STRING;
-                    binding[i].buffer = const_cast<char*> ((*values)[i].data.string);
-                    binding[i].buffer_length = (*values)[i].data.length;
-                    break;
-                case ARG_TYPE_BINARY:
-                case ARG_TYPE_BINARY_ALT:
-                    binding[i].buffer_type = MYSQL_TYPE_BLOB;
-                    binding[i].buffer = const_cast<void*> ((*values)[i].data.binary);
-                    binding[i].buffer_length = (*values)[i].data.length;
-                    break;
-                case ARG_TYPE_UNSIGNED_NUMBER:
-                    binding[i].is_unsigned = my_true; 
-                    /* FALLTHROUGH */
-                case ARG_TYPE_NUMBER:
-                case ARG_TYPE_NUMBER_ALT:
-                    binding[i].buffer_type = MYSQL_TYPE_LONG;
-                    binding[i].buffer = &(*values)[i].data.number;
-                    binding[i].buffer_length = sizeof((*values)[i].data.number);
-                    break;
-                case ARG_TYPE_LARGE_UNSIGNED_NUMBER:
-                    binding[i].is_unsigned = my_true; 
-                    /* FALLTHROUGH */
-                case ARG_TYPE_LARGE_NUMBER:
-                case ARG_TYPE_LARGE_NUMBER_ALT:
-                    binding[i].buffer_type = MYSQL_TYPE_LONGLONG;
-                    binding[i].buffer = &(*values)[i].data.largeNumber;
-                    binding[i].buffer_length = sizeof(&(*values)[i].data.largeNumber);
-                    break;
-                case ARG_TYPE_FLOAT:
-                    binding[i].buffer_type = MYSQL_TYPE_FLOAT;
-                    binding[i].buffer = &(*values)[i].data.float_;
-                    binding[i].buffer_length = sizeof(&(*values)[i].data.float_);
-                    break;
-                case ARG_TYPE_DOUBLE:
-                    binding[i].buffer_type = MYSQL_TYPE_DOUBLE;
-                    binding[i].buffer = &(*values)[i].data.double_;
-                    binding[i].buffer_length = sizeof((*values)[i].data.double_);
-                    break;
-            }
-        }
-
-        if (mysql_stmt_bind_param(ps->stmt, binding))
-        {
-            sLog.outError("mysql_stmt_bind_param() failed: %s", mysql_stmt_error(ps->stmt));
-            delete[] binding;
-            if (myValues)
-                delete values;
-            return false;
-        }
-    }
-
-    if (mysql_stmt_execute(ps->stmt))
-    {
-        sLog.outError("mysql_stmt_execute() failed: %s", mysql_stmt_error(ps->stmt));
-        delete[] binding;
-        if (myValues)
-            delete values;
-        return false;
-    }
-
-    if (myValues)
-        delete values;
-
-    // this is safe, even if there's no result
-    mysql_stmt_store_result(ps->stmt);
-
-    if (resultset)
-    {
-        if (!mysql_stmt_field_count(ps->stmt))
-        {
-            delete[] binding;
-            return false;
-        }
-
-        if (!mysql_stmt_num_rows(ps->stmt))
-        {
-            mysql_stmt_free_result(ps->stmt);
-            delete[] binding;
-            return false;
-        }
-    }
-    else
-    {
-        if (mysql_stmt_field_count(ps->stmt))
-            mysql_stmt_free_result(ps->stmt);
-        mysql_stmt_reset(ps->stmt);
-    }
-
-    delete[] binding;
-    return true;
+    reset();
 }
 
-void Database::_ConvertValistToPreparedValues(va_list args, PreparedValues& values, const char* fmt)
+SqlTransaction * Database::TransHelper::init(uint32 serialId)
 {
-    for (const char* i = fmt; *i != '\0'; ++i)
+    ASSERT(!m_pTrans);   //if we will get a nested transaction request - we MUST fix code!!!
+    m_pTrans = new SqlTransaction(serialId);
+
+    return m_pTrans;
+}
+
+SqlTransaction * Database::TransHelper::detach()
+{
+    SqlTransaction * pRes = m_pTrans;
+    m_pTrans = nullptr;
+    return pRes;
+}
+
+void Database::TransHelper::reset()
+{
+    if(m_pTrans)
     {
-        switch (*i)
-        {
-            case ARG_TYPE_STRING:
-            case ARG_TYPE_STRING_ALT:
-                values << va_arg(args, const char*);
-                break;
-            case ARG_TYPE_BINARY:
-            case ARG_TYPE_BINARY_ALT:
-                {
-                    size_t size = va_arg(args, size_t);
-                    const void* data = va_arg(args, const void*);
-                    values << std::pair<const void*, size_t>(data, size);
-                }
-                break;
-            case ARG_TYPE_UNSIGNED_NUMBER:
-                values << va_arg(args, uint32);
-                break;
-            case ARG_TYPE_NUMBER:
-            case ARG_TYPE_NUMBER_ALT:
-                values << va_arg(args, int32);
-                break;
-            case ARG_TYPE_LARGE_UNSIGNED_NUMBER:
-                values << va_arg(args, uint64);
-                break;
-            case ARG_TYPE_LARGE_NUMBER:
-            case ARG_TYPE_LARGE_NUMBER_ALT:
-                values << va_arg(args, int64);
-                break;
-            case ARG_TYPE_FLOAT:
-                // passed floats are promoted to doubles
-                values << (float) va_arg(args, double);
-                break;
-            case ARG_TYPE_DOUBLE:
-                values << va_arg(args, double);
-                break;
-        }
+        delete m_pTrans;
+        m_pTrans = nullptr;
     }
-}
-
-/**
-  * @brief Runs Query via Prepared Statements.
-  * If statement doesn't exist, it shall be created.
-  * This function blocks calling thread until query is done,
-  * if your query is result-less use \ref PreparedExecute instead.
-  * @param sql The sql to execute in template form
-  * @param format Types of bound variables/values - see \ref PreparedArgType
-  * @returns Result with compatible interface to \ref QueryResult.
-  *
-  * @note For compatiblity reasons, if query result failed or contains no rows,
-  * the result will be NULL and may cause a crash if you don't count with it.
-  *
-  * @see Database::Query, Database::PQuery, Database::PreparedExecute
-  * Example:
-  *
-  *     ...PreparedQuery("SELECT 1, 2, 3 FROM table WHERE id = ? AND name = ?", "is", 20, "john")
-  */
-PreparedQueryResult_AutoPtr Database::PreparedQuery(const char* sql, const char* format, ...)
-{
-    ACE_Guard<ACE_Thread_Mutex> guardian(mMutex);
-    PreparedStatement* stmt = _GetOrMakePreparedStatement(sql, format, NULL);
-
-    if (!stmt)
-        return PreparedQueryResult_AutoPtr(NULL);
-
-    va_list ap;
-    va_start(ap, format);
-
-    if (!_ExecutePreparedStatement(stmt, NULL, &ap, true))
-    {
-        va_end(ap);
-        return PreparedQueryResult_AutoPtr(NULL);
-    }
-    
-    va_end(ap);
-
-    return PreparedQueryResult_AutoPtr(new PreparedQueryResult(stmt->stmt));
-}
-
-PreparedQueryResult_AutoPtr Database::PreparedQuery(const char* sql, PreparedValues& values)
-{
-    ACE_Guard<ACE_Thread_Mutex> guardian(mMutex);
-    PreparedStatement* stmt = _GetOrMakePreparedStatement(sql, NULL, &values);
-
-    if (!stmt)
-        return PreparedQueryResult_AutoPtr(NULL);
-
-    if (!_ExecutePreparedStatement(stmt, &values, NULL, true))
-        return PreparedQueryResult_AutoPtr(NULL);
-
-    return PreparedQueryResult_AutoPtr(new PreparedQueryResult(stmt->stmt));
-}
-
-bool Database::DirectExecute(PreparedStatement* stmt, PreparedValues& values, va_list* args)
-{
-    ACE_Guard<ACE_Thread_Mutex> guardian(mMutex);
-
-    return _ExecutePreparedStatement(stmt, &values, args, false);
-}
-
-
-/**
-  * @brief Executes Query via Prepared Statements.
-  */
-bool Database::PreparedExecute(const char* sql, const char* format, ...)
-{
-    if (!mMysql)
-        return false;
-
-    PreparedValues values(strlen(format));
-
-    va_list args;
-    va_start(args, format);
-    _ConvertValistToPreparedValues(args, values, format);
-    va_end(args);
-    
-    PreparedStatement* stmt = _GetOrMakePreparedStatement(sql, NULL, &values);
-
-    // don't use queued execution if it has not been initialized
-    if (!m_threadBody)
-        return DirectExecute(stmt, values, NULL);
-
-    nMutex.acquire();
-    tranThread = ACE_Based::Thread::current();              // owner of this transaction
-    TransactionQueues::iterator i = m_tranQueues.find(tranThread);
-    if (i != m_tranQueues.end() && i->second != NULL)
-        i->second->DelayExecute(stmt, values);                        // Statement for transaction
-    else
-        m_threadBody->Delay(new SqlPreparedStatement(stmt, values));         // Simple sql statement
-
-    nMutex.release();
-    return true;
-}
-
-/**
-  * @brief Executes Query via Prepared Statements.
-  */
-bool Database::PreparedExecute(const char* sql, PreparedValues& values)
-{
-    if (!mMysql)
-        return false;
-
-    PreparedStatement* stmt = _GetOrMakePreparedStatement(sql, NULL, &values);
-
-    // don't use queued execution if it has not been initialized
-    if (!m_threadBody)
-        return DirectExecute(stmt, values, NULL);
-
-    nMutex.acquire();
-    tranThread = ACE_Based::Thread::current();              // owner of this transaction
-    TransactionQueues::iterator i = m_tranQueues.find(tranThread);
-    if (i != m_tranQueues.end() && i->second != NULL)
-        i->second->DelayExecute(stmt, values);                        // Statement for transaction
-    else
-        m_threadBody->Delay(new SqlPreparedStatement(stmt, values));  // Simple sql statement
-
-    nMutex.release();
-    return true;
 }

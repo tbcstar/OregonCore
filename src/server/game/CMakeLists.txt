@@ -209,6 +209,9 @@ if( ELUNA )
   )
 endif()
 
+target_link_libraries(game
+   shared
+)
 
 # Generate precompiled header
 if (USE_COREPCH)

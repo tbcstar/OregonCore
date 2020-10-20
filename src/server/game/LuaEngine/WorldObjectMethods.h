@@ -156,7 +156,7 @@ namespace LuaWorldObject
 
         Unit* target = NULL;
         ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, TYPEMASK_PLAYER, 0, hostile, dead);
-        Oregon::UnitLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(target, checker);
+        Oregon::UnitLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, target, checker);
         obj->VisitNearbyObject(range, searcher);
 
         Eluna::Push(L, target);
@@ -180,7 +180,7 @@ namespace LuaWorldObject
 
         GameObject* target = NULL;
         ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, TYPEMASK_GAMEOBJECT, entry, hostile);
-        Oregon::GameObjectLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(target, checker);
+        Oregon::GameObjectLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, target, checker);
         obj->VisitNearbyObject(range, searcher);
 
         Eluna::Push(L, target);
@@ -206,7 +206,7 @@ namespace LuaWorldObject
 
         Creature* target = NULL;
         ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, TYPEMASK_UNIT, entry, hostile, dead);
-        Oregon::CreatureLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(target, checker);
+        Oregon::CreatureLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, target, checker);
         obj->VisitNearbyObject(range, searcher);
 
         Eluna::Push(L, target);
@@ -230,7 +230,7 @@ namespace LuaWorldObject
 
         std::list<Player*> list;
         ElunaUtil::WorldObjectInRangeCheck checker(false, obj, range, TYPEMASK_PLAYER, 0, hostile, dead);
-        Oregon::PlayerListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(list, checker);
+        Oregon::PlayerListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, list, checker);
         obj->VisitNearbyObject(range, searcher);
 
         lua_newtable(L);
@@ -267,7 +267,7 @@ namespace LuaWorldObject
 
         std::list<Creature*> list;
         ElunaUtil::WorldObjectInRangeCheck checker(false, obj, range, TYPEMASK_UNIT, entry, hostile, dead);
-        Oregon::CreatureListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(list, checker);
+        Oregon::CreatureListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, list, checker);
         obj->VisitNearbyObject(range, searcher);
 
         lua_newtable(L);
@@ -302,7 +302,7 @@ namespace LuaWorldObject
 
         std::list<GameObject*> list;
         ElunaUtil::WorldObjectInRangeCheck checker(false, obj, range, TYPEMASK_GAMEOBJECT, entry, hostile);
-        Oregon::GameObjectListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(list, checker);
+        Oregon::GameObjectListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, list, checker);
         obj->VisitNearbyObject(range, searcher);
 
         lua_newtable(L);
@@ -377,7 +377,7 @@ namespace LuaWorldObject
         ElunaUtil::WorldObjectInRangeCheck checker(false, obj, range, type, entry, hostile, dead);
 
         std::list<WorldObject*> list;
-        Oregon::WorldObjectListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(list, checker);
+        Oregon::WorldObjectListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, list, checker);
         obj->VisitNearbyObject(range, searcher);
 
         lua_newtable(L);

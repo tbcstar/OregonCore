@@ -63,7 +63,7 @@ public:                                                 // constructors and glob
     ~ReputationMgr() { }
 
     void SaveToDB();
-    void LoadFromDB(QueryResult_AutoPtr result);
+    void LoadFromDB(QueryResult* result);
 public:                                                 // statics
     static const int32 PointsInRank[MAX_REPUTATION_RANK];
     static const int32 Reputation_Cap;

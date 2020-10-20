@@ -25,6 +25,7 @@
 #include "SocialMgr.h"
 #include "Utilities/Util.h"
 #include "Language.h"
+#include "ScriptMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -108,6 +109,7 @@ bool Guild::Create(Player* leader, std::string gname)
 
     CreateDefaultGuildRanks(lSession->GetSessionDbLocaleIndex());
 
+    sScriptMgr.OnGuildCreate(this, leader, gname.c_str());
 
 #ifdef ELUNA
     // used by eluna
@@ -248,7 +250,9 @@ bool Guild::AddMember(uint64 plGuid, uint32 plRank)
 
     UpdateAccountsNumber();
 
- 
+    // Call scripts if member was succesfully added (and stored to database)
+    sScriptMgr.OnGuildAddMember(this, pl, newmember.RankId);
+
 #ifdef ELUNA
    // used by eluna
     sEluna->OnAddMember(this, pl, newmember.RankId);
@@ -290,7 +294,7 @@ void Guild::SetGINFO(std::string ginfo)
 
 }
 
-bool Guild::LoadGuildFromDB(QueryResult_AutoPtr guildDataResult)
+bool Guild::LoadGuildFromDB(QueryResult* guildDataResult)
 {
     if (!guildDataResult)
         return false;
@@ -344,7 +348,7 @@ bool Guild::CheckGuildStructure()
     return true;
 }
 
-bool Guild::LoadRanksFromDB(QueryResult_AutoPtr guildRanksResult)
+bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
 {
     if (!guildRanksResult)
     {
@@ -417,7 +421,7 @@ bool Guild::LoadRanksFromDB(QueryResult_AutoPtr guildRanksResult)
     return true;
 }
 
-bool Guild::LoadMembersFromDB(QueryResult_AutoPtr guildMembersResult)
+bool Guild::LoadMembersFromDB(QueryResult* guildMembersResult)
 {
     if (!guildMembersResult)
         return false;
@@ -517,7 +521,7 @@ bool Guild::FillPlayerData(uint64 guid, MemberSlot* memslot)
     }
     else
     {
-        QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT name,level,zone,class,account FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
+        QueryResult* result = CharacterDatabase.PQuery("SELECT name,level,zone,class,account FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
         if (!result)
             return false;                                   // player doesn't exist
 
@@ -635,8 +639,10 @@ void Guild::DelMember(uint64 guid, bool isDisbanding)
 
     CharacterDatabase.PExecute("DELETE FROM guild_member WHERE guid = '%u'", GUID_LOPART(guid));
 
-#ifdef ELUNA
+    // Call script on remove before member is actually removed from guild (and database)
+    sScriptMgr.OnGuildRemoveMember(this, player, isDisbanding);
 
+#ifdef ELUNA
     // used by eluna
     sEluna->OnRemoveMember(this, player, isDisbanding); // IsKicked not a part of Mangos, implement?
 #endif
@@ -840,6 +846,7 @@ void Guild::Disband()
     CharacterDatabase.PExecute("DELETE FROM guild_eventlog WHERE guildid = '%u'", m_Id);
     CharacterDatabase.CommitTransaction();
 
+    sScriptMgr.OnGuildDisband(this);
  
 #ifdef ELUNA
    // used by eluna
@@ -1013,7 +1020,7 @@ void Guild::LoadGuildEventLogFromDB()
     if (m_eventlogloaded)
         return;
 
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT LogGuid, EventType, PlayerGuid1, PlayerGuid2, NewRank, TimeStamp FROM guild_eventlog WHERE guildid=%u ORDER BY LogGuid DESC LIMIT %u", m_Id, GUILD_EVENTLOG_MAX_ENTRIES);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT LogGuid, EventType, PlayerGuid1, PlayerGuid2, NewRank, TimeStamp FROM guild_eventlog WHERE guildid=%u ORDER BY LogGuid DESC LIMIT %u", m_Id, GUILD_EVENTLOG_MAX_ENTRIES);
     if (!result)
         return;
     do
@@ -1054,7 +1061,7 @@ void Guild::UnloadGuildEventlog()
 // This will renum guids used at load to prevent always going up until infinit
 void Guild::RenumGuildEventlog()
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT Min(LogGuid), Max(LogGuid) FROM guild_eventlog WHERE guildid = %u", m_Id);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT Min(LogGuid), Max(LogGuid) FROM guild_eventlog WHERE guildid = %u", m_Id);
     if (!result)
         return;
 
@@ -1328,7 +1335,7 @@ void Guild::LoadGuildBankFromDB()
     LoadGuildBankEventLogFromDB();
 
     //                                                     0      1        2        3
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT TabId, TabName, TabIcon, TabText FROM guild_bank_tab WHERE guildid='%u' ORDER BY TabId", m_Id);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT TabId, TabName, TabIcon, TabText FROM guild_bank_tab WHERE guildid='%u' ORDER BY TabId", m_Id);
     if (!result)
     {
         m_PurchasedTabs = 0;
@@ -1628,7 +1635,7 @@ uint32 Guild::GetBankSlotPerDay(uint32 rankId, uint8 TabId)
 // *************************************************
 // Rights per day related
 
-bool Guild::LoadBankRightsFromDB(QueryResult_AutoPtr guildBankTabRightsResult)
+bool Guild::LoadBankRightsFromDB(QueryResult* guildBankTabRightsResult)
 {
     if (!guildBankTabRightsResult)
         return true;
@@ -1671,7 +1678,7 @@ void Guild::LoadGuildBankEventLogFromDB()
 {
     // We can't add a limit as in Guild::LoadGuildEventLogFromDB since we fetch both money and bank log and know nothing about the composition
     //                                                     0        1         2      3           4            5               6          7
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT LogGuid, LogEntry, TabId, PlayerGuid, ItemOrMoney, ItemStackCount, DestTabId, TimeStamp FROM guild_bank_eventlog WHERE guildid='%u' ORDER BY TimeStamp DESC", m_Id);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT LogGuid, LogEntry, TabId, PlayerGuid, ItemOrMoney, ItemStackCount, DestTabId, TimeStamp FROM guild_bank_eventlog WHERE guildid='%u' ORDER BY TimeStamp DESC", m_Id);
     if (!result)
         return;
 
@@ -1819,7 +1826,7 @@ void Guild::LogBankEvent(uint8 LogEntry, uint8 TabId, uint32 PlayerGuidLow, uint
 // This will renum guids used at load to prevent always going up until infinit
 void Guild::RenumBankLogs()
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT Min(LogGuid), Max(LogGuid) FROM guild_bank_eventlog WHERE guildid = %u", m_Id);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT Min(LogGuid), Max(LogGuid) FROM guild_bank_eventlog WHERE guildid = %u", m_Id);
     if (!result)
         return;
 

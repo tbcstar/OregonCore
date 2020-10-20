@@ -321,7 +321,7 @@ private:
     typedef std::list<DeletedInfo> DeletedInfoList;
     static bool GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::string searchString = "")
     {
-        QueryResult_AutoPtr resultChar;
+        QueryResult* resultChar;
         if (!searchString.empty())
         {
             // search by GUID

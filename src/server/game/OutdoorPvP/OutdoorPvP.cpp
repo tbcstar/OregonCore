@@ -164,7 +164,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     if (Map* map = MapManager::Instance().FindMap(cr->GetMapId()))
         map->RemoveFromMap(cr, false);
     // delete respawn time for this creature
-    WorldDatabase.PExecute("DELETE FROM creature_respawn WHERE guid = '%u'", guid);
+    CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE guid = '%u'", guid);
     cr->AddObjectToRemoveList();
     sObjectMgr.DeleteCreatureData(guid);
     m_CreatureTypes[m_Creatures[type]] = 0;
@@ -282,7 +282,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     std::list<Player*> players;
     Oregon::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
-    Oregon::PlayerListSearcher<Oregon::AnyPlayerInObjectRangeCheck> searcher(players, checker);
+    Oregon::PlayerListSearcher<Oregon::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
     m_capturePoint->VisitNearbyWorldObject(radius, searcher);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)

@@ -218,8 +218,10 @@ extern int main(int argc, char** argv)
 
     // cleanup query
     // set expired bans to inactive
+    LoginDatabase.BeginTransaction();
     LoginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+    LoginDatabase.CommitTransaction();
 
     // Launch the listening network socket
     ACE_Acceptor<AuthSocket, ACE_SOCK_Acceptor> acceptor;
@@ -278,7 +280,8 @@ extern int main(int argc, char** argv)
         }
     }
     #endif
-
+    //server has started up successfully => enable async DB requests
+    LoginDatabase.AllowAsyncTransactions();
     // maximum counter for next ping
     uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / 100000));
     uint32 loopCounter = 0;
@@ -296,7 +299,7 @@ extern int main(int argc, char** argv)
         {
             loopCounter = 0;
             sLog.outDetail("Ping MySQL to keep connection alive");
-            LoginDatabase.Query("SELECT 1 FROM realmlist LIMIT 1");
+            LoginDatabase.Ping();
         }
         #ifdef _WIN32
         if (m_ServiceStatus == 0) stopEvent = true;

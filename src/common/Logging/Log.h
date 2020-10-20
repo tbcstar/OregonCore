@@ -96,7 +96,7 @@ class Log : public Oregon::Singleton<Log, Oregon::ClassLevelLockable<Log, ACE_Th
 
     public:
         void Initialize();
-
+        static void WaitBeforeContinueIfNeed();
         void InitColors(const std::string& init_str);
         void SetColor(ColorTypes color);
         void ResetColor();
@@ -146,7 +146,7 @@ class Log : public Oregon::Singleton<Log, Oregon::ClassLevelLockable<Log, ACE_Th
         {
             return m_logMask;
         }
-
+        
         unsigned long GetDBLogMask() const
         {
             return m_logMaskDatabase;

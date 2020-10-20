@@ -128,13 +128,6 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
             DEBUG_LOG("WORLD: HandleGossipSelectOptionOpcode - %u not found.", guid);
             return;
         }
-
-#ifdef ELUNA
-		// used by eluna
-		sEluna->HandleGossipSelectOption(GetPlayer(), item, GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
-		return;
-#endif
-
     }
     else if (IS_PLAYER_GUID(guid))
     {
@@ -144,43 +137,9 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
             return;
         }
 
-#ifdef ELUNA
-		// used by eluna
-		sEluna->HandleGossipSelectOption(GetPlayer(), menuId, GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
-		return;
-#endif
-
     }
     else
     {
-
-#ifdef ELUNA
-        if (IS_ITEM_GUID(guid))
-        {
-            Item* item = GetPlayer()->GetItemByGuid(guid);
-            if (!item)
-            {
-                DEBUG_LOG("WORLD: HandleGossipSelectOptionOpcode - %u not found or you can't interact with it.", guid);
-                return;
-            }
-            // used by eluna
-            sEluna->HandleGossipSelectOption(GetPlayer(), item, GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
-            return;
-        }
-        else if (IS_PLAYER_GUID(guid))
-        {
-            if (GetPlayer()->GetGUIDLow() != guid || GetPlayer()->PlayerTalkClass->GetGossipMenu().GetMenuId() != menuId)
-            {
-                DEBUG_LOG("WORLD: HandleGossipSelectOptionOpcode - %u not found or you can't interact with it.", guid);
-                return;
-            }
-
-            // used by eluna
-            sEluna->HandleGossipSelectOption(GetPlayer(), menuId, GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
-            return;
-        }
-#endif
-
         DEBUG_LOG("WORLD: HandleGossipSelectOptionOpcode - unsupported GUID type for highguid %u. lowpart %u.", uint32(GUID_HIPART(guid)), uint32(GUID_LOPART(guid)));
         return;
     }
@@ -621,7 +580,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
     CharacterDatabase.AsyncPQuery(&WorldSession::HandleAddFriendOpcodeCallBack, GetAccountId(), friendNote, "SELECT guid, race, account FROM characters WHERE name = '%s'", friendName.c_str());
 }
 
-void WorldSession::HandleAddFriendOpcodeCallBack(QueryResult_AutoPtr result, uint32 accountId, std::string friendNote)
+void WorldSession::HandleAddFriendOpcodeCallBack(QueryResult* result, uint32 accountId, std::string friendNote)
 {
     uint64 friendGuid;
     uint64 friendAccountId;
@@ -709,7 +668,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
     CharacterDatabase.AsyncPQuery(&WorldSession::HandleAddIgnoreOpcodeCallBack, GetAccountId(), "SELECT guid FROM characters WHERE name = '%s'", IgnoreName.c_str());
 }
 
-void WorldSession::HandleAddIgnoreOpcodeCallBack(QueryResult_AutoPtr result, uint32 accountId)
+void WorldSession::HandleAddIgnoreOpcodeCallBack(QueryResult* result, uint32 accountId)
 {
     uint64 IgnoreGuid;
     FriendsResult ignoreResult;
@@ -1345,7 +1304,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     uint32 accid = plr->GetSession()->GetAccountId();
 
-    QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT username,email,last_ip FROM account WHERE id=%u", accid);
+    QueryResult* result = LoginDatabase.PQuery("SELECT username,email,last_ip FROM account WHERE id=%u", accid);
     if (!result)
     {
         SendNotification(LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, charname.c_str());

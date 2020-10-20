@@ -7,9 +7,19 @@ OregonCore is a piece of software that targets emulation of a World of Warcraft:
 Build Status
 ------------
 
-| Compiler      | Platform    | Branch | Status                  |
-|:--------------|:------------|:------:|:-----------------------:|
-| clang         | Linux x64   | master | [![Build Status][1]][7] |
+|Compiler              |Platform              | Environment          |Status                |
+|:---------------------|:---------------------|:---------------------|:--------------------:|
+|gcc/g++               |Linux x64             | eluna disabled       |[![Build1][21]][25]   |
+|gcc/g++               |Linux x64             | eluna enabled        |[![Build1][22]][25]   |
+|clang/clang++         |Linux x64             | eluna disabled       |[![Build1][23]][25]   |
+|clang/clang++         |Linux x64             | eluna enabled        |[![Build1][24]][25]   |
+
+[21]: https://travis-badge.herokuapp.com/repos/talamortis/OregonCore/branches/master/1
+[22]: https://travis-badge.herokuapp.com/repos/talamortis/OregonCore/branches/master/2
+[23]: https://travis-badge.herokuapp.com/repos/talamortis/OregonCore/branches/master/3
+[24]: https://travis-badge.herokuapp.com/repos/talamortis/OregonCore/branches/master/4
+
+[25]: https://travis-ci.org/github/talamortis/OregonCore
 
 
 Docs, Community and Support

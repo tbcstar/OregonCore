@@ -1,18 +1,22 @@
 /*
- * This file is part of the OregonCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
+ * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
+ * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef __SQLOPERATIONS_H
@@ -21,170 +25,123 @@
 #include "Common.h"
 
 #include "ace/Thread_Mutex.h"
-#include "ace/Method_Request.h"
 #include "LockedQueue.h"
 #include <queue>
 #include "Utilities/Callback.h"
-#include "QueryResult.h"
-#include "Database.h"
 
-// BASE
+/// ---- BASE ---
 
 class Database;
+class SqlConnection;
 class SqlDelayThread;
-struct PreparedStatement;
+class SqlStmtParameters;
 
 class SqlOperation
 {
     public:
-        virtual void OnRemove()
-        {
-            delete this;
-        }
-        virtual void Execute(Database* db) = 0;
+        SqlOperation(uint32 id) : serialId(id) {}
+        SqlOperation() : serialId(0) {}
+        uint32 GetSerialId() const { return serialId; }
+        virtual void OnRemove() { delete this; }
+        virtual bool Execute(SqlConnection* conn) = 0;
         virtual ~SqlOperation() {}
+
+    protected:
+        uint32 serialId;
 };
 
-// ASYNC STATEMENTS / TRANSACTIONS
+/// ---- ASYNC STATEMENTS / TRANSACTIONS ----
 
-class SqlStatement : public SqlOperation
+class SqlPlainRequest : public SqlOperation
 {
     private:
-        const char* m_sql;
+        char const* m_sql;
     public:
-        SqlStatement(const char* sql) : m_sql(strdup(sql)) {}
-        ~SqlStatement()
-        {
-            void* tofree = const_cast<char*>(m_sql);
-            free(tofree);
-        }
-        void Execute(Database* db);
-};
-
-class SqlPreparedStatement : public SqlOperation
-{
-    private:
-        PreparedStatement* m_stmt;
-        PreparedValues m_values;
-    public:
-        SqlPreparedStatement(PreparedStatement* stmt, PreparedValues& values) : m_stmt(stmt), m_values(values) {}
-
-        void Execute(Database* db)
-        {
-            db->DirectExecute(m_stmt, m_values, NULL);
-        }
+        SqlPlainRequest(char const* sql) : m_sql(mangos_strdup(sql)){}
+        ~SqlPlainRequest() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
+        bool Execute(SqlConnection* conn);
 };
 
 class SqlTransaction : public SqlOperation
 {
-    protected:
-        friend class Database;
-        struct QueuedItem
-        {
-            union
-            {
-                char* sql;
-                struct
-                {
-                    PreparedStatement* stmt;
-                    PreparedValues* values;
-                };
-            };
+    private:
+        std::vector<SqlOperation*> m_queue;
 
-            bool isStmt;
-        };
-
-        std::queue<QueuedItem> queue;
-        ACE_Thread_Mutex mutex;
     public:
-        ~SqlTransaction()
-        {
-            while (!queue.empty())
-            {
-                QueuedItem item = queue.front();
-                if (!item.isStmt)
-                    free (item.sql);
-                else
-                    delete item.values;
-                queue.pop();
-            }
-        }
+        SqlTransaction(uint32 serialId) : SqlOperation(serialId) {}
+        ~SqlTransaction();
 
-        void DelayExecute(const char* sql)
-        {
-            QueuedItem item;
-            item.sql = strdup(sql);
-            item.isStmt = false;
+        void DelayExecute(SqlOperation* sql)   {   m_queue.push_back(sql); }
 
-            mutex.acquire();
-            queue.push(item);
-            mutex.release();
-        }
-        void DelayExecute(PreparedStatement* stmt, PreparedValues& values)
-        {
-            QueuedItem item;
-            item.stmt = stmt;
-            item.values = new PreparedValues(values.size());
-            *item.values = values;
-            item.isStmt = true;
-
-            mutex.acquire();
-            queue.push(item);
-            mutex.release();
-        }
-        void Execute(Database* db)
-        {
-            db->ExecuteTransaction(this);
-        }
+        bool Execute(SqlConnection* conn);
 };
 
-// ASYNC QUERIES
-
-class SqlQuery;                                             // contains a single async query
-class QueryResult;                                          // the result of one
-class SqlResultQueue;                                       // queue for thread sync
-class SqlQueryHolder;                                       // groups several async quries
-class SqlQueryHolderEx;                                     // points to a holder, added to the delay thread
-
-class SqlResultQueue : public ACE_Based::LockedQueue<Oregon::IQueryCallback*, ACE_Thread_Mutex>
+class SqlPreparedRequest : public SqlOperation
 {
     public:
-        SqlResultQueue() {}
-        void Update();
+        SqlPreparedRequest(int nIndex, SqlStmtParameters* arg);
+        ~SqlPreparedRequest();
+
+        bool Execute(SqlConnection* conn);
+
+    private:
+        int const m_nIndex;
+        SqlStmtParameters* m_param;
+};
+
+/// ---- ASYNC QUERIES ----
+
+class SqlQuery;                                             /// contains a single async query
+class QueryResult;                                          /// the result of one
+class SqlResultQueue;                                       /// queue for thread sync
+class SqlQueryHolder;                                       /// groups several async quries
+class SqlQueryHolderEx;                                     /// points to a holder, added to the delay thread
+
+class SqlResultQueue : public ACE_Based::LockedQueue<Oregon::IQueryCallback* , ACE_Thread_Mutex>
+{
+    public:
+        SqlResultQueue() : numUnsafeQueries(0) {}
+        void CancelAll();
+        void Update(uint32 maxTime);
+        typedef ACE_Based::LockedQueue<Oregon::IQueryCallback*, ACE_Thread_Mutex> CallbackQueue;
+        CallbackQueue _threadUnsafeWaitingQueries;
+        uint32 numUnsafeQueries;
 };
 
 class SqlQuery : public SqlOperation
 {
     private:
-        const char* m_sql;
+        char const* m_sql;
         Oregon::IQueryCallback* m_callback;
         SqlResultQueue* m_queue;
     public:
-        SqlQuery(const char* sql, Oregon::IQueryCallback* callback, SqlResultQueue* queue)
-            : m_sql(strdup(sql)), m_callback(callback), m_queue(queue) {}
-        ~SqlQuery()
-        {
-            void* tofree = const_cast<char*>(m_sql);
-            free(tofree);
-        }
-        void Execute(Database* db);
+        SqlQuery(char const* sql, Oregon::IQueryCallback* callback, SqlResultQueue* queue)
+            : m_sql(mangos_strdup(sql)), m_callback(callback), m_queue(queue) {}
+        ~SqlQuery() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
+        bool Execute(SqlConnection* conn);
 };
 
 class SqlQueryHolder
 {
-        friend class SqlQueryHolderEx;
+    friend class SqlQueryHolderEx;
     private:
-        typedef std::pair<const char*, QueryResult_AutoPtr> SqlResultPair;
+        typedef std::pair<char const*, QueryResult*> SqlResultPair;
         std::vector<SqlResultPair> m_queries;
+
+        uint32 serialId;
     public:
-        SqlQueryHolder() {}
-        ~SqlQueryHolder();
-        bool SetQuery(size_t index, const char* sql);
-        bool SetPQuery(size_t index, const char* format, ...) ATTR_PRINTF(3, 4);
+        SqlQueryHolder(uint32 id) : serialId(id) {}
+        SqlQueryHolder() : serialId(0) {}
+        virtual ~SqlQueryHolder();
+        bool SetQuery(size_t index, char const* sql);
+        bool SetPQuery(size_t index, char const* format, ...) ATTR_PRINTF(3,4);
         void SetSize(size_t size);
-        QueryResult_AutoPtr GetResult(size_t index);
-        void SetResult(size_t index, QueryResult_AutoPtr result);
-        bool Execute(Oregon::IQueryCallback* callback, SqlDelayThread* thread, SqlResultQueue* queue);
+        size_t GetSize() const { return m_queries.size(); }
+        QueryResult* GetResult(size_t index);
+        void SetResult(size_t index, QueryResult* result);
+        bool Execute(Oregon::IQueryCallback* callback, Database* db, SqlResultQueue* queue);
+        void DeleteAllResults();
+        uint32 GetSerialId() const { return serialId; }
 };
 
 class SqlQueryHolderEx : public SqlOperation
@@ -194,44 +151,8 @@ class SqlQueryHolderEx : public SqlOperation
         Oregon::IQueryCallback* m_callback;
         SqlResultQueue* m_queue;
     public:
-        SqlQueryHolderEx(SqlQueryHolder* holder, Oregon::IQueryCallback* callback, SqlResultQueue* queue)
-            : m_holder(holder), m_callback(callback), m_queue(queue) {}
-        void Execute(Database* db);
-};
-
-class SqlAsyncTask : public ACE_Method_Request
-{
-    public:
-        SqlAsyncTask(Database* db, SqlOperation* op) : m_db(db), m_op(op) {}
-        ~SqlAsyncTask()
-        {
-            if (!m_op)
-                return;
-
-            delete m_op;
-            m_op = NULL;
-        }
-
-        int call()
-        {
-            if (m_db == NULL || m_op == NULL)
-                return -1;
-
-            try
-            {
-                m_op->Execute(m_db);
-            }
-            catch (...)
-            {
-                return -1;
-            }
-
-            return 0;
-        }
-
-    private:
-        Database* m_db;
-        SqlOperation* m_op;
+        SqlQueryHolderEx(SqlQueryHolder* holder, Oregon::IQueryCallback* callback, SqlResultQueue* queue, uint32 id)
+            : SqlOperation(id), m_holder(holder), m_callback(callback), m_queue(queue) {}
+        bool Execute(SqlConnection* conn);
 };
 #endif                                                      //__SQLOPERATIONS_H
-

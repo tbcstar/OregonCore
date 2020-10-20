@@ -4668,7 +4668,7 @@ void AddSC_shadowmoon_valley()
     new npc_shadowcouncil_warlock();
     new npc_plexi();
     new npc_nakansi();
-    new npc_zuluhed_the_whacked();
+    new npc_zuluhed_the_whacked();//stuck
     new npc_dragonmaw_archer();
     new npc_shadowmoon_ancient_spirit();
     new npc_karsius_the_ancient_watcher();

@@ -28,8 +28,8 @@
 #include "CreatureAIImpl.h"
 #include "ScriptLoader.h"
 #include "ScriptSystem.h"
-#ifdef ELUNA
 #include "Player.h"
+#ifdef ELUNA
 #include "LuaEngine.h"
 #endif
 
@@ -529,6 +529,8 @@ void ScriptMgr::OnPlayerEnter(Map* map, Player* player)
 {
     ASSERT(map);
     ASSERT(player);
+
+    FOREACH_SCRIPT(PlayerScript)->OnMapChanged(player);
 
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsContinent);
     itr->second->OnPlayerEnter(map, player);
@@ -1188,11 +1190,22 @@ MovementHandlerScript::MovementHandlerScript(const char* name)
     ScriptMgr::ScriptRegistry<MovementHandlerScript>::AddScript(this);
 }
 
+UnitScript::UnitScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptMgr::ScriptRegistry<UnitScript>::AddScript(this);
+}
 
 BGScript::BGScript(const char* name)
     : ScriptObject(name)
 {
     ScriptMgr::ScriptRegistry<BGScript>::AddScript(this);
+}
+
+GuildScript::GuildScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptMgr::ScriptRegistry<GuildScript>::AddScript(this);
 }
 
 // Group
@@ -1315,6 +1328,7 @@ void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
     FOREACH_SCRIPT(PlayerScript)->OnGiveXP(player, amount, victim);
 }
 
+
 void ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
 {
     FOREACH_SCRIPT(PlayerScript)->OnReputationChange(player, factionID, standing, incremental);
@@ -1378,6 +1392,11 @@ void ScriptMgr::OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck)
 void ScriptMgr::OnPlayerLogin(Player* player, bool firstLogin)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLogin(player, firstLogin);
+}
+
+void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
 }
 
 void ScriptMgr::OnPlayerLogout(Player* player)
@@ -1444,6 +1463,37 @@ void ScriptMgr::OnPlayerRepop(Player* player)
 void ScriptMgr::OnQuestObjectiveProgress(Player* player, Quest const* quest, uint32 objectiveIndex, uint16 progress)
 {
     FOREACH_SCRIPT(PlayerScript)->OnQuestObjectiveProgress(player, quest, objectiveIndex, progress);
+}
+
+// Guild
+void ScriptMgr::OnGuildRemoveMember(Guild* guild, Player* player, bool isDisbanding)
+{
+    FOREACH_SCRIPT(GuildScript)->OnRemoveMember(guild, player, isDisbanding);
+}
+
+void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint32& plRank)
+{
+    FOREACH_SCRIPT(GuildScript)->OnAddMember(guild, player, plRank);
+}
+
+void ScriptMgr::OnGuildCreate(Guild* guild, Player* leader, const std::string& name)
+{
+    FOREACH_SCRIPT(GuildScript)->OnCreate(guild, leader, name);
+}
+
+void ScriptMgr::OnGuildDisband(Guild* guild)
+{
+    FOREACH_SCRIPT(GuildScript)->OnDisband(guild);
+}
+
+void ScriptMgr::OnDealDamage(Unit* unit, uint32& amount)
+{
+    FOREACH_SCRIPT(UnitScript)->OnDealDamage(unit, amount);
+}
+
+void ScriptMgr::OnHeal(Unit* healer, Unit* reciever, uint32& gain)
+{
+    FOREACH_SCRIPT(UnitScript)->OnHeal(healer, reciever, gain);
 }
 
 template<class TScript>
@@ -1544,6 +1594,8 @@ template class ScriptMgr::ScriptRegistry<DynamicObjectScript>;
 template class ScriptMgr::ScriptRegistry<TransportScript>;
 template class ScriptMgr::ScriptRegistry<MovementHandlerScript>;
 template class ScriptMgr::ScriptRegistry<BGScript>;
+template class ScriptMgr::ScriptRegistry<GuildScript>;
+template class ScriptMgr::ScriptRegistry<UnitScript>;
 
 // Undefine utility macros.
 #undef GET_SCRIPT_RET

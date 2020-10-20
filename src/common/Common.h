@@ -229,6 +229,13 @@ LocaleConstant GetLocaleByName(const std::string& name);
 #define DEFAULT_LOCALE LOCALE_enUS
 
 typedef std::vector<std::string> StringVector;
+//operator new[] based version of strdup() function! Release memory by using operator delete[] !
+inline char* mangos_strdup(char const* source)
+{
+    char* dest = new char[strlen(source) + 1];
+    strcpy(dest, source);
+    return dest;
+};
 
 // we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)
 #ifdef max

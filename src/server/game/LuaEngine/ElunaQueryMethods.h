@@ -181,13 +181,13 @@ namespace LuaQuery
      * @param uint32 column
      * @return int64 data
      */
-    int GetInt64(Eluna* /*E*/, lua_State* L, ElunaQuery* result)
-    {
-        uint32 col = Eluna::CHECKVAL<uint32>(L, 2);
-        CheckFields(L, result);
-        Eluna::Push(L, result->Fetch()[col].GetInt64());
-        return 1;
-    }
+    //int GetInt64(Eluna* /*E*/, lua_State* L, ElunaQuery* result)
+    //{
+    //    uint32 col = Eluna::CHECKVAL<uint32>(L, 2);
+    //    CheckFields(L, result);
+    //    Eluna::Push(L, result->Fetch()[col].GetInt64());
+    //    return 1;
+    //}
 
     /**
      * Returns the data in the specified column of the current row, casted to a 32-bit floating point value.
@@ -209,13 +209,13 @@ namespace LuaQuery
      * @param uint32 column
      * @return double data
      */
-    int GetDouble(Eluna* /*E*/, lua_State* L, ElunaQuery* result)
-    {
-        uint32 col = Eluna::CHECKVAL<uint32>(L, 2);
-        CheckFields(L, result);
-        Eluna::Push(L, result->Fetch()[col].GetDouble());
-        return 1;
-    }
+    //int GetDouble(Eluna* /*E*/, lua_State* L, ElunaQuery* result)
+    //{
+    //    uint32 col = Eluna::CHECKVAL<uint32>(L, 2);
+    //    CheckFields(L, result);
+    //    Eluna::Push(L, result->Fetch()[col].GetDouble());
+    //    return 1;
+    //}
 
     /**
      * Returns the data in the specified column of the current row, casted to a string.

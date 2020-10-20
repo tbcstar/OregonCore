@@ -980,9 +980,9 @@ ElunaRegister<ElunaQuery> QueryMethods[] =
     { "GetInt8", &LuaQuery::GetInt8 },
     { "GetInt16", &LuaQuery::GetInt16 },
     { "GetInt32", &LuaQuery::GetInt32 },
-    { "GetInt64", &LuaQuery::GetInt64 },
+    //{ "GetInt64", &LuaQuery::GetInt64 },
     { "GetFloat", &LuaQuery::GetFloat },
-    { "GetDouble", &LuaQuery::GetDouble },
+    //{ "GetDouble", &LuaQuery::GetDouble },
     { "GetString", &LuaQuery::GetString },
 
     // Boolean

@@ -183,7 +183,7 @@ void GameObject::RemoveFromWorld()
     }
 }
 
-bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state, uint32 artKit)
+bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state, uint32 artKit)
 {
     ASSERT(map);
     SetMap(map);
@@ -212,6 +212,12 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
         return false;
     }
 
+    if (phaseMask == 0)
+    {
+        sLog.outBasic("Gameobject (GUID: %u Entry: %u) has no phaseMask using default phase!", guidlow, name_id);
+        phaseMask = PHASEMASK_NORMAL;
+    }
+    SetPhaseMask(phaseMask, false, false);
     SetFloatValue(GAMEOBJECT_POS_X, x);
     SetFloatValue(GAMEOBJECT_POS_Y, y);
     SetFloatValue(GAMEOBJECT_POS_Z, z);
@@ -430,7 +436,7 @@ void GameObject::Update(uint32 diff)
                     {
                         // Hunter trap: Search units which are unfriendly to the trap's owner
                         Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                        Oregon::UnitSearcher<Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(ok, checker);
+                        Oregon::UnitSearcher<Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, ok, checker);
                         VisitNearbyGridObject(radius, searcher);
                         if (!ok)
                             VisitNearbyWorldObject(radius, searcher);
@@ -440,7 +446,7 @@ void GameObject::Update(uint32 diff)
                         // Environmental trap: Any player
                         Player* player = NULL;
                         Oregon::AnyPlayerInObjectRangeCheck checker(this, radius);
-                        Oregon::PlayerSearcher<Oregon::AnyPlayerInObjectRangeCheck> searcher(player, checker);
+                        Oregon::PlayerSearcher<Oregon::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
                         VisitNearbyWorldObject(radius, searcher);
                         ok = player;
                     }
@@ -652,10 +658,10 @@ void GameObject::SaveToDB()
         return;
     }
 
-    SaveToDB(GetMapId(), data->spawnMask);
+    SaveToDB(GetMapId(), data->spawnMask, data->phaseMask);
 }
 
-void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask)
+void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 {
     const GameObjectInfo* goI = GetGOInfo();
 
@@ -670,6 +676,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask)
     // data->guid = guid don't must be update at save
     data.id = GetEntry();
     data.mapid = mapid;
+    data.phaseMask = phaseMask;
     data.posX = GetFloatValue(GAMEOBJECT_POS_X);
     data.posY = GetFloatValue(GAMEOBJECT_POS_Y);
     data.posZ = GetFloatValue(GAMEOBJECT_POS_Z);
@@ -688,7 +695,8 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask)
        << m_DBTableGuid << ", "
        << GetUInt32Value(OBJECT_FIELD_ENTRY) << ", "
        << mapid << ", "
-       << (uint32)spawnMask << ", "
+        << (uint32)spawnMask << ", "
+       << (uint32)phaseMask << ", "
        << GetFloatValue(GAMEOBJECT_POS_X) << ", "
        << GetFloatValue(GAMEOBJECT_POS_Y) << ", "
        << GetFloatValue(GAMEOBJECT_POS_Z) << ", "
@@ -722,6 +730,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
 
     uint32 entry = data->id;
     //uint32 map_id = data->mapid;
+    uint32 phaseMask = data->phaseMask;
     float x = data->posX;
     float y = data->posY;
     float z = data->posZ;
@@ -739,7 +748,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     m_DBTableGuid = guid;
     if (map->GetInstanceId() != 0) guid = sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
-    if (!Create(guid, entry, map, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
+    if (!Create(guid, entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state, artKit))
         return false;
 
     if (data->spawntimesecs >= 0)
@@ -972,7 +981,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
         Cell cell(p);
 
         Oregon::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
-        Oregon::GameObjectLastSearcher<Oregon::NearestGameObjectEntryInObjectRangeCheck> checker(trapGO, go_check);
+        Oregon::GameObjectLastSearcher<Oregon::NearestGameObjectEntryInObjectRangeCheck> checker(target, trapGO, go_check);
 
         TypeContainerVisitor<Oregon::GameObjectLastSearcher<Oregon::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
         cell.Visit(p, object_checker, *GetMap(), *target, range);
@@ -991,7 +1000,7 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
     CellCoord p(Oregon::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
     Oregon::NearestGameObjectFishingHole u_check(*this, range);
-    Oregon::GameObjectSearcher<Oregon::NearestGameObjectFishingHole> checker(ok, u_check);
+    Oregon::GameObjectSearcher<Oregon::NearestGameObjectFishingHole> checker(this, ok, u_check);
 
     TypeContainerVisitor<Oregon::GameObjectSearcher<Oregon::NearestGameObjectFishingHole>, GridTypeMapContainer > grid_object_checker(checker);
     cell.Visit(p, grid_object_checker, *GetMap(), *this, range);
@@ -1763,6 +1772,11 @@ void GameObject::SetDisplayId(uint32 displayid)
 {
     SetUInt32Value(GAMEOBJECT_DISPLAYID, displayid);
     UpdateModel();
+}
+
+void GameObject::SetPhaseMask(uint32 newPhaseMask, bool update, bool individual)
+{
+    WorldObject::SetPhaseMask(newPhaseMask, update, individual);
 }
 
 void GameObject::EnableCollision(bool enable)
