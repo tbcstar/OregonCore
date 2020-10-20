@@ -23,9 +23,13 @@
 //void AddSC_custom_example();
 //void AddSC_custom_gossip_codebox();
 //void AddSC_test();
-void AddSC_npc_arena_spectator();
 void AddModuleScripts();
+
+//custom
+void AddSC_StockExchange();
+void AddSC_npc_arena_spectator();
 void AddSC_custom_dualspec();
+
 //world
 void AddSC_areatrigger_scripts();
 void AddSC_boss_emeriss();
