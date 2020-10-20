@@ -32,7 +32,7 @@ void MapManager::LoadTransports()
 
     if (!result)
     {
-        sLog.outString(">> Loaded %u transports", count);
+        sLog.outString(">> 加载 %u个 transports", count);
         return;
     }
 
@@ -103,7 +103,7 @@ void MapManager::LoadTransports()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u transports", count);
+    sLog.outString(">> 加载 %u个 transports", count);
 
     // check transport data DB integrity
     result = WorldDatabase.Query("SELECT gameobject.guid,gameobject.id,transports.name FROM gameobject,transports WHERE gameobject.id = transports.entry");

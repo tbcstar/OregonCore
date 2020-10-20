@@ -40,7 +40,7 @@
  ###*/
 
  //It isn't a proper gossip text. Was there any? Can't find source on that.
-#define GOSSIP_LANDION "I've come to obtain your report, Landion."
+#define GOSSIP_LANDION "我是来拿你的报告的，兰蒂奥。"
 
 class npc_scout_landion : public CreatureScript
 {
@@ -78,13 +78,13 @@ public:
 ## npc_highlord_demitrian
 ###*/
 
-#define GOSSIP_DEMITRIAN1 "What do you know of it?"
-#define GOSSIP_DEMITRIAN2 "I am listening , Demitrian."
-#define GOSSIP_DEMITRIAN3 "Continue, please."
-#define GOSSIP_DEMITRIAN4 "A battle?"
+#define GOSSIP_DEMITRIAN1 "你知道些什么?"
+#define GOSSIP_DEMITRIAN2 "我在听，德米提恩。"
+#define GOSSIP_DEMITRIAN3 "请继续。"
+#define GOSSIP_DEMITRIAN4 "一场战斗？"
 #define GOSSIP_DEMITRIAN5 "<Nod>"
-#define GOSSIP_DEMITRIAN6 "Caught unaware? How?"
-#define GOSSIP_DEMITRIAN7 "So what did Ragnaros do next?"
+#define GOSSIP_DEMITRIAN6 "没意识到？ 怎么样？"
+#define GOSSIP_DEMITRIAN7 "那么拉格纳罗斯接下来做什么呢?"
 
 class npc_highlord_demitrain : public CreatureScript
 {
@@ -151,20 +151,20 @@ public:
 ###*/
 
 //gossip item text best guess
-#define GOSSIP_ITEM1 "I seek information about Natalia"
+#define GOSSIP_ITEM1 "我寻找关于纳塔莉亚的信息"
 
-#define GOSSIP_ITEM2 "That sounds dangerous!"
-#define GOSSIP_ITEM3 "What did you do?"
-#define GOSSIP_ITEM4 "Who?"
-#define GOSSIP_ITEM5 "Women do that. What did she demand?"
-#define GOSSIP_ITEM6 "What do you mean?"
-#define GOSSIP_ITEM7 "What happened next?"
+#define GOSSIP_ITEM2 "那听起来危险！"
+#define GOSSIP_ITEM3 "你做了什么?"
+#define GOSSIP_ITEM4 "谁?"
+#define GOSSIP_ITEM5 "她们这样做。 她们想要干嘛？"
+#define GOSSIP_ITEM6 "你是什么意思?"
+#define GOSSIP_ITEM7 "接下来发生了什么?"
 
-#define GOSSIP_ITEM11 "Yes, please continue"
-#define GOSSIP_ITEM12 "What language?"
-#define GOSSIP_ITEM13 "The Priestess attacked you?!"
-#define GOSSIP_ITEM14 "I should ask the monkey about this"
-#define GOSSIP_ITEM15 "Then what..."
+#define GOSSIP_ITEM11 "是的,请继续"
+#define GOSSIP_ITEM12 "什么语言?"
+#define GOSSIP_ITEM13 "女祭司袭击了你？"
+#define GOSSIP_ITEM14 "我应该问猴子这个问题"
+#define GOSSIP_ITEM15 "那么……"
 
 //trigger creatures to kill
 #define TRIGGER_RUTGAR 15222

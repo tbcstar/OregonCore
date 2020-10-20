@@ -36,7 +36,7 @@ EndScriptData */
 #define SPELL_THUNDERCLAP       23931
 #define SPELL_UPPERCUT          22916
 
-#define GOSSIP_HCB "I know this is rather silly but a young ward who is a bit shy would like your hoofprint."
+#define GOSSIP_HCB "我知道这有点傻，但一个有点害羞的年轻守卫会喜欢你的蹄印的。"
 //@todo verify abilities/timers
 
 class npc_cairne_bloodhoof : public CreatureScript

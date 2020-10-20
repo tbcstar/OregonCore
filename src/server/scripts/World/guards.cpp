@@ -16,7 +16,7 @@
  */
 
 /* ScriptData
-SDName: Guards
+SDName: 守卫
 SD%Complete: 100
 SDComment: All Guard gossip data, quite some npc_text-id's still missing, adding constantly as new id's are known. CombatAI should be organized better for future.
 SDCategory: Guards
@@ -60,27 +60,27 @@ EndContentData */
 #define GOSSIP_SENDER_SEC_AUCTIONHOUSE        102
 
 //script spesific gossip text
-#define GOSSIP_TEXT_TAVERN                    "Worlds End Tavern"
-#define GOSSIP_TEXT_BANKSCYERS                "Scyers bank"
-#define GOSSIP_TEXT_BANKALDOR                 "Aldor Bank"
-#define GOSSIP_TEXT_INNSCYERS                 "Scyers Inn"
-#define GOSSIP_TEXT_INNALDOR                  "Aldor Inn"
-#define GOSSIP_TEXT_STABLESCYERS              "Scyers Stable"
-#define GOSSIP_TEXT_STABLEALDOR               "Aldor Stable"
-#define GOSSIP_TEXT_BATTLEMASTERALLIANCE      "Alliance Battlemasters"
-#define GOSSIP_TEXT_BATTLEMASTERHORDE         "Horde Battlemasters"
-#define GOSSIP_TEXT_BATTLEMASTERARENA         "Arena Battlemasters"
-#define GOSSIP_TEXT_MANALOOM                  "Mana Loom"
-#define GOSSIP_TEXT_ALCHEMYLAB                "Alchemy Lab"
-#define GOSSIP_TEXT_GEMMERCHANT               "Gem Merchant"
-#define GOSSIP_TEXT_GEMSCYERS                 "Scyers Gem Merchant"
-#define GOSSIP_TEXT_GEMALDOR                  "Aldor Gem Merchant"
+#define GOSSIP_TEXT_TAVERN                    "世界末日酒馆"
+#define GOSSIP_TEXT_BANKSCYERS                "占星者银行"
+#define GOSSIP_TEXT_BANKALDOR                 "奥尔多银行"
+#define GOSSIP_TEXT_INNSCYERS                 "占星者旅馆"
+#define GOSSIP_TEXT_INNALDOR                  "奥尔多旅馆"
+#define GOSSIP_TEXT_STABLESCYERS              "占星者兽栏"
+#define GOSSIP_TEXT_STABLEALDOR               "奥尔多兽栏"
+#define GOSSIP_TEXT_BATTLEMASTERALLIANCE      "联盟战场管理员"
+#define GOSSIP_TEXT_BATTLEMASTERHORDE         "部落战场管理员"
+#define GOSSIP_TEXT_BATTLEMASTERARENA         "竞技场管理员"
+#define GOSSIP_TEXT_MANALOOM                  "魔法织布机"
+#define GOSSIP_TEXT_ALCHEMYLAB                "炼金试验室"
+#define GOSSIP_TEXT_GEMMERCHANT               "宝石商人"
+#define GOSSIP_TEXT_GEMSCYERS                 "占星者宝石商人"
+#define GOSSIP_TEXT_GEMALDOR                  "奥尔多宝石商人"
 
-#define GOSSIP_TEXT_AH_SILVERMOON_1           "Western Auction House"
-#define GOSSIP_TEXT_AH_SILVERMOON_2           "Royal Exchange Auction House"
+#define GOSSIP_TEXT_AH_SILVERMOON_1           "西部拍卖行"
+#define GOSSIP_TEXT_AH_SILVERMOON_2           "皇家贸易区拍卖行"
 
-#define GOSSIP_TEXT_INN_SILVERMOON_1          "Silvermoon City Inn"
-#define GOSSIP_TEXT_INN_SILVERMOON_2          "Wayfarer's Rest tavern"
+#define GOSSIP_TEXT_INN_SILVERMOON_1          "银月城旅馆"
+#define GOSSIP_TEXT_INN_SILVERMOON_2          "旅者梦乡旅馆"
 
 /*******************************************************
  * guard_azuremyst start
@@ -92,23 +92,23 @@ void SendDefaultMenu_guard_azuremyst(Player* player, Creature* pCreature, uint32
 {
     switch (action)
     {
-    case GOSSIP_ACTION_INFO_DEF + 1:                    //Bank
+    case GOSSIP_ACTION_INFO_DEF + 1:                    //银行
         player->SEND_POI(-3918.95f, -11544.7f, 6, 6, 0, "Bank");
         player->SEND_GOSSIP_MENU(10067, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 2:                    //Hippogryph Master
+    case GOSSIP_ACTION_INFO_DEF + 2:                    //角鹰兽管理员
         player->SEND_POI(-4057.15f, -11788.6f, 6, 6, 0, "Stephanos");
         player->SEND_GOSSIP_MENU(10071, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 3:                    //Guild master
+    case GOSSIP_ACTION_INFO_DEF + 3:                    //公会管理员
         player->SEND_POI(-4092.43f, -11626.6f, 6, 6, 0, "Funaam");
         player->SEND_GOSSIP_MENU(10073, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 4:                    //Inn
+    case GOSSIP_ACTION_INFO_DEF + 4:                    //旅馆
         player->SEND_POI(-4129.43f, -12469, 6, 6, 0, "Caregiver Chellan");
         player->SEND_GOSSIP_MENU(10074, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 5:                    //Stable Master
+    case GOSSIP_ACTION_INFO_DEF + 5:                    //兽栏管理员
         player->SEND_POI(-4146.42f, -12492.7f, 6, 6, 0, "Esbina");
         player->SEND_GOSSIP_MENU(10075, pCreature->GetGUID());
         break;
@@ -122,7 +122,7 @@ void SendDefaultMenu_guard_azuremyst(Player* player, Creature* pCreature, uint32
         player->ADD_GOSSIP_ITEM(0, GOSSIP_TEXT_WARRIOR             , GOSSIP_SENDER_SEC_CLASSTRAIN, GOSSIP_ACTION_INFO_DEF + 7);
         player->SEND_GOSSIP_MENU(10076, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 7:                    //Profession trainer
+    case GOSSIP_ACTION_INFO_DEF + 7:                    //职业训练师
         player->ADD_GOSSIP_ITEM(0, GOSSIP_TEXT_ALCHEMY             , GOSSIP_SENDER_SEC_PROFTRAIN, GOSSIP_ACTION_INFO_DEF + 1);
         player->ADD_GOSSIP_ITEM(0, GOSSIP_TEXT_BLACKSMITHING       , GOSSIP_SENDER_SEC_PROFTRAIN, GOSSIP_ACTION_INFO_DEF + 2);
         player->ADD_GOSSIP_ITEM(0, GOSSIP_TEXT_COOKING             , GOSSIP_SENDER_SEC_PROFTRAIN, GOSSIP_ACTION_INFO_DEF + 3);
@@ -145,31 +145,31 @@ void SendClassTrainerMenu_guard_azuremyst(Player* player, Creature* pCreature, u
 {
     switch (action)
     {
-    case GOSSIP_ACTION_INFO_DEF + 1:                    //Druid
+    case GOSSIP_ACTION_INFO_DEF + 1:                    //德鲁伊
         player->SEND_POI(-4274.81f, -11495.3f, 6, 6, 0, "Shalannius");
         player->SEND_GOSSIP_MENU(10077, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 2:                    //Hunter
+    case GOSSIP_ACTION_INFO_DEF + 2:                    //猎人
         player->SEND_POI(-4203.65f, -12526.5f, 6, 6, 0, "Acteon");
         player->SEND_GOSSIP_MENU(10078, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 3:                    //Mage
+    case GOSSIP_ACTION_INFO_DEF + 3:                    //法师
         player->SEND_POI(-4149.62f, -12530.1f, 6, 6, 0, "Semid");
         player->SEND_GOSSIP_MENU(10081, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 4:                    //Paladin
+    case GOSSIP_ACTION_INFO_DEF + 4:                    //圣骑士
         player->SEND_POI(-4138.98f, -12468.5f, 6, 6, 0, "Tullas");
         player->SEND_GOSSIP_MENU(10083, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 5:                    //Priest
+    case GOSSIP_ACTION_INFO_DEF + 5:                    //牧师
         player->SEND_POI(-4131.66f, -12478.6f, 6, 6, 0, "Guvan");
         player->SEND_GOSSIP_MENU(10084, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 6:                    //Shaman
+    case GOSSIP_ACTION_INFO_DEF + 6:                    //萨满
         player->SEND_POI(-4162.33f, -12456.1f, 6, 6, 0, "Tuluun");
         player->SEND_GOSSIP_MENU(10085, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 7:                    //Warrior
+    case GOSSIP_ACTION_INFO_DEF + 7:                    //战士
         player->SEND_POI(-4165.05f, -12536.4f, 6, 6, 0, "Ruada");
         player->SEND_GOSSIP_MENU(10086, pCreature->GetGUID());
         break;
@@ -180,54 +180,54 @@ void SendProfTrainerMenu_guard_azuremyst(Player* player, Creature* pCreature, ui
 {
     switch (action)
     {
-    case GOSSIP_ACTION_INFO_DEF + 1:                    //Alchemy
+    case GOSSIP_ACTION_INFO_DEF + 1:                    //炼金术
         player->SEND_POI(-4191.15f, -12470, 6, 6, 0, "Daedal");
         player->SEND_GOSSIP_MENU(10088, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 2:                    //Blacksmithing
+    case GOSSIP_ACTION_INFO_DEF + 2:                    //锻造
         player->SEND_POI(-4726.29f, -12387, 6, 6, 0, "Blacksmith Calypso");
         player->SEND_GOSSIP_MENU(10089, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 3:                    //Cooking
+    case GOSSIP_ACTION_INFO_DEF + 3:                    //烹饪
         player->SEND_POI(-4710.87f, -12400.6f, 6, 6, 0, "'Cookie' McWeaksauce");
         player->SEND_GOSSIP_MENU(10090, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 4:                    //Enchanting
+    case GOSSIP_ACTION_INFO_DEF + 4:                    //附魔
         player->SEND_POI(-3882.85f, -11496.7f, 6, 6, 0, "Nahogg");
         player->SEND_GOSSIP_MENU(10091, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 5:                    //Engineering
+    case GOSSIP_ACTION_INFO_DEF + 5:                    //工程
         player->SEND_POI(-4157.57f, -12470.2f, 6, 6, 0, "Artificer Daelo");
         player->SEND_GOSSIP_MENU(10092, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 6:                    //First Aid
+    case GOSSIP_ACTION_INFO_DEF + 6:                    //急救
         player->SEND_POI(-4199.11f, -12469.9f, 6, 6, 0, "Anchorite Fateema");
         player->SEND_GOSSIP_MENU(10093, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 7:                    //Fishing
+    case GOSSIP_ACTION_INFO_DEF + 7:                    //钓鱼
         player->SEND_POI(-4266.38f, -12985.1f, 6, 6, 0, "Diktynna");
         player->SEND_GOSSIP_MENU(10094, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 8:                    //Herbalism
+    case GOSSIP_ACTION_INFO_DEF + 8:                    //草药
         player->SEND_GOSSIP_MENU(10095, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 9:                    //Jewelcrafting
+    case GOSSIP_ACTION_INFO_DEF + 9:                    //珠宝加工
         player->SEND_POI(-3781.55f, -11541.8f, 6, 6, 0, "Farii");
         player->SEND_GOSSIP_MENU(10096, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 10:                   //Leatherworking
+    case GOSSIP_ACTION_INFO_DEF + 10:                   //制皮
         player->SEND_POI(-3442.68f, -12322.2f, 6, 6, 0, "Moordo");
         player->SEND_GOSSIP_MENU(10098, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 11:                   //Mining
+    case GOSSIP_ACTION_INFO_DEF + 11:                   //采矿
         player->SEND_POI(-4179.89f, -12493.1f, 6, 6, 0, "Dulvi");
         player->SEND_GOSSIP_MENU(10097, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 12:                   //Skinning
+    case GOSSIP_ACTION_INFO_DEF + 12:                   //剥皮
         player->SEND_POI(-3431.17f, -12316.5f, 6, 6, 0, "Gurf");
         player->SEND_GOSSIP_MENU(10098, pCreature->GetGUID());
         break;
-    case GOSSIP_ACTION_INFO_DEF + 13:                   //Tailoring
+    case GOSSIP_ACTION_INFO_DEF + 13:                   //裁缝
         player->SEND_POI(-4711.54f, -12386.7f, 6, 6, 0, "Erin Kelly");
         player->SEND_GOSSIP_MENU(10099, pCreature->GetGUID());
         break;

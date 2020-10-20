@@ -76,7 +76,7 @@ bool Corpse::Create(uint32 guidlow, Player* owner, uint32 /*mapid*/, float x, fl
 
     if (!IsPositionValid())
     {
-        sLog.outError("Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.outError("尸体 (guidlow %d, owner %s) 没有创建。建议的坐标无效 (X: %f Y: %f)",
                       guidlow, owner->GetName(), x, y);
         return false;
     }
@@ -139,7 +139,7 @@ void Corpse::DeleteBonesFromWorld()
 
     if (!corpse)
     {
-        sLog.outError("Bones %u not found in world.", GetGUIDLow());
+        sLog.outError("在世界上找不到Bones %u 。", GetGUIDLow());
         return;
     }
 
@@ -192,7 +192,7 @@ bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
 
     if (!IsPositionValid())
     {
-        sLog.outError("Corpse (guidlow %d, owner %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.outError("尸体 (guidlow %d, owner %d) 没有创建。建议的坐标无效 (X: %f Y: %f)",
                       GetGUIDLow(), GUID_LOPART(GetOwnerGUID()), GetPositionX(), GetPositionY());
         return false;
     }

@@ -330,7 +330,7 @@ public:
 ## npc_overseer_nuaar
 ######*/
 
-#define GOSSIP_HON "Overseer, I am here to negotiate on behalf of the Cenarion Expedition."
+#define GOSSIP_HON "监工，我是代表塞纳里奥远征队来谈判的。"
 
 class npc_overseer_nuaar : CreatureScript
 {
@@ -362,8 +362,8 @@ public:
 ## npc_saikkal_the_elder
 ######*/
 
-#define GOSSIP_HSTE "Yes... yes, it's me."
-#define GOSSIP_SSTE "Yes elder. Tell me more of the book."
+#define GOSSIP_HSTE "是的……是的,是我。"
+#define GOSSIP_SSTE "是的长者。再给我讲讲这本书的内容。"
 
 class npc_saikkal_the_elder : CreatureScript
 {
@@ -832,11 +832,11 @@ public:
 # npc_kolphis_darkscale
 #########*/
 
-#define GOSSIP_ITEM_KOLPHIS1 "I'm fine, thank you. You asked for me?"
-#define GOSSIP_ITEM_KOLPHIS2 "Oh, it's not my fault. I can assure you."
-#define GOSSIP_ITEM_KOLPHIS3 "Um, no...no, I don't want that at all."
+#define GOSSIP_ITEM_KOLPHIS1 "我很好，谢谢。你要找我?"
+#define GOSSIP_ITEM_KOLPHIS2 "哦，这不是我的错。我可以向你保证。"
+#define GOSSIP_ITEM_KOLPHIS3 "嗯,不…不，我一点也不想要。"
 #define GOSSIP_ITEM_KOLPHIS4 "Impressive. When do we attack?"
-#define GOSSIP_ITEM_KOLPHIS5 "Absolutely!"
+#define GOSSIP_ITEM_KOLPHIS5 "正是如此！"
 
 class npc_kolphis_darkscale : CreatureScript
 {

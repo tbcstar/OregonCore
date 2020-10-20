@@ -23,11 +23,11 @@
 #include "ObjectMgr.h"
 #include "Map.h"
 
-#define OUT_SAVE_INST_DATA             debug_log("OSCR: Saving Instance Data for Instance %s (Map %d, Instance Id %d)", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_SAVE_INST_DATA_COMPLETE    debug_log("OSCR: Saving Instance Data for Instance %s (Map %d, Instance Id %d) completed.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_LOAD_INST_DATA(a)          debug_log("OSCR: Loading Instance Data for Instance %s (Map %d, Instance Id %d). Input is '%s'", instance->GetMapName(), instance->GetId(), instance->GetInstanceId(), a)
-#define OUT_LOAD_INST_DATA_COMPLETE    debug_log("OSCR: Instance Data Load for Instance %s (Map %d, Instance Id: %d) is complete.",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_LOAD_INST_DATA_FAIL        error_log("OSCR: Unable to load Instance Data for Instance %s (Map %d, Instance Id: %d).",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_SAVE_INST_DATA             debug_log("OSCR: 保存副本 %s 的副本数据(Map %d，副本Id %d)", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_SAVE_INST_DATA_COMPLETE    debug_log("OSCR: 已保存副本 %s 的副本数据(Map %d，副本Id %d)。", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_LOAD_INST_DATA(a)          debug_log("OSCR: 正在加载副本 %s 的副本数据(Map %d，实例Id %d)。输入“%s”", instance->GetMapName(), instance->GetId(), instance->GetInstanceId(), a)
+#define OUT_LOAD_INST_DATA_COMPLETE    debug_log("OSCR: 副本 %s (Map %d，副本Id: %d)的副本数据加载完成。",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_LOAD_INST_DATA_FAIL        error_log("OSCR: 无法加载副本 %s 的副本数据(Map %d，副本Id: %d)。",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
 
 class ScriptedInstance : public InstanceData
 {

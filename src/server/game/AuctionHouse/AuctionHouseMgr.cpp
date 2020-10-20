@@ -141,7 +141,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction)
 
             uint32 owner_accid = sObjectMgr.GetPlayerAccountIdByGUID(auction->owner);
 
-            sLog.outCommand(bidder_accId, "GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
+            sLog.outCommand(bidder_accId, "GM %s (账号: %u) 拍卖中拍到的物品: %s (Entry: %u 数量: %u) 并支付金币: %u. 原本归属 %s (账号: %u)",
                             bidder_name.c_str(), bidder_accId, pItem->GetProto()->Name1, pItem->GetEntry(), pItem->GetCount(), auction->bid, owner_name.c_str(), owner_accid);
         }
     }
@@ -276,7 +276,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
     if (!result)
     {
-        sLog.outString(">> Loaded 0 auction items");
+        sLog.outString(">> 已加载0件拍卖物品");
         return;
     }
 
@@ -295,7 +295,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
         if (!proto)
         {
-            sLog.outError("AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid, item_template);
+            sLog.outError("AuctionHouseMgr::拍卖品中有未知的物品(GUID: %u id: #%u)，已跳过。", item_guid, item_template);
             continue;
         }
 
@@ -312,7 +312,7 @@ void AuctionHouseMgr::LoadAuctionItems()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u auction items", count);
+    sLog.outString(">> 已加载%u件拍卖物品", count);
 }
 
 void AuctionHouseMgr::LoadAuctions()

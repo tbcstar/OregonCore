@@ -127,7 +127,7 @@ void AuctionHouseBot::addNewAuctions(Player* AHBplayer, AHBConfig* config)
 {
     if (!AHBSeller)
     {
-        if (debug_Out) sLog.outError("AHSeller: Disabled");
+        if (debug_Out) sLog.outError("AHSeller: 禁用");
         return;
     }
 
@@ -168,7 +168,7 @@ void AuctionHouseBot::addNewAuctions(Player* AHBplayer, AHBConfig* config)
     else
         items = (maxItems - auctions);
 
-    if (debug_Out) sLog.outString("AHSeller: Adding %u Auctions", items);
+    if (debug_Out) sLog.outString("AHSeller: 添加 %u 拍卖", items);
 
     uint32 AuctioneerGUID = 0;
 
@@ -184,12 +184,12 @@ void AuctionHouseBot::addNewAuctions(Player* AHBplayer, AHBConfig* config)
         AuctioneerGUID = 23442; //goblin in GZ
         break;
     default:
-        if (debug_Out) sLog.outError("AHSeller: GetAHID() - Default switch reached");
+        if (debug_Out) sLog.outError("AHSeller: 获取AHID() - 默认切换到");
         AuctioneerGUID = 23442; //default to neutral 7
         break;
     }
 
-    if (debug_Out) sLog.outString("AHSeller: Current Auctineer GUID is %u", AuctioneerGUID);
+    if (debug_Out) sLog.outString("AHSeller: 当前拍卖单位是%u", AuctioneerGUID);
 
     uint32 greyTGcount = config->GetPercents(AHB_GREY_TG);
     uint32 whiteTGcount = config->GetPercents(AHB_WHITE_TG);
@@ -626,30 +626,30 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player* AHBplayer, AHBConfig* con
         if (debug_Out)
         {
             sLog.outString("-------------------------------------------------");
-            sLog.outString("AHBuyer: Info for Auction #%u:", auction->Id);
-            sLog.outString("AHBuyer: AuctionHouse: %u", auction->GetHouseId());
-            sLog.outString("AHBuyer: Auctioneer: %u", auction->auctioneer);
-            sLog.outString("AHBuyer: Owner: %u", auction->owner);
-            sLog.outString("AHBuyer: Bidder: %u", auction->bidder);
-            sLog.outString("AHBuyer: Starting Bid: %u", auction->startbid);
-            sLog.outString("AHBuyer: Current Bid: %u", currentprice);
-            sLog.outString("AHBuyer: Buyout: %u", auction->buyout);
-            sLog.outString("AHBuyer: Deposit: %u", auction->deposit);
-            sLog.outString("AHBuyer: Expire Time: %u", uint32(auction->expire_time));
-            sLog.outString("AHBuyer: Bid Rate: %f", bidrate);
+            sLog.outString("AHBuyer: 拍卖信息 #%u:", auction->Id);
+            sLog.outString("AHBuyer: 拍卖行: %u", auction->GetHouseId());
+            sLog.outString("AHBuyer: 拍卖师: %u", auction->auctioneer);
+            sLog.outString("AHBuyer: 所有者: %u", auction->owner);
+            sLog.outString("AHBuyer: 竞拍者: %u", auction->bidder);
+            sLog.outString("AHBuyer: 开始报价: %u", auction->startbid);
+            sLog.outString("AHBuyer: 当前报价: %u", currentprice);
+            sLog.outString("AHBuyer: 收购: %u", auction->buyout);
+            sLog.outString("AHBuyer: 押金: %u", auction->deposit);
+            sLog.outString("AHBuyer: 到期时间: %u", uint32(auction->expire_time));
+            sLog.outString("AHBuyer: 投标价: %f", bidrate);
             sLog.outString("AHBuyer: Bid Max: %Lf", bidMax);
             sLog.outString("AHBuyer: Bid Value: %Lf", bidvalue);
             sLog.outString("AHBuyer: Bid Price: %u", bidprice);
-            sLog.outString("AHBuyer: Item GUID: %u", auction->item_guidlow);
-            sLog.outString("AHBuyer: Item Template: %u", auction->item_template);
-            sLog.outString("AHBuyer: Item Info:");
-            sLog.outString("AHBuyer: Item ID: %u", prototype->ItemId);
-            sLog.outString("AHBuyer: Buy Price: %u", prototype->BuyPrice);
-            sLog.outString("AHBuyer: Sell Price: %u", prototype->SellPrice);
-            sLog.outString("AHBuyer: Bonding: %u", prototype->Bonding);
-            sLog.outString("AHBuyer: Quality: %u", prototype->Quality);
-            sLog.outString("AHBuyer: Item Level: %u", prototype->ItemLevel);
-            sLog.outString("AHBuyer: Ammo Type: %u", prototype->AmmoType);
+            sLog.outString("AHBuyer: 物品 GUID: %u", auction->item_guidlow);
+            sLog.outString("AHBuyer: 物品模板: %u", auction->item_template);
+            sLog.outString("AHBuyer: 物品信息:");
+            sLog.outString("AHBuyer: 物品 ID: %u", prototype->ItemId);
+            sLog.outString("AHBuyer: 买价: %u", prototype->BuyPrice);
+            sLog.outString("AHBuyer: 卖价: %u", prototype->SellPrice);
+            sLog.outString("AHBuyer: 绑定: %u", prototype->Bonding);
+            sLog.outString("AHBuyer: 品质: %u", prototype->Quality);
+            sLog.outString("AHBuyer: 物品等级: %u", prototype->ItemLevel);
+            sLog.outString("AHBuyer: 弹药类型: %u", prototype->AmmoType);
             sLog.outString("-------------------------------------------------");
         }
 
@@ -826,7 +826,7 @@ void AuctionHouseBot::Initialize()
         QueryResult* result = CharacterDatabase.PQuery("SELECT 1 FROM characters WHERE account = %u AND guid = %u", AHBplayerAccount, AHBplayerGUID);
         if (!result)
         {
-            sLog.outError("AuctionHouseBot: The account/GUID-information set for your AHBot is incorrect (account: %u guid: %u)", AHBplayerAccount, AHBplayerGUID);
+            sLog.outError("AuctionHouseBot: 拍卖行机器人: AHBot的帐号/指南信息设置不正确 (account: %u guid: %u)", AHBplayerAccount, AHBplayerGUID);
             return;
         }
     }
@@ -848,7 +848,7 @@ void AuctionHouseBot::Initialize()
         }
         else
         {
-            if (debug_Out) sLog.outString("AuctionHouseBot: \"%s\" failed", npcQuery);
+            if (debug_Out) sLog.outString("AuctionHouseBot: \"%s\" 失败", npcQuery);
         }
 
         char lootQuery[] = "SELECT item FROM creature_loot_template UNION "
@@ -874,7 +874,7 @@ void AuctionHouseBot::Initialize()
         }
         else
         {
-            if (debug_Out) sLog.outString("AuctionHouseBot: \"%s\" failed", lootQuery);
+            if (debug_Out) sLog.outString("AuctionHouseBot: \"%s\" 失败", lootQuery);
         }
 
         for (uint32 itemID = 0; itemID < sItemStorage.GetMaxEntry(); itemID++)
@@ -1339,27 +1339,27 @@ void AuctionHouseBot::Initialize()
             (orangeItemsBin.size() == 0) &&
             (yellowItemsBin.size() == 0))
         {
-            sLog.outError("AuctionHouseBot: No items");
+            sLog.outError("AuctionHouseBot: 没有商品");
             AHBSeller = 0;
         }
 
         sLog.outString("AuctionHouseBot:");
-        sLog.outString("loaded " UI64FMTD " grey trade goods", greyTradeGoodsBin.size());
-        sLog.outString("loaded " UI64FMTD " white trade goods", whiteTradeGoodsBin.size());
-        sLog.outString("loaded " UI64FMTD " green trade goods", greenTradeGoodsBin.size());
-        sLog.outString("loaded " UI64FMTD " blue trade goods", blueTradeGoodsBin.size());
-        sLog.outString("loaded " UI64FMTD " purple trade goods", purpleTradeGoodsBin.size());
-        sLog.outString("loaded " UI64FMTD " orange trade goods", orangeTradeGoodsBin.size());
-        sLog.outString("loaded " UI64FMTD " yellow trade goods", yellowTradeGoodsBin.size());
-        sLog.outString("loaded " UI64FMTD " grey items", greyItemsBin.size());
-        sLog.outString("loaded " UI64FMTD " white items", whiteItemsBin.size());
-        sLog.outString("loaded " UI64FMTD " green items", greenItemsBin.size());
-        sLog.outString("loaded " UI64FMTD " blue items", blueItemsBin.size());
-        sLog.outString("loaded " UI64FMTD " purple items", purpleItemsBin.size());
-        sLog.outString("loaded " UI64FMTD " orange items", orangeItemsBin.size());
-        sLog.outString("loaded " UI64FMTD " yellow items", yellowItemsBin.size());
+        sLog.outString("加载 " UI64FMTD " 灰色贸易商品", greyTradeGoodsBin.size());
+        sLog.outString("加载 " UI64FMTD " 白色贸易商品", whiteTradeGoodsBin.size());
+        sLog.outString("加载 " UI64FMTD " 绿色贸易商品", greenTradeGoodsBin.size());
+        sLog.outString("加载 " UI64FMTD " 蓝色贸易商品", blueTradeGoodsBin.size());
+        sLog.outString("加载 " UI64FMTD " 紫色贸易商品", purpleTradeGoodsBin.size());
+        sLog.outString("加载 " UI64FMTD " 橙色贸易商品", orangeTradeGoodsBin.size());
+        sLog.outString("加载 " UI64FMTD " 金色贸易商品", yellowTradeGoodsBin.size());
+        sLog.outString("加载 " UI64FMTD " 灰色物品", greyItemsBin.size());
+        sLog.outString("加载 " UI64FMTD " 白色物品", whiteItemsBin.size());
+        sLog.outString("加载 " UI64FMTD " 绿色物品", greenItemsBin.size());
+        sLog.outString("加载 " UI64FMTD " 蓝色东西", blueItemsBin.size());
+        sLog.outString("加载 " UI64FMTD " 紫色物品", purpleItemsBin.size());
+        sLog.outString("加载 " UI64FMTD " 橙色物品", orangeItemsBin.size());
+        sLog.outString("加载 " UI64FMTD " 金色物品", yellowItemsBin.size());
     }
-    sLog.outString("AuctionHouseBot and AuctionHouseBuyer have been loaded.");
+    sLog.outString("AuctionHouseBot和AuctionHouseBuyer已经加载。");
 }
 
 void AuctionHouseBot::IncrementItemCounts(AuctionEntry* ah)
@@ -1455,25 +1455,25 @@ void AuctionHouseBot::Commands(uint32 command, uint32 ahMapID, uint32 col, char*
     switch (col)
     {
     case AHB_GREY:
-        color = "grey";
+        color = "灰色";
         break;
     case AHB_WHITE:
-        color = "white";
+        color = "白色";
         break;
     case AHB_GREEN:
-        color = "green";
+        color = "绿色";
         break;
     case AHB_BLUE:
-        color = "blue";
+        color = "蓝色";
         break;
     case AHB_PURPLE:
-        color = "purple";
+        color = "紫色";
         break;
     case AHB_ORANGE:
-        color = "orange";
+        color = "橙色";
         break;
     case AHB_YELLOW:
-        color = "yellow";
+        color = "金色";
         break;
     default:
         break;
@@ -1712,20 +1712,20 @@ void AuctionHouseBot::LoadValues(AHBConfig* config)
         {
             sLog.outString("minItems                = %u", config->GetMinItems());
             sLog.outString("maxItems                = %u", config->GetMaxItems());
-            sLog.outString("percentGreyTradeGoods   = %u", config->GetPercentages(AHB_GREY_TG));
-            sLog.outString("percentWhiteTradeGoods  = %u", config->GetPercentages(AHB_WHITE_TG));
-            sLog.outString("percentGreenTradeGoods  = %u", config->GetPercentages(AHB_GREEN_TG));
-            sLog.outString("percentBlueTradeGoods   = %u", config->GetPercentages(AHB_BLUE_TG));
-            sLog.outString("percentPurpleTradeGoods = %u", config->GetPercentages(AHB_PURPLE_TG));
-            sLog.outString("percentOrangeTradeGoods = %u", config->GetPercentages(AHB_ORANGE_TG));
-            sLog.outString("percentYellowTradeGoods = %u", config->GetPercentages(AHB_YELLOW_TG));
-            sLog.outString("percentGreyItems        = %u", config->GetPercentages(AHB_GREY_I));
-            sLog.outString("percentWhiteItems       = %u", config->GetPercentages(AHB_WHITE_I));
-            sLog.outString("percentGreenItems       = %u", config->GetPercentages(AHB_GREEN_I));
-            sLog.outString("percentBlueItems        = %u", config->GetPercentages(AHB_BLUE_I));
-            sLog.outString("percentPurpleItems      = %u", config->GetPercentages(AHB_PURPLE_I));
-            sLog.outString("percentOrangeItems      = %u", config->GetPercentages(AHB_ORANGE_I));
-            sLog.outString("percentYellowItems      = %u", config->GetPercentages(AHB_YELLOW_I));
+            sLog.outString("灰色贸易货物百分比   = %u", config->GetPercentages(AHB_GREY_TG));
+            sLog.outString("白色贸易商品百分百   = %u", config->GetPercentages(AHB_WHITE_TG));
+            sLog.outString("绿色贸易商品百分百   = %u", config->GetPercentages(AHB_GREEN_TG));
+            sLog.outString("蓝色贸易商品百分比   = %u", config->GetPercentages(AHB_BLUE_TG));
+            sLog.outString("紫色贸易商品百分百   = %u", config->GetPercentages(AHB_PURPLE_TG));
+            sLog.outString("橙色贸易商品百分比   = %u", config->GetPercentages(AHB_ORANGE_TG));
+            sLog.outString("金色贸易商品百分比   = %u", config->GetPercentages(AHB_YELLOW_TG));
+            sLog.outString("灰色物品百分比       = %u", config->GetPercentages(AHB_GREY_I));
+            sLog.outString("白色物品百分比       = %u", config->GetPercentages(AHB_WHITE_I));
+            sLog.outString("绿色物品百分比       = %u", config->GetPercentages(AHB_GREEN_I));
+            sLog.outString("蓝色物品百分比        = %u", config->GetPercentages(AHB_BLUE_I));
+            sLog.outString("紫色物品百分比      = %u", config->GetPercentages(AHB_PURPLE_I));
+            sLog.outString("橙色物品百分比      = %u", config->GetPercentages(AHB_ORANGE_I));
+            sLog.outString("金色物品百分比      = %u", config->GetPercentages(AHB_YELLOW_I));
             sLog.outString("minPriceGrey            = %u", config->GetMinPrice(AHB_GREY));
             sLog.outString("maxPriceGrey            = %u", config->GetMaxPrice(AHB_GREY));
             sLog.outString("minPriceWhite           = %u", config->GetMinPrice(AHB_WHITE));
@@ -1831,7 +1831,7 @@ void AuctionHouseBot::LoadValues(AHBConfig* config)
         }
         if (debug_Out)
         {
-            sLog.outString("Current Items in %s Auctionhouses:", CharacterDatabase.PQuery("SELECT name FROM auctionhousebot WHERE auctionhouse = %u", config->GetAHID())->Fetch()->GetString());
+            sLog.outString("%s拍卖行当前物品:", CharacterDatabase.PQuery("SELECT name FROM auctionhousebot WHERE auctionhouse = %u", config->GetAHID())->Fetch()->GetString());
             sLog.outString("Grey Trade Goods\t%u\tGrey Items\t%u", config->GetItemCounts(AHB_GREY_TG), config->GetItemCounts(AHB_GREY_I));
             sLog.outString("White Trade Goods\t%u\tWhite Items\t%u", config->GetItemCounts(AHB_WHITE_TG), config->GetItemCounts(AHB_WHITE_I));
             sLog.outString("Green Trade Goods\t%u\tGreen Items\t%u", config->GetItemCounts(AHB_GREEN_TG), config->GetItemCounts(AHB_GREEN_I));

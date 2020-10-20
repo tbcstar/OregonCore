@@ -209,7 +209,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
     //do not allow to sell already auctioned items
     if (sAuctionMgr->GetAItem(GUID_LOPART(item)))
     {
-        sLog.outError("AuctionError, player %s is sending item id: %u, but item is already in another auction", pl->GetName(), GUID_LOPART(item));
+        sLog.outError("拍卖错误，玩家%s发送物品id: %u，但物品已经在另一个拍卖中", pl->GetName(), GUID_LOPART(item));
         SendAuctionCommandResult(0, AUCTION_SELL_ITEM, AUCTION_INTERNAL_ERROR);
         return;
     }
@@ -250,7 +250,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 
     if (GetSecurity() > SEC_PLAYER && sWorld.getConfig(CONFIG_GM_LOG_TRADE))
     {
-        sLog.outCommand(GetAccountId(), "GM %s (Account: %u) create auction: %s (Entry: %u Count: %u)",
+        sLog.outCommand(GetAccountId(), "GM %s (账号: %u) 创建拍卖: %s (Entry: %u 数量: %u)",
                         GetPlayerName(), GetAccountId(), it->GetProto()->Name1, it->GetEntry(), it->GetCount());
     }
 
@@ -465,7 +465,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
         }
         else
         {
-            sLog.outError("Auction id: %u has invalid item (item guid : %u)!!!", auction->Id, auction->item_guidlow);
+            sLog.outError("Auction id: %u有无效的物品(物品guid: %u)!", auction->Id, auction->item_guidlow);
             SendAuctionCommandResult(0, AUCTION_CANCEL, AUCTION_INTERNAL_ERROR);
             return;
         }
@@ -474,7 +474,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
     {
         SendAuctionCommandResult(0, AUCTION_CANCEL, AUCTION_INTERNAL_ERROR);
         // this code isn't possible ... maybe there should be assert
-        sLog.outError("CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is NULL", pl->GetGUIDLow(), auctionId);
+        sLog.outError("作弊者:%u，他试图取消其他玩家的拍卖(id: %u)，或者拍卖为NULL", pl->GetGUIDLow(), auctionId);
         return;
     }
 
@@ -509,7 +509,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
     recv_data >> outbiddedCount;
     if (recv_data.size() != (16 + outbiddedCount * 4))
     {
-        sLog.outError("Client sent bad opcode!!! with count: %u and size : %lu (must be: %u)", outbiddedCount, (unsigned long)recv_data.size(), (16 + outbiddedCount * 4));
+        sLog.outError("客户端发送了错误的操作码!计数:%u，大小:%lu(必须为:%u)", outbiddedCount, (unsigned long)recv_data.size(), (16 + outbiddedCount * 4));
         outbiddedCount = 0;
     }
 

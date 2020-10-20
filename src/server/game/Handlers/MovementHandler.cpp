@@ -98,7 +98,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
-        sLog.outError("WORLD: failed to teleport player %s (%d) to map %d because of unknown reason!", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), loc.GetMapId());
+        sLog.outError("WORLD: 传送玩家 %s (%d)到Map %d 失败，原因不明!", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), loc.GetMapId());
         GetPlayer()->ResetMap();
         GetPlayer()->SetMap(oldMap);
         GetPlayer()->TeleportToHomebind();

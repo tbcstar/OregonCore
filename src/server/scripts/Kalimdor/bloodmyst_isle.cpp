@@ -59,8 +59,8 @@ public:
         {
             if (Creature* tracker = GetClosestCreatureWithEntry(me, NPC_TRACKER, 35.0f))
             {
-                tracker->Say("We've got you now, Mathis the Cruel!", LANG_UNIVERSAL, me->GetGUID());
-                me->Say("You will regret this, maggot.", LANG_UNIVERSAL, me->GetGUID());
+                tracker->Say("我们抓住你了，残忍的玛提斯!", LANG_UNIVERSAL, me->GetGUID());
+                me->Say("你会后悔的，蛆虫。", LANG_UNIVERSAL, me->GetGUID());
             }
         }
 
@@ -89,7 +89,7 @@ public:
                 me->SetStandState(UNIT_STAND_STATE_KNEEL);
                 if (Creature* tracker = GetClosestCreatureWithEntry(me, NPC_TRACKER, 35.0f))
                 {
-                    tracker->Say("Return to Kuros. I will bring him to Blood Watch", LANG_UNIVERSAL, me->GetGUID());
+                    tracker->Say("返回库洛斯。我要把他带到血哨", LANG_UNIVERSAL, me->GetGUID());
                     creditPlayer();
                     tracker->DespawnOrUnsummon(10000);
                 }

@@ -38,7 +38,7 @@
 IDI_APPICON             ICON                    "OregonCore.ico"
 
 /////////////////////////////////////////////////////////////////////////////
-// Neutre (Par défaut système) resources
+// Neutre (Par dÃ©faut systÃ¨me) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUSD)
 #ifdef _WIN32

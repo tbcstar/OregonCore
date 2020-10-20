@@ -109,13 +109,13 @@ public:
 ## npc_loramus_thalipedes
 ######*/
 
-#define GOSSIP_HELLO_LT1    "Can you help me?"
-#define GOSSIP_HELLO_LT2    "Tell me your story"
-#define GOSSIP_SELECT_LT1   "Please continue"
-#define GOSSIP_SELECT_LT2   "I do not understand"
-#define GOSSIP_SELECT_LT3   "Indeed"
-#define GOSSIP_SELECT_LT4   "I will do this with or your help, Loramus"
-#define GOSSIP_SELECT_LT5   "Yes"
+#define GOSSIP_HELLO_LT1    "你能帮我吗？"
+#define GOSSIP_HELLO_LT2    "告诉我你的故事"
+#define GOSSIP_SELECT_LT1   "请继续"
+#define GOSSIP_SELECT_LT2   "我不明白"
+#define GOSSIP_SELECT_LT3   "的确"
+#define GOSSIP_SELECT_LT4   "我愿意在你的帮助下做这件事，洛拉姆斯"
+#define GOSSIP_SELECT_LT5   "是的"
 
 class npc_loramus_thalipedes : CreatureScript
 {
@@ -196,7 +196,7 @@ enum eRizzle
     SAY_RIZZLE_FINAL = -1000355
 };
 
-#define GOSSIP_GET_MOONSTONE "Hand over the Southfury moonstone and I'll let you go."
+#define GOSSIP_GET_MOONSTONE "把月光石交出来，我就放你走。"
 
 float WPs[58][4] =
 {

@@ -110,12 +110,12 @@ void LoadSkillDiscoveryTable()
         }
         while (result->NextRow());
 
-        sLog.outString(">> Loaded %u skill discovery definitions", count);
+        sLog.outString(">> 加载 %u个 skill discovery definitions", count);
         if (!ssNonDiscoverableEntries.str().empty())
             sLog.outErrorDb("Some items can't be successfully discovered: has chance field value < 0.000001 in skill_discovery_template DB table . List:\n%s", ssNonDiscoverableEntries.str().c_str());
     }
     else
-        sLog.outString(">> Loaded 0 skill discovery definitions. DB table skill_discovery_template is empty.");
+        sLog.outString(">> 加载 0个 skill discovery definitions. DB table skill_discovery_template is empty.");
 }
 
 uint32 GetSkillDiscoverySpell(uint32 skillId, uint32 spellId, Player* player)

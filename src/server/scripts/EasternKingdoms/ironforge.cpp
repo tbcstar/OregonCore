@@ -34,11 +34,11 @@ EndContentData */
 ## npc_royal_historian_archesonus
 ######*/
 
-#define GOSSIP_ITEM_ROYAL   "I am ready to listen"
-#define GOSSIP_ITEM_ROYAL_1 "That is tragic. How did this happen?"
-#define GOSSIP_ITEM_ROYAL_2 "Interesting, continue please."
-#define GOSSIP_ITEM_ROYAL_3 "Unbelievable! How dare they??"
-#define GOSSIP_ITEM_ROYAL_4 "Of course I will help!"
+#define GOSSIP_ITEM_ROYAL   "我准备听"
+#define GOSSIP_ITEM_ROYAL_1 "这是悲剧。这是怎么发生的?"
+#define GOSSIP_ITEM_ROYAL_2 "有趣的,请继续。"
+#define GOSSIP_ITEM_ROYAL_3 "难以置信!他们怎么敢? ?"
+#define GOSSIP_ITEM_ROYAL_4 "我当然会帮忙!"
 
 class npc_royal_historian_archesonus : public CreatureScript
 {

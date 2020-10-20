@@ -484,16 +484,16 @@ enum Ferro
     QUEST_SUPPLIES_TO_AUBERDINE = 976
 };
 
-#define SAY_TEXT_1 "It looks like we're in trouble. Look lively, here they come!"
-#define SAY_DEATH_1 "Assassins from that cult you found... Let's get moving before someone else finds us out here."
-#define SAY_TEXT_2 "Hold! I sense an evil presence... Undead!"
-#define SAY_DEATH_2 "They're coming out of the woodwork today. Let's keep moving or we may find more things that want me dead."
-#define SAY_TEXT_3_A "These three again?"
-#define SAY_TEXT_3_B "I'll finish you off for good this time!"
-#define SAY_END_1 "Well done! I should be fine on my own from here. Remember to talk to Delgren when you return to Maestra's Post in Ashenvale."
+#define SAY_TEXT_1 "看来我们有麻烦了。快一点，他们来了!"
+#define SAY_DEATH_1 "你找到的那个邪教里的刺客…在别人发现我们之前，我们赶紧行动吧。"
+#define SAY_TEXT_2 "站住！我感觉到了邪恶的存在……不死族！"
+#define SAY_DEATH_2 "他们今天破门而入了。我们继续走吧，不然我们会遇见更多想要杀死我们的人。"
+#define SAY_TEXT_3_A "又是这三个人？"
+#define SAY_TEXT_3_B "这次我要把你彻底解决掉！"
+#define SAY_END_1 "做得好!我在这里一个人应该没问题。记得当你回到灰谷梅伊瑟娜岗哨时和德尔格伦谈谈。"
 
-#define SAY_BALIZAR "Not quite so sure of yourself without the Purifier, hm?"
-#define SAY_SCOUT "A paladin! Slaying him would please the master. Attack!"
+#define SAY_BALIZAR "没有了净化器你就不行了吗，嗯?"
+#define SAY_SCOUT "一个圣骑士！杀了他会让主人高兴的。进攻！"
 
 class npc_freero : CreatureScript
 {

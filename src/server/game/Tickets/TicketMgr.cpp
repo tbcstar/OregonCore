@@ -101,7 +101,7 @@ void TicketMgr::LoadGMTickets()
     if (!result)
     {
         ticketmgr.InitTicketID();
-        sLog.outString(">> GM Tickets table is empty, no tickets were loaded.");
+        sLog.outString(">> GM Tickets 表是空的, 未加载任何tickets.");
         return;
     }
 
