@@ -25,6 +25,7 @@
 //void AddSC_test();
 void AddSC_npc_arena_spectator();
 void AddModuleScripts();
+void AddSC_custom_dualspec();
 //world
 void AddSC_areatrigger_scripts();
 void AddSC_boss_emeriss();
@@ -434,6 +435,7 @@ void AddScripts()
     //    AddSC_custom_gossip_codebox();
     //    AddSC_test();
     AddSC_npc_arena_spectator();
+	AddSC_custom_dualspec();
     AddModuleScripts();
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();

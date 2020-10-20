@@ -32,6 +32,9 @@ enum SpellEffIndex
 #define EFFECT_FIRST_FOUND 254
 #define EFFECT_ALL 255
 
+#define MAX_TALENT_RANK 5
+#define MAX_TALENT_SPECS 2
+
 enum Gender
 {
     GENDER_MALE                        = 0,
