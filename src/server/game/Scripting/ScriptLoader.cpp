@@ -24,6 +24,10 @@
 //void AddSC_custom_gossip_codebox();
 //void AddSC_test();
 void AddModuleScripts();
+
+//custom
+void AddSC_StockExchange();
+
 //world
 void AddSC_areatrigger_scripts();
 void AddSC_boss_emeriss();
