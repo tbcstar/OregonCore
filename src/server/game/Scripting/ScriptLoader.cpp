@@ -23,8 +23,11 @@
 //void AddSC_custom_example();
 //void AddSC_custom_gossip_codebox();
 //void AddSC_test();
-void AddSC_npc_arena_spectator();
 void AddModuleScripts();
+
+//custom
+void AddSC_npc_arena_spectator();
+
 //world
 void AddSC_areatrigger_scripts();
 void AddSC_boss_emeriss();
