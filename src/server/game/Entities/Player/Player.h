@@ -1075,6 +1075,13 @@ class Player : public Unit, public GridObject<Player>
             else m_ExtraFlags &= ~PLAYER_EXTRA_PVP_DEATH;
         }
 
+        bool isSpectator() const
+        {
+            return spectatorFlag;
+        }
+
+        void SetSpectator(bool on);
+
         void GiveXP(uint32 xp, Unit* victim, bool disableRafBonus = false);
         void GiveLevel(uint32 level, bool ignoreRAF = false);
         void InitStatsForLevel(bool reapplyMods = false);
@@ -1997,8 +2004,8 @@ class Player : public Unit, public GridObject<Player>
         void SendDelayResponse(const uint32);
         void SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP, bool RafBonus = false);
 
-		uint8 LastSwingErrorMsg() const { return m_swingErrorMsg; }
-		void SwingErrorMsg(uint8 val) { m_swingErrorMsg = val; }
+        uint8 LastSwingErrorMsg() const { return m_swingErrorMsg; }
+        void SwingErrorMsg(uint8 val) { m_swingErrorMsg = val; }
 
         //notifiers
         void SendAttackSwingCantAttack();
@@ -2949,6 +2956,8 @@ class Player : public Unit, public GridObject<Player>
         bool CanAlwaysSee(WorldObject const* obj) const override;
 
         bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
+
+        bool spectatorFlag;
 
     private:
         // internal common parts for CanStore/StoreItem functions

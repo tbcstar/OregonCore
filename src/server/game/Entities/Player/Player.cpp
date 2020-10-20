@@ -477,6 +477,8 @@ Player::Player(WorldSession* session) : Unit(true), m_reputationMgr(this)
 
     m_ExtraFlags = 0;
 
+	spectatorFlag = false;
+
     // players always accept
     if (GetSession()->GetSecurity() == SEC_PLAYER)
         SetAcceptWhispers(true);
@@ -2442,6 +2444,69 @@ bool Player::IsInAreaTriggerRadius(const AreaTriggerEntry* trigger) const
     return true;
 }
 
+void Player::SetSpectator(bool on)
+{
+	if (on)
+	{
+		CombatStop();
+		SetSpeed(MOVE_RUN, 2.0);
+
+		spectatorFlag = true;
+
+		RemoveArenaAuras();
+		RemoveAllEnchantments(TEMP_ENCHANTMENT_SLOT, true);
+
+		//m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
+		SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+		m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE; 
+		SetFaction(35);
+		SetGMVisible(false);
+		SetFFAPvP(false);
+
+		RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+		RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+		Pet* pet = GetPet();
+		if (pet)
+		{
+			if (pet->getPetType() == SUMMON_PET || pet->getPetType() == HUNTER_PET)
+			{
+				SetTemporaryUnsummonedPetNumber(pet->GetCharmInfo()->GetPetNumber());
+				SetOldPetSpell(pet->GetUInt32Value(UNIT_CREATED_BY_SPELL));
+			}
+			RemovePet(NULL,PET_SAVE_NOT_IN_SLOT);
+		}
+		else
+			SetTemporaryUnsummonedPetNumber(0);
+
+		ResetContestedPvP();
+
+		getHostileRefManager().setOnlineOfflineState(false);
+		CombatStopWithPets();
+
+		uint32 morphs[8] = {25900, 736, 20582};
+		SetDisplayId(morphs[urand(0, 2)]);
+	}
+    else
+    {
+		UpdateSpeed(MOVE_RUN, true);
+		spectatorFlag = false;
+		//m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
+		RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+		m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;
+        setFactionForRace(getRace());
+        SetGMVisible(true);
+
+        // restore FFA PvP Server state
+        if (sWorld.IsFFAPvPRealm())
+            SetFFAPvP(true);
+
+        getHostileRefManager().setOnlineOfflineState(true);
+        DeMorph();
+    }
+    UpdateObjectVisibility();
+
+
+}
 void Player::SetGameMaster(bool on)
 {
     if (on)
@@ -17331,7 +17396,7 @@ void Player::UpdateSpeakTime()
 
 bool Player::CanSpeak() const
 {
-    return  GetSession()->m_muteTime <= time (NULL);
+	return GetSession()->m_muteTime <= time (NULL);
 }
 
 /*********************************************************/
@@ -19144,7 +19209,7 @@ void Player::LeaveBattleground(bool teleportToEntryPoint)
         bg->RemovePlayerAtLeave(GetGUID(), teleportToEntryPoint, true);
 
         // call after remove to be sure that player resurrected for correct cast
-        if (bg->isBattleground() && !IsGameMaster() && sWorld.getConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
+        if (bg->isBattleground() && !IsGameMaster() && !isSpectator() && sWorld.getConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
         {
             if (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN)
             {
@@ -19253,6 +19318,9 @@ bool Player::IsVisibleGloballyFor(Player* u) const
     // Visible units, always are visible for all players
     if (IsVisible())
         return true;
+
+	if (u->ToPlayer()->isSpectator() && isSpectator())
+		return false;
 
     // GMs are visible for higher gms (or players are visible for gms)
     if (u->GetSession()->GetSecurity() > SEC_PLAYER)
