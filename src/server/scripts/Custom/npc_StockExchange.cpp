@@ -17,7 +17,7 @@ public:
     bool OnGossipHello(Player* plr, Creature* creature) override //MAIN MENU
     {
         //StockUpdate every 2 minutes
-        QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT `UpdateTime`   FROM `stocks` WHERE iD = 0");
+        QueryResult* result = WorldDatabase.PQuery("SELECT `UpdateTime`   FROM `stocks` WHERE iD = 0");
         if (!result)
             return false;
         Field* field = result->Fetch();
@@ -38,7 +38,7 @@ public:
             WorldDatabase.PExecute("UPDATE `stocks` SET `UpdateTime` = %u WHERE `iD` = 0", getMSTime());
         }
         WorldSession* session = plr->GetSession();
-        QueryResult_AutoPtr licencetest = CharacterDatabase.PQuery("SELECT `1`, `2`, `3`, `4`, `5`  FROM `character_stockdata` WHERE iD = %u", plr->GetGUIDLow());
+        QueryResult* licencetest = CharacterDatabase.PQuery("SELECT `1`, `2`, `3`, `4`, `5`  FROM `character_stockdata` WHERE iD = %u", plr->GetGUIDLow());
         plr->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Scroll_08:30:30:-18:0|t现在的汇率是多少？", GOSSIP_SENDER_MAIN, 2);
         plr->ADD_GOSSIP_ITEM(GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t还有多少未售出的股票?", GOSSIP_SENDER_MAIN, 1);
         if (!licencetest)
@@ -65,7 +65,7 @@ public:
         int worth[5];
         for (int iter = 1; iter < 6; iter++)
         {
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT `OwnedRatio`,`Worth`   FROM `stocks` WHERE iD = %u", iter);
+            QueryResult* result = WorldDatabase.PQuery("SELECT `OwnedRatio`,`Worth`   FROM `stocks` WHERE iD = %u", iter);
             if (!result)
                 return false;
             Field* field = result->Fetch();
@@ -190,13 +190,13 @@ public:
             uint32 investmentI = uint32(atol(code));
             if (investmentI*GOLDTOCOPPER <= plr->GetMoney())
             {
-                QueryResult_AutoPtr result1 = WorldDatabase.PQuery("SELECT `OwnedRatio`,`Worth`  FROM `stocks` WHERE iD = %u", stock);
+                QueryResult* result1 = WorldDatabase.PQuery("SELECT `OwnedRatio`,`Worth`  FROM `stocks` WHERE iD = %u", stock);
                 if (!result1)
                     return false;
                 Field* field = result1->Fetch();
                 float ownedratio = field[0].GetFloat();
                 int worth = field[1].GetInt32();
-                QueryResult_AutoPtr result2 = CharacterDatabase.PQuery("SELECT `%u` FROM `character_stockdata` WHERE iD = %u", stock, plr->GetGUIDLow());
+                QueryResult* result2 = CharacterDatabase.PQuery("SELECT `%u` FROM `character_stockdata` WHERE iD = %u", stock, plr->GetGUIDLow());
                 if (!result2)
                     return false;
                 field = result2->Fetch();
@@ -262,10 +262,10 @@ private:
     }
     bool SellStock(Player* plr, int32 stock, Creature* creature) /*SELL ALL THE SHARES OF THE SPECIFIED STOCK */
     {
-        QueryResult_AutoPtr result2 = WorldDatabase.PQuery("SELECT `OwnedRatio`,`Worth`   FROM `stocks` WHERE iD = %u", stock);
+        QueryResult* result2 = WorldDatabase.PQuery("SELECT `OwnedRatio`,`Worth`   FROM `stocks` WHERE iD = %u", stock);
         if (!result2)
             return false;
-        QueryResult_AutoPtr result1 = CharacterDatabase.PQuery("SELECT `1`, `2`, `3`, `4`, `5`  FROM `character_stockdata` WHERE iD = %u", plr->GetGUIDLow());
+        QueryResult* result1 = CharacterDatabase.PQuery("SELECT `1`, `2`, `3`, `4`, `5`  FROM `character_stockdata` WHERE iD = %u", plr->GetGUIDLow());
         if (!result1)
             return false;
         Field* field = result1->Fetch();
@@ -305,7 +305,7 @@ private:
         // Load stock values from DB
         for (int itr = 0; itr < STOCKNUMBER; itr++)
         {
-            QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT `Scale`,`OwnedRatio`,`Worth`  FROM `stocks` WHERE iD = %u", itr + 1);
+            QueryResult* result = WorldDatabase.PQuery("SELECT `Scale`,`OwnedRatio`,`Worth`  FROM `stocks` WHERE iD = %u", itr + 1);
             if (!result)
                 return false;
             Field* field = result->Fetch();
