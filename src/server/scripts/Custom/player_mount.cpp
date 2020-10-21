@@ -503,7 +503,7 @@ public:
 	uint32 GetVotePoints(uint32 PlayerId)
 	{
 		uint32 vp;
-		QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT vp FROM fusion.account_data WHERE id = '%u'", PlayerId);
+		QueryResult* result = LoginDatabase.PQuery("SELECT vp FROM fusion.account_data WHERE id = '%u'", PlayerId);
 		if(result)
 		{
 			vp = (*result)[0].GetUInt32();
@@ -525,7 +525,7 @@ public:
 	uint32 GetDonationPoints(uint32 PlayerId)
 	{
 		uint32 dp;
-		QueryResult_AutoPtr result = LoginDatabase.PQuery("SELECT dp FROM fusion.account_data WHERE id = '%u'", PlayerId);
+		QueryResult* result = LoginDatabase.PQuery("SELECT dp FROM fusion.account_data WHERE id = '%u'", PlayerId);
 		if(result)
 		{
 			dp = (*result)[0].GetUInt32();
