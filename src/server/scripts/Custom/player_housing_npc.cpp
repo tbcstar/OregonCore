@@ -39,7 +39,7 @@ int count = 0;
 int selection;
 
 #define	PACKAGE_1  		"PACKAGE1"
-#define 	PACKAGE_2  		"PACKAGE2"
+#define PACKAGE_2  		"PACKAGE2"
 #define	PACKAGE_3 		"PACKAGE3"
 #define	PACKAGE_4		"PACKAGE4"
 
@@ -77,7 +77,7 @@ class player_housing_npc : public CreatureScript
 				player->PlayerTalkClass->ClearMenus();
 				do{
 					Field *fields = result->Fetch();
-					idStr[count] = fields[0].GetInt64();
+					idStr[count] = Fields[0].GetInt64();
 					item = fields[1].GetString();
 					uint32 price = fields[2].GetUInt32();
 					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, item+" Price: "+UInt32ToString2(price)+" Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+count);
