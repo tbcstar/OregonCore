@@ -67,7 +67,7 @@ class player_housing_npc : public CreatureScript
         }
         bool OnGossipHello(Player* player, Creature* creature)
         {
-			QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT id, zone_name, price FROM player_house_available");
+			QueryResult* result = CharacterDatabase.PQuery("SELECT id, zone_name, price FROM player_house_available");
 			if(result)
 			{
 				std::string item;
@@ -128,7 +128,7 @@ class player_housing_npc : public CreatureScript
 
 			if (uiAction == GOSSIP_ACTION_INFO_DEF+902)
 			{
-				QueryResult_AutoPtr spawnresult;
+				QueryResult* spawnresult;
 				spawnresult = CharacterDatabase.PQuery("SELECT map_id, spawn_x, spawn_y, spawn_z, spawn_o FROM player_house_available WHERE id=%u", selection);	
 				if(spawnresult)
 				{
@@ -190,7 +190,7 @@ class player_housing_npc_guide : public CreatureScript
             {
 				player->PlayerTalkClass->CloseGossip();
 				uint32 selection;
-				QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT id FROM player_house_available WHERE c_guid = '%u'", creature->GetGUIDLow());
+				QueryResult* result = CharacterDatabase.PQuery("SELECT id FROM player_house_available WHERE c_guid = '%u'", creature->GetGUIDLow());
 				if(result)
 				{
 					Field *fields = result->Fetch();
@@ -213,7 +213,7 @@ class player_housing_npc_guide : public CreatureScript
 
 		uint32 GetOwnerLandCount(uint32 playerguid)
 		{
-			QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT * FROM player_house_taken WHERE player_guid=%u", playerguid);
+			QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM player_house_taken WHERE player_guid=%u", playerguid);
 			uint32 house_count = 0;
 			if(result) 
 			{
@@ -461,7 +461,7 @@ class player_housing_npc_package_guide : public CreatureScript
             {
 				player->PlayerTalkClass->CloseGossip();
 				uint32 selection;
-				QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT id FROM player_house_available WHERE c_guid = '%u'", creature->GetGUIDLow());
+				QueryResult* result = CharacterDatabase.PQuery("SELECT id FROM player_house_available WHERE c_guid = '%u'", creature->GetGUIDLow());
 				if(result)
 				{
 					Field *fields = result->Fetch();
@@ -480,7 +480,7 @@ class player_housing_npc_package_guide : public CreatureScript
 
 		uint32 GetOwnerLandCount(uint32 playerguid)
 		{
-			QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT * FROM player_house_taken WHERE player_guid=%u", playerguid);
+			QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM player_house_taken WHERE player_guid=%u", playerguid);
 			uint32 house_count = 0;
 			do{
 				house_count++;
@@ -492,7 +492,7 @@ class player_housing_npc_package_guide : public CreatureScript
 int getNPCBonus(uint64 plrName)
 {
 	uint32 npc = 0;
-	QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT npcs_bonus FROM player_house WHERE player_guid = %u", plrName);
+	QueryResult* result = CharacterDatabase.PQuery("SELECT npcs_bonus FROM player_house WHERE player_guid = %u", plrName);
 	if(result)
 	{
 		npc = (*result)[0].GetUInt32();
@@ -506,7 +506,7 @@ int getNPCBonus(uint64 plrName)
 
 bool hasPackage(uint32 AccID, uint32 package)
 {
-	QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT * FROM player_house WHERE package%u = 1 AND player_guid = %u", package, AccID);
+	QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM player_house WHERE package%u = 1 AND player_guid = %u", package, AccID);
 	if(result)
 		return true;
 	return false;
@@ -515,7 +515,7 @@ bool hasPackage(uint32 AccID, uint32 package)
 int getGoBonus(uint64 plrName)
 {
 	uint32 npc = 0;
-	QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT items_bonus FROM player_house WHERE player_guid = %u", plrName);
+	QueryResult* result = CharacterDatabase.PQuery("SELECT items_bonus FROM player_house WHERE player_guid = %u", plrName);
 	if(result)
 	{
 		npc = (*result)[0].GetUInt32();
@@ -535,7 +535,7 @@ bool updatePlayerPackage(uint32 AccID, uint32 package)
 
 bool isLandOwner(uint64 name)
 {
-	QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT * FROM player_house_taken WHERE player_guid=%u", name);
+	QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM player_house_taken WHERE player_guid=%u", name);
 	if(result)
 		return true;
 	return false;
@@ -544,7 +544,7 @@ bool isLandOwner(uint64 name)
 int getLandPrice(uint32 selection)
 {
 	uint32 PFL = -1;
-	QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT price FROM player_house_available WHERE id=%u", selection);
+	QueryResult* result = CharacterDatabase.PQuery("SELECT price FROM player_house_available WHERE id=%u", selection);
 	if(result)
 		PFL = (*result)[0].GetUInt32();
 	return PFL;
@@ -562,7 +562,7 @@ bool buyLand(Player* player, Creature* creep, uint32 selection)
 	if(player->HasItemCount(HOUSE_TOKEN, _PFL, true))
 	{
 		player->DestroyItemCount(HOUSE_TOKEN, _PFL, true);
-		QueryResult_AutoPtr a_result = CharacterDatabase.PQuery("SELECT zone_name, map_id, bottom_x, top_x, left_y, right_y,"
+		QueryResult* a_result = CharacterDatabase.PQuery("SELECT zone_name, map_id, bottom_x, top_x, left_y, right_y,"
 			//6			7		 8		   9	    10
 			"spawn_x, spawn_y, spawn_z, spawn_o, c_guid FROM player_house_available WHERE id=%u", selection);
 		if(a_result)
