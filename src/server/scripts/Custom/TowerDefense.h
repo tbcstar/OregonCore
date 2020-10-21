@@ -44,7 +44,7 @@
 #define TD_UPDATER_SCRIPT_NAME "towerdefense_updater"
 
 /*
-* Message colors, used to add effects, make text appear clearer.
+* 信息颜色，用来增加效果，使文字看起来更清晰。
 */
 #define MSG_COLOR_LIGHTRED      "|cffff6060"
 #define MSG_COLOR_LIGHTBLUE     "|cff00ccff"
@@ -61,9 +61,9 @@
 #define MSG_COLOR_ORANGE		"|cffff9900"
 
 /*
-* The mail system, sending rewards to players, informing them of previous event status.
+* 邮件系统，发送奖励给玩家，通知他们之前的事件状态。
 */
-#define TD_SYSTEM_MSG_MAIL_SUBJECT "The Tower Defense: Rewards!"
+#define TD_SYSTEM_MSG_MAIL_SUBJECT "塔防:奖励!"
 #define TD_SYSTEM_MSG_MAIL_BODY_EVENT_UNFINISHED "Due to an unfinished event. We have added %u resources to your account!"
 #define TD_SYSTEM_MSG_MAIL_BODY_EVENT_UNFINISHED_FLED "You have lost your Tower Defense event, before you lost, you had %u resources, and was in wave %u."
 #define TD_SYSTEM_MSG_MAIL_BODY_EVENT_LOST "You have lost your Tower Defense event, we have added %u resources to your account."
@@ -71,9 +71,9 @@
 #define TD_SYSTEM_MAIL_TYPE MAIL_STATIONERY_GM
 
 /*
-* The system messages, send to the player in mid center of the screen or in his chatbox
+* 系统信息，发送到玩家的屏幕中央或在聊天框中。
 */
-#define TD_SYSTEM_MSG_ALREADYRUNNING "The event is already running!"
+#define TD_SYSTEM_MSG_ALREADYRUNNING "事件已经开始运行!"
 #define TD_SYSTEM_MSG_CANNOT_USE_OUTSIDE "You cannot use this item outside a running event!"
 #define TD_SYSTEM_MSG_CANNOT_START_DUE "You cannot start the event, if you are logging out, or in combat, or in a group!"
 #define TD_SYSTEM_MSG_CANNOT_START_ALREADY " There is a player already running the event in your instance!"
@@ -120,29 +120,29 @@
 #define TD_SYSTEM_MSG_A_BOSS_APPEARED "A %s has appeared!"
 
 /*
-* Global Menu Texts
+* 全局菜单文本
 */
 #define TD_TEXT_EXIT "Nevermind."
-#define TD_TEXT_GOBACK "<-- Go back"
+#define TD_TEXT_GOBACK "<-- 返回"
 
 /*
-* The NPC menu texts before starting the event
+* 启动事件前的NPC菜单文本
 */
-#define TD_NPC_TEXT_START_EVENT "I would like to play Tower Defense."
-#define TD_NPC_TEXT_EVENT_EASY "I want the easy way! [Easy Mode]"
-#define TD_NPC_TEXT_EVENT_HARD "Come at me Tower Defense! [Hard Mode]"
-#define TD_NPC_TEXT_EVENT_EXTREME "You shall not pass! [Death Mode]"
-#define TD_NPC_TEXT_SHOW_RECORDS "Can you show me my records?"
+#define TD_NPC_TEXT_START_EVENT "进入塔防游戏模式。"
+#define TD_NPC_TEXT_EVENT_EASY "随便玩玩【简单模式】"
+#define TD_NPC_TEXT_EVENT_HARD "来吧，塔防!【困难模式】"
+#define TD_NPC_TEXT_EVENT_EXTREME "你不可能通过!【死亡模式】"
+#define TD_NPC_TEXT_SHOW_RECORDS "你能给我看看我的记录吗?"
 /*
-* The Vendor menu texts
+* 供应商菜单文本
 */
-#define TD_VENDOR_TEXT_EXCHANGE "Exchange all your resources into tokens!"
-#define TD_VENDOR_TEXT_LIST "Purchase an item!"
+#define TD_VENDOR_TEXT_EXCHANGE "将所有资源交换为令牌！"
+#define TD_VENDOR_TEXT_LIST "购买一个物品！"
 /*
-* The Item menu texts after starting the event
+* 启动事件后的物品菜单文本
 */
 #define TD_ITEM_TEXT_BASE_HEALTH "Base Health: %u."
-#define TD_ITEM_TEXT_CURRENT_RESOURCES "Resources: %u."
+#define TD_ITEM_TEXT_CURRENT_RESOURCES "资源: %u。"
 #define TD_ITEM_TEXT_START_EVENT "Start event."
 #define TD_ITEM_TEXT_START_WAVE "Start wave %u."
 #define TD_ITEM_TEXT_SPAWN_TOWER_GUARD "Spawn a %s at the nearest block (Cost %u)."
@@ -150,9 +150,9 @@
 #define TD_ITEM_TEXT_QUIT_EVENT "Quit the event!"
 #define TD_ITEM_TEXT_NO_EVENT_DATA "You need to start the event to use this item!"
 /*
-* The Guard menu texts
+* 守卫菜单文本
 */
-#define TD_GUARD_TEXT_TOWER_NAME "%s."
+#define TD_GUARD_TEXT_TOWER_NAME "%s。"
 #define TD_GUARD_TEXT_UNIT_NAME "%s Unit."
 #define TD_GUARD_TEXT_CURRENT_RESOURCES "You have %u resources."
 #define TD_GUARD_TEXT_UPGRADE_LEVEL_MAX "This unit reached maximum level."
@@ -186,7 +186,7 @@ enum TDEventSpellCastType
     TD_CAST_AOE_CAST_TARGET,
 };
 /*
-* used in HandleEventComplete to finish event, and delete data.
+* 在HandleEventComplete中用于完成事件，并删除数据。
 * TD_EVENT_COMPLETE_UNFINISHED: Occurs in OnLogout Hook or incase of server crash.
 * TD_EVENT_COMPLETE_QUIT: Occurs in player clicks TD_ITEM_MENU_QUIT_EVENT OnGossipSelect in TD_ITEM(); script OnGossipSelect.
 * TD_EVENT_COMPLETE_LOST: Occurs in when player base health is reaches zero.
@@ -262,12 +262,12 @@ enum TDEventUpdateType
 
 enum TDEventFactions
 {
-    TD_FACTION_GUARD = 1665, // ally to all players, enemy to all monsters
-    TD_FACTION_ATTACKER = 14 // enemy to all units
+    TD_FACTION_GUARD = 1665, // 所有玩家为盟友，所有怪物为敌人
+    TD_FACTION_ATTACKER = 14 // 与所有单位为敌
 };
 /*
-* Sounds, Music used in the event
-* You can add more: visit http://www.trinitycore.org/f/topic/2849-all-world-of-warcraft-335a-sound-ids-and-how-to-extract-them-and-hear-them/page__hl__+extract%20+sound#entry18329 for Guide to find ids.
+* 声音，在事件中使用的音乐
+* 您可以添加更多: 访问 http://www.trinitycore.org/f/topic/2849-all-world-of-warcraft-335a-sound-ids-and-how-to-extract-them-and-hear-them/page__hl__+extract%20+sound#entry18329 作为查找id的指南。
 * Music tends to overlap, don't use too much too soon.
 */
 enum TDEventMusic
@@ -327,7 +327,7 @@ struct MonsterInfo
             SetIsRunning(Fields[11].GetBool());      // set if the creature is running on spawn or walking
             SetAttSpeed(Fields[13].GetUInt32());     // set the creatures attack speed
         }else
-            sLog.outBasic("TowerDefense: unable to load base stats for creature entry [%u] in the database.", Entry);
+            sLog.outBasic("TowerDefense: 无法加载数据库中生物entry [%u]的基本属性。", Entry);
     }
 
     uint32 GetPathById()
@@ -403,9 +403,9 @@ struct MonsterInfo
         if(!me)
             sLog.outBasic("TowerDefense: could not spawn creature entry: [%u], please review your settings.", Entry);
 
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC); // not attackable by player
+        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC); // 不能被玩家攻击
         me->SetDefaultMovementType(IDLE_MOTION_TYPE); // init motion type
-        me->SetFaction(14); // enemy faction
+        me->SetFaction(14); // 敌人阵营
         me->SetReactState(REACT_PASSIVE); // do not react from attacks
     }
 
@@ -445,12 +445,12 @@ struct MonsterInfo
     uint32 Entry; // creature entry id
     uint32 WaveId;
     uint32 PathId;
-    uint32 Power; // how much health does player lose if creature reaches end point
-    uint32 Bounty; // how much resources that player gains if creature gets killed from guards
+    uint32 Power; // 如果生物到达终点，玩家会损失多少生命值
+    uint32 Bounty; // 如果生物被守卫杀死，玩家能获得多少资源
     bool IsRunning; // if true, then enemy is running by default, faster than normal walk speed, if this is true, IsAirMob must be false;
     bool IsAirMob; // if true, then enemy is air attacker, so only anti-air guards can attack him, if this is true, IsRunning must be false;
     uint32 Health;
-    uint32 Dmg; // current Damage of the creature
+    uint32 Dmg; // 该生物当前的伤害
     float AttackDistance;
     uint32 AttackSpeed;
     float Speed;
@@ -645,7 +645,7 @@ public:
         //On creation, NOT load. this happens every time the instance is created by a player going inside.
         virtual void Initialize()
         {
-            LoadConfigData(); // Load configuration data from the database, and set variables
+            LoadConfigData(); //从数据库加载配置数据，并设置变量
             LoadPastEvents(); // Load past event information to reward players in case of crash, or send mail.
             SetupWaves(); 
         }
@@ -660,7 +660,7 @@ public:
         }
 
         /*
-        * External Assignment and Retrieval Functions Variables.
+        * 外部赋值和检索函数变量。
         */
         void SetEventId(uint32 eventId)	                        { _eventId = eventId ;                                  }
         uint32 GetEventId()	                                    { return _eventId;	                                    }
@@ -779,7 +779,7 @@ public:
         uint32 minLvl, startResources, buildItemEntry, quitAfterWave, gobPlatformEntry;
         float pSpawnX, pSpawnY,pSpawnZ,pSpawnO;
 
-        // Variables used by the system.
+        // 系统使用的变量。
         uint32 CountDown, _playerGUID, _highEventId, _spawntimer, _eventId, _resources, _baseHealth, _units, _currentWave;
         bool _eventFinished;
         TDEventStatus eventStatus;
@@ -793,7 +793,7 @@ class TowerDefensePlayerScript : PlayerScript
 public:
     TowerDefensePlayerScript() : PlayerScript(TD_SYSTEM_PLAYER_HOOKS_SCRIPT_NAME) {}
 
-    // Called when a player logs out
+    // 当玩家登出时调用
     void OnLogout(Player *player);
 };
 

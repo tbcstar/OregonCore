@@ -77,14 +77,14 @@ class player_housing_npc : public CreatureScript
 				player->PlayerTalkClass->ClearMenus();
 				do{
 					Field *fields = result->Fetch();
-					idStr[count] = Fields[0].GetInt64();
+					idStr[count] = Fields[0].GetUInt64();
 					item = fields[1].GetString();
 					uint32 price = fields[2].GetUInt32();
 					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, item+" Price: "+UInt32ToString2(price)+" Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+count);
 					count++;
 				} while (result->NextRow());
 			} else {
-				ChatHandler(player->GetSession()).PSendSysMessage("No land is available at this time!");
+				ChatHandler(player->GetSession()).PSendSysMessage("现在没有可用的土地了!");
 				player->PlayerTalkClass->CloseGossip();
 			}
 
@@ -94,7 +94,7 @@ class player_housing_npc : public CreatureScript
 					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, "Give me a replacement land item!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+777);
 				}
 			}
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "Not interested.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+10000);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "不感兴趣。", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+10000);
 	     player->SaveRecallPosition();
             player->PlayerTalkClass->SendGossipMenu(11110, creature->GetGUID());
             return true;
@@ -119,10 +119,10 @@ class player_housing_npc : public CreatureScript
 				if(player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, LAND_ITEM_ID, 1) == EQUIP_ERR_OK)
 				{	
 					if(player->AddItem(LAND_ITEM_ID, 1)){
-					ChatHandler(player->GetSession()).PSendSysMessage("Don't lose it this time!");
+					ChatHandler(player->GetSession()).PSendSysMessage("这次可别丢了!");
 					}
 				} else {
-					ChatHandler(player->GetSession()).PSendSysMessage("Bag is full or other issue!");
+					ChatHandler(player->GetSession()).PSendSysMessage("包已满或其他问题！");
 				}
 			}
 
@@ -168,8 +168,8 @@ class player_housing_npc_guide : public CreatureScript
 	 bool OnGossipHello(Player* player, Creature* creature)
         {
 			player->PlayerTalkClass->ClearMenus();
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, "Buy this land!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-            		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "Take me back!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, "购买这片土地!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+            		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "带我回去！", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
             		player->PlayerTalkClass->SendGossipMenu(4, creature->GetGUID());
 			return true;
 		}
@@ -198,11 +198,11 @@ class player_housing_npc_guide : public CreatureScript
 					if(GetOwnerLandCount(player->GetGUID()) < 10){
 						buyLand(player, creature, selection);
 					} else {
-						ChatHandler(player->GetSession()).PSendSysMessage("You can not purchase anymore land!");
+						ChatHandler(player->GetSession()).PSendSysMessage("你不能再购买土地了!");
 						player->PlayerTalkClass->CloseGossip();
 					}
 				} else {
-					ChatHandler(player->GetSession()).PSendSysMessage("Failed!");
+					ChatHandler(player->GetSession()).PSendSysMessage("失败！");
 					player->PlayerTalkClass->CloseGossip();
 				}
 

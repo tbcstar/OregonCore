@@ -105,78 +105,78 @@ enum eEnums
     P4_NPC_7 =     985401
 };
 
-#define	ITEM_1_TEXT  		"Chair"
-#define 	ITEM_2_TEXT  		"Table"
-#define	ITEM_3_TEXT 		"Mailbox"
+#define	ITEM_1_TEXT  		"椅子"
+#define ITEM_2_TEXT  		"桌子"
+#define	ITEM_3_TEXT 		"邮箱"
 #define	ITEM_4_TEXT 		"Plant"
-#define	ITEM_5_TEXT 		"Bookshelf"
-#define	ITEM_6_TEXT 		"Campfire"
-#define	ITEM_7_TEXT 		"Tent"
+#define	ITEM_5_TEXT 		"书架"
+#define	ITEM_6_TEXT 		"营火"
+#define	ITEM_7_TEXT 		"帐篷"
 #define	ITEM_8_TEXT 		"Emeth the Ancient Portal"
-#define	ITEM_9_TEXT 		"Purple Torch"
-#define	ITEM_10_TEXT 		"Red Crystal"
-#define	ITEM_11_TEXT 		"Throne"
-#define	ITEM_12_TEXT 		"Berserk Buff"
-#define	ITEM_13_TEXT 		"Speed Buff"
-#define	ITEM_14_TEXT 		"Heal Buff"
+#define	ITEM_9_TEXT 		"紫色火炬"
+#define	ITEM_10_TEXT 		"红色水晶"
+#define	ITEM_11_TEXT 		"王座"
+#define	ITEM_12_TEXT 		"狂暴Buff"
+#define	ITEM_13_TEXT 		"速度Buff"
+#define	ITEM_14_TEXT 		"回复Buff"
 
-#define	NPC_1_TEXT  		"Teleporter"
-#define 	NPC_2_TEXT  		"Arena Vendor"
+#define	NPC_1_TEXT  		"传送点"
+#define NPC_2_TEXT  		"竞技场商人"
 #define	NPC_3_TEXT 		"Invincible Gear Vendor"
-#define	NPC_4_TEXT 		"Donor Vendor"
-#define	NPC_5_TEXT 		"Vote Vendor"
+#define	NPC_4_TEXT 		"捐赠商城"
+#define	NPC_5_TEXT 		"积分商店"
 #define	NPC_6_TEXT 		"Refund Vendor"
 #define	NPC_7_TEXT 		"Honor Vendor"
 #define	NPC_8_TEXT 		"Custom Gems"
 #define	NPC_9_TEXT 		"Event Vendor"
-#define	NPC_10_TEXT 		"God of PvP"
-#define	NPC_11_TEXT 		"Training Dummy"
+#define	NPC_10_TEXT 		"PvP之神"
+#define	NPC_11_TEXT 		"训练木偶"
 #define	NPC_12_TEXT 		"Battle Maiden"
 
 
 //PACKAGE 1 GOBJs and NPCs
-#define	P1_ITEM_1_TEXT  		"Alliance Banner"
-#define 	P1_ITEM_2_TEXT  		"Horde Banner"
-#define	P1_ITEM_3_TEXT 		"Rune Aura"
-#define	P1_ITEM_4_TEXT 		"Purple Aura"
-#define	P1_ITEM_5_TEXT 		"Flying Platform"
+#define	P1_ITEM_1_TEXT  		"联盟旗帜"
+#define P1_ITEM_2_TEXT  		"部落旗帜"
+#define	P1_ITEM_3_TEXT 		"符文光环"
+#define	P1_ITEM_4_TEXT 		"紫色光环"
+#define	P1_ITEM_5_TEXT 		"飞行平台"
 #define	P1_NPC_1_TEXT  		"Lord Tirion"
-#define 	P1_NPC_2_TEXT  		"Deluxe Voter"
+#define P1_NPC_2_TEXT  		"Deluxe Voter"
 #define	P1_NPC_3_TEXT 		"Voters Gear"
 #define	P1_NPC_4_TEXT 		"Master of Illusions"
 #define	P1_NPC_5_TEXT 		"Title Master"
 //PACKAGE 2 GOBJs and NPCs
-#define	P2_ITEM_1_TEXT  		"Golden Bench"
-#define 	P2_ITEM_2_TEXT  		"Bush"
-#define	P2_ITEM_3_TEXT 		"Guild Vault"
+#define	P2_ITEM_1_TEXT  		"黄金海岸"
+#define P2_ITEM_2_TEXT  		"Bush"
+#define	P2_ITEM_3_TEXT 		"公会仓库"
 #define	P2_ITEM_4_TEXT 		"Cleansed Songflower"
 #define	P2_ITEM_5_TEXT 		"Elune's Blessing"
 #define	P2_NPC_1_TEXT  		"Beastermaster Arogon"
-#define 	P2_NPC_2_TEXT  		"Sylvannas"
+#define P2_NPC_2_TEXT  		"Sylvannas"
 #define	P2_NPC_3_TEXT 		"Sharrow"
 #define	P2_NPC_4_TEXT 		"Totems and More"
 #define	P2_NPC_5_TEXT 		"Token Converter"
 #define	P2_NPC_6_TEXT			"Spectral Tiger"
 //PACKAGE 3 GOBJs and NPCs
 #define	P3_ITEM_1_TEXT  		"Owl Statue"
-#define 	P3_ITEM_2_TEXT  		"Man Statue"
+#define P3_ITEM_2_TEXT  		"Man Statue"
 #define	P3_ITEM_3_TEXT 		"Little Flame"
 #define	P3_ITEM_4_TEXT 		"Beer Tent"
 #define	P3_ITEM_5_TEXT 		"Signalling Gem Aura"
 #define	P3_NPC_1_TEXT  		"Arathi Basin"
-#define 	P3_NPC_2_TEXT  		"Warsong Gulch"
+#define P3_NPC_2_TEXT  		"Warsong Gulch"
 #define	P3_NPC_3_TEXT 		"Real Steel"
 #define	P3_NPC_4_TEXT 		"Eye of the Storm"
 #define	P3_NPC_5_TEXT 		"Arena Battlemaster"
 #define	P3_NPC_6_TEXT 		"Arena Organizer"
 //PACKAGE 4 GOBJs and NPCs
 #define	P4_ITEM_1_TEXT  		"Arena Earth Rune"
-#define 	P4_ITEM_2_TEXT  		"Gambling Records"
+#define P4_ITEM_2_TEXT  		"Gambling Records"
 #define	P4_ITEM_3_TEXT 		"Gambling Area"
 #define	P4_ITEM_4_TEXT 		"Duel Flag"
 #define	P4_ITEM_5_TEXT 		"Stormwind Rug"
 #define	P4_NPC_1_TEXT  		"Transmogrification"
-#define 	P4_NPC_2_TEXT  		"Commander Steele"
+#define P4_NPC_2_TEXT  		"Commander Steele"
 #define	P4_NPC_3_TEXT 		"Irelia"
 #define	P4_NPC_4_TEXT 		"Bounty Hunter"
 #define	P4_NPC_5_TEXT 		"Bounty Bear"
@@ -220,7 +220,7 @@ public:
         uint32 AccID = player->GetGUIDLow();
         player->PlayerTalkClass->ClearMenus();
         if(player->IsInCombat()){
-            ChatHandler(player->GetSession()).PSendSysMessage("You can not use this item while in combat!");
+            ChatHandler(player->GetSession()).PSendSysMessage("你不能在战斗中使用此物品!");
             return false;
         }
 
@@ -253,13 +253,13 @@ public:
                         std::string zone_name = fields[0].GetString();
                         if(zone_name == "")
                             zone_name = "First House";
-                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to " + zone_name, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+800+house_count);
+                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "传送到 " + zone_name, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+800+house_count);
                         house_count++;
                     } while (result->NextRow());
                 }
             }
         } else {
-            ChatHandler(player->GetSession()).PSendSysMessage("You do not own any land!");
+            ChatHandler(player->GetSession()).PSendSysMessage("你还没有获得土地！");
             return false;
         }
         player->PlayerTalkClass->SendGossipMenu(1, item->GetGUID());
@@ -462,7 +462,7 @@ public:
                 for (grpRef; grpRef != NULL; grpRef = grpRef->next())
                 {
                     Player* groupMember = grpRef->GetSource();
-                    ChatHandler(player->GetSession()).PSendSysMessage("Sending summon request to...");
+                    ChatHandler(player->GetSession()).PSendSysMessage("发送召唤请求至...");
                     if(!groupMember)
                         continue;		
                     else
@@ -492,14 +492,14 @@ public:
                     Creature* target = ChatHandler(player).getSelectedCreature();
                     if (!target)
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("Please select a valid creature within your land area.");
+                        ChatHandler(player->GetSession()).PSendSysMessage("请在你的陆地范围内选择一个有效的生物。");
                         player->PlayerTalkClass->CloseGossip(); // Rochet's comment: Why close gossip? Why not return to the menu, so its easier to try again?
                         return false;
                     }
 
                     target->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.25);
                     target->SaveToDB();
-                    ChatHandler(player->GetSession()).PSendSysMessage("You have modified %s, and changed the size to: 0.25", target->GetName());
+                    ChatHandler(player->GetSession()).PSendSysMessage("您已经修改了%s，并将大小改为:0.25", target->GetName());
                     player->PlayerTalkClass->CloseGossip();
 
                     return true;

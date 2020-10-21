@@ -13,7 +13,7 @@
  
  
 -- Dumping database structure for characters
-CREATE DATABASE IF NOT EXISTS `characters` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE IF NOT EXISTS `characters` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `characters`;
  
 -- Dumping structure for table characters.player_house
@@ -47,13 +47,13 @@ CREATE TABLE IF NOT EXISTS `player_house_available` (
   `spawn_o` float DEFAULT NULL,
   `c_guid` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
  
 -- Dumping structure for table characters.player_house_npcs
 CREATE TABLE IF NOT EXISTS `player_house_npcs` (
   `npcId` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`npcId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
  
 -- Dumping data for table characters.player_house_npcs: 0 rows
 /*!40000 ALTER TABLE `player_house_npcs` DISABLE KEYS */;
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `player_house_npcs` (
 CREATE TABLE IF NOT EXISTS `player_house_objects` (
   `gobjID` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`gobjID`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
  
 -- Dumping data for table characters.player_house_objects: 0 rows
 /*!40000 ALTER TABLE `player_house_objects` DISABLE KEYS */;
@@ -76,25 +76,25 @@ CREATE TABLE IF NOT EXISTS `player_house_spawns` (
   `CreaOrObjName` varchar(50) DEFAULT '0',
   `CreatureOrObject` int(3) unsigned NOT NULL DEFAULT '0',
   `package` int(3) unsigned NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  
 -- Dumping data for table characters.player_house_spawns: ~1 rows (approximately)
 /*!40000 ALTER TABLE `player_house_spawns` DISABLE KEYS */;
 INSERT INTO `player_house_spawns` (`id`, `CreaOrObjId`, `CreaOrObjName`, `CreatureOrObject`, `package`) VALUES
-    (1, 31395, 'Illidan Stormrage', 0, 1),
-    (1, 10217, 'Chair', 1, 1),
-    (2, 193167, 'Bunkbed', 1, 1),
-    (3, 191966, 'Table', 1, 1),
-    (4, 181103, 'Flower', 1, 1),
-    (1, 193167, 'Bunkbed', 1, 2),
-    (1, 31395, 'Illidan Stormrage', 0, 2),
-    (1, 193167, 'Bunkbed', 1, 3),
-    (1, 31395, 'Illidan Stormrage', 0, 3),
-    (1, 193167, 'Bunkbed', 1, 4),
-    (1, 31395, 'Illidan Stormrage', 0, 4),
-    (1, 193167, 'Bunkbed', 1, 5),
-    (1, 31395, 'Illidan Stormrage', 0, 5),
-    (2, 31395, 'Not Illidan Stormrage', 0, 1);
+    (1, 31395, '伊利丹·怒风', 0, 1),
+    (1, 10217, '椅子', 1, 1),
+    (2, 193167, '双层床', 1, 1),
+    (3, 191966, '桌子', 1, 1),
+    (4, 181103, '花儿', 1, 1),
+    (1, 193167, '双层床', 1, 2),
+    (1, 31395, '伊利丹·怒风', 0, 2),
+    (1, 193167, '双层床', 1, 3),
+    (1, 31395, '伊利丹·怒风', 0, 3),
+    (1, 193167, '双层床', 1, 4),
+    (1, 31395, '伊利丹·怒风', 0, 4),
+    (1, 193167, '双层床', 1, 5),
+    (1, 31395, '伊利丹·怒风', 0, 5),
+    (2, 31395, '不是伊利丹·怒风', 0, 1);
 /*!40000 ALTER TABLE `player_house_spawns` ENABLE KEYS */;
  
 -- Dumping structure for table characters.player_house_taken
@@ -122,4 +122,4 @@ CREATE TABLE IF NOT EXISTS `player_house_taken` (
   `sign4y` float DEFAULT NULL,
   `upgrades` int(11) unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;

@@ -6,7 +6,7 @@ CREATE TABLE `custom_td_base_levels` (
   `creatureName` varchar(360) DEFAULT NULL,
   `creatureEntry` int(12) NOT NULL DEFAULT '0',
   `creatureLevel` int(12) NOT NULL DEFAULT '0',
-  `upgradeText` varchar(9000) NOT NULL DEFAULT 'Upgrade to level %u (Effect) (Cost %u)',
+  `upgradeText` varchar(9000) NOT NULL DEFAULT '升级到等级 %u (效果) (Cost %u)',
   `newDefaultSpell` int(12) NOT NULL DEFAULT '0',
   `newScale` float NOT NULL DEFAULT '0',
   `newDisplay` int(12) NOT NULL DEFAULT '0',
@@ -19,47 +19,47 @@ CREATE TABLE `custom_td_base_levels` (
   `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `upgradeCost` int(12) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_base_levels
 -- ----------------------------
-INSERT INTO `custom_td_base_levels` VALUES ('Rock Tower Level 1', '200008', '1', 'Upgrade to level %u (2x Faster + Damage) (Cost %u)', '0', '0.35', '0', '0', '0', '800', '800', '0', '0', '1', '15');
-INSERT INTO `custom_td_base_levels` VALUES ('Rock Tower Level 2', '200008', '2', 'Upgrade to level %u (2x Stronger) (Cost %u)', '0', '0.4', '0', '0', '7', '800', '1000', '0', '0', '2', '30');
-INSERT INTO `custom_td_base_levels` VALUES ('Rock Tower Level 3', '200008', '3', 'Upgrade to level %u (Can Attack Air Units) (Cost %u)', '0', '0.5', '0', '0', '8', '800', '2000', '1', '0', '3', '40');
-INSERT INTO `custom_td_base_levels` VALUES ('Ice Tower Level 1', '200010', '1', 'Upgrade to level %u (Apply damage to nearby attackers) (Cost %u)', '0', '0.2', '0', '46885', '0', '0', '500', '0', '0', '4', '30');
-INSERT INTO `custom_td_base_levels` VALUES ('Ice Tower Level 2', '200010', '2', 'Upgrade to level %u (Increase Range by 5 yards) (Cost %u)', '0', '0.25', '0', '69090', '6', '0', '750', '0', '0', '5', '60');
-INSERT INTO `custom_td_base_levels` VALUES ('Ice Tower Level 3', '200010', '3', 'Upgrade to level %u (Electrify nearby attackers) (Cost %u)', '69696', '0.3', '0', '62641', '7', '0', '1000', '0', '0', '6', '80');
-INSERT INTO `custom_td_base_levels` VALUES ('Fire Tower Level 1', '200009', '1', 'Upgrade to level %u (Twice as much range + Damage) (Cost %u)', '0', '0.2', '0', '62300', '10', '0', '1000', '0', '0', '7', '20');
-INSERT INTO `custom_td_base_levels` VALUES ('Fire Tower Level 2', '200009', '2', 'Upgrade to level %u (Twice as much damage) (Cost %u)', '0', '0.25', '0', '52855', '10', '0', '1800', '0', '0', '8', '30');
-INSERT INTO `custom_td_base_levels` VALUES ('Fire Tower Level 3', '200009', '3', 'Upgrade to level %u (More range + speed + damage) (Cost %u)', '0', '0.3', '0', '64785', '10', '800', '2500', '0', '0', '9', '40');
-INSERT INTO `custom_td_base_levels` VALUES ('Air Tower Level 1', '200011', '1', 'Upgrade to level %u (Shoots Lightning Arrows with increased damage) (Cost %u)', '0', '0.8', '0', '35504', '0', '0', '1000', '0', '0', '10', '20');
-INSERT INTO `custom_td_base_levels` VALUES ('Air Tower Level 2', '200011', '2', 'Upgrade to level %u (2x Damage + Range) (Cost %u)', '0', '1', '0', '74917', '0', '800', '2000', '0', '0', '11', '30');
-INSERT INTO `custom_td_base_levels` VALUES ('Air Tower Level 3', '200011', '3', 'Upgrade to level %u (Higher Damage + Range + Speed) (Cost %u)', '0', '1.2', '0', '74917', '12', '800', '5000', '0', '0', '12', '40');
-INSERT INTO `custom_td_base_levels` VALUES ('Electric Tower Level 1', '200012', '1', 'Upgrade to level %u (2x Faster + Range) (Cost %u)', '0', '1.5', '0', '35838', '7', '1500', '1400', '0', '0', '13', '30');
-INSERT INTO `custom_td_base_levels` VALUES ('Electric Tower Level 2', '200012', '2', 'Upgrade to level %u (Can Attack Air Units + Damage) (Cost %u)', '0', '1.8', '0', '35838', '8', '1450', '2000', '1', '0', '14', '40');
-INSERT INTO `custom_td_base_levels` VALUES ('Electric Tower Level 3', '200012', '3', 'Upgrade to level %u (Higher Damage + Range) (Cost %u)', '0', '2', '0', '62641', '9', '1400', '4000', '1', '0', '15', '60');
-INSERT INTO `custom_td_base_levels` VALUES ('Beam Tower Level 1', '200013', '1', 'Upgrade to level %u (2x Damage + Slowing Units) (Cost %u)', '0', '1', '0', '0', '0', '3000', '7500', '0', '0', '16', '20');
-INSERT INTO `custom_td_base_levels` VALUES ('Beam Tower Level 2', '200013', '2', 'Upgrade to level %u (Higher Range 2.5x Damage) (Cost %u)', '0', '1.2', '0', '0', '10', '3000', '10000', '0', '0', '17', '40');
-INSERT INTO `custom_td_base_levels` VALUES ('Beam Tower Level 3', '200013', '3', 'Upgrade to level %u (3x Damage + Higher Range) (Cost %u)', '0', '0.1', '23835', '0', '12', '3000', '12500', '0', '0', '18', '60');
-INSERT INTO `custom_td_base_levels` VALUES ('Beam Tower Level 4', '200013', '4', 'Upgrade to level %u (2x Speed + 4x Damage) (Cost %u)', '0', '0.2', '23835', '0', '12', '2500', '15000', '0', '0', '19', '80');
-INSERT INTO `custom_td_base_levels` VALUES ('Electric Tower Level 4', '200012', '4', 'Upgrade to level %u (Higher Damage + Speed + Range) (Cost %u)', '0', '2', '28418', '62641', '10', '1400', '8000', '0', '0', '20', '100');
-INSERT INTO `custom_td_base_levels` VALUES ('Air Tower Level 4', '200011', '4', 'Upgrade to level %u (Multiple Targets + 5x Damage + Range) (Cost %u)', '59244', '1.2', '27015', '74917', '14', '800', '12000', '0', '0', '21', '60');
-INSERT INTO `custom_td_base_levels` VALUES ('Sear Tower', '200014', '1', 'Upgrade to level %u (2x Damage) (Cost %u)', '0', '0.2', '0', '65630', '0', '0', '1500', '0', '0', '22', '10');
-INSERT INTO `custom_td_base_levels` VALUES ('Sear Tower', '200014', '2', 'Upgrade to level %u (2x Range) (Cost %u)', '0', '0.3', '0', '65630', '5', '0', '2000', '0', '0', '23', '20');
-INSERT INTO `custom_td_base_levels` VALUES ('Sear Tower', '200014', '3', 'Upgrade to level %u (2x Speed) (Cost %u)', '0', '0.3', '21262', '65630', '0', '3000', '3000', '0', '0', '24', '30');
-INSERT INTO `custom_td_base_levels` VALUES ('Sear Tower', '200014', '4', 'Upgrade to level %u (Higher Damage) (Cost %u)', '0', '0.3', '0', '65630', '0', '3000', '4000', '0', '0', '25', '40');
-INSERT INTO `custom_td_base_levels` VALUES ('Sear Tower', '200014', '5', 'Upgrade to level %u (More Targets + damage + speed) (Cost %u)', '0', '0.4', '0', '72521', '0', '2800', '5000', '0', '0', '26', '60');
-INSERT INTO `custom_td_base_levels` VALUES ('Sear Tower', '200014', '6', 'Upgrade to level %u (3x Damage + Range + Speed) (Cost %u)', '0', '0.55', '0', '72523', '5', '2200', '15000', '0', '0', '27', '150');
-INSERT INTO `custom_td_base_levels` VALUES ('Electric Tower Level 5', '200012', '5', 'Upgrade to level %u (More Targets + Range + Damage) (Cost %u)', '0', '2', '0', '62641', '11', '1350', '12000', '0', '0', '28', '120');
-INSERT INTO `custom_td_base_levels` VALUES ('Fire Tower Level 4', '200009', '4', 'Upgrade to level %u (Higher Damage + Range) (Cost %u)', '0', '0.35', '0', '64785', '13', '700', '4000', '0', '0', '30', '50');
-INSERT INTO `custom_td_base_levels` VALUES ('Spit Tower', '200015', '1', 'Upgrade to level %u (More Range + 2x Damage) (Cost %u)', '0', '0.5', '0', '30987', '14', '2000', '1000', '0', '0', '31', '25');
-INSERT INTO `custom_td_base_levels` VALUES ('Spit Tower', '200015', '2', 'Upgrade to level %u (More Range + Speed + Minor Damage) (Cost %u)', '0', '0.65', '0', '30987', '16', '1500', '2000', '0', '0', '32', '35');
-INSERT INTO `custom_td_base_levels` VALUES ('Spit Tower', '200015', '3', 'Upgrade to level %u (More Range + Damage) (Cost %u)', '68003', '0.5', '23177', '0', '18', '1500', '3000', '0', '0', '33', '50');
-INSERT INTO `custom_td_base_levels` VALUES ('Spit Tower', '200015', '4', 'Upgrade to level %u (More Range + Speed + Damage) (Cost %u)', '68003', '0.6', '0', '35838', '20', '1000', '4000', '0', '0', '34', '70');
-INSERT INTO `custom_td_base_levels` VALUES ('Spit Tower', '200015', '5', 'Upgrade to level %u (SUPER RANGE + Damage + Can Attack Air) (Cost %u)', '68003', '0.7', '0', '35838', '25', '1000', '5000', '1', '0', '35', '90');
-INSERT INTO `custom_td_base_levels` VALUES ('Spit Tower', '200015', '6', 'Upgrade to level %u (DAT RANGE + MONSTER DAMAGE + SPEEDKING) (Cost %u)', '67632', '1.3', '20040', '25039', '30', '800', '10000', '1', '0', '36', '100');
-INSERT INTO `custom_td_base_levels` VALUES ('Spit Tower', '200015', '7', 'Upgrade to level %u (This is MADNESS) (Cost %u)', '67632', '1.4', '20040', '25039', '35', '500', '20000', '1', '0', '37', '200');
+INSERT INTO `custom_td_base_levels` VALUES ('1级岩石塔', '200008', '1', '升级到等级 %u (速度+伤害增加2倍) (Cost %u)', '0', '0.35', '0', '0', '0', '800', '800', '0', '0', '1', '15');
+INSERT INTO `custom_td_base_levels` VALUES ('2级岩石塔', '200008', '2', '升级到等级 %u (2x Stronger) (Cost %u)', '0', '0.4', '0', '0', '7', '800', '1000', '0', '0', '2', '30');
+INSERT INTO `custom_td_base_levels` VALUES ('3级岩石塔', '200008', '3', '升级到等级 %u (能攻击空中单位) (Cost %u)', '0', '0.5', '0', '0', '8', '800', '2000', '1', '0', '3', '40');
+INSERT INTO `custom_td_base_levels` VALUES ('1级火塔', '200009', '1', '升级到等级 %u (射程+伤害增加2倍) (Cost %u)', '0', '0.2', '0', '62300', '10', '0', '1000', '0', '0', '7', '20');
+INSERT INTO `custom_td_base_levels` VALUES ('2级火塔', '200009', '2', '升级到等级 %u (伤害增加2倍) (Cost %u)', '0', '0.25', '0', '52855', '10', '0', '1800', '0', '0', '8', '30');
+INSERT INTO `custom_td_base_levels` VALUES ('3级火塔', '200009', '3', '升级到等级 %u (射程+速度+伤害) (Cost %u)', '0', '0.3', '0', '64785', '10', '800', '2500', '0', '0', '9', '40');
+INSERT INTO `custom_td_base_levels` VALUES ('4级火塔', '200009', '4', '升级到等级 %u (高伤害+射程) (Cost %u)', '0', '0.35', '0', '64785', '13', '700', '4000', '0', '0', '30', '50');
+INSERT INTO `custom_td_base_levels` VALUES ('1级冰塔', '200010', '1', '升级到等级 %u (对附近的攻击者造成伤害) (Cost %u)', '0', '0.2', '0', '46885', '0', '0', '500', '0', '0', '4', '30');
+INSERT INTO `custom_td_base_levels` VALUES ('2级冰塔', '200010', '2', '升级到等级 %u (增加5码的射程) (Cost %u)', '0', '0.25', '0', '69090', '6', '0', '750', '0', '0', '5', '60');
+INSERT INTO `custom_td_base_levels` VALUES ('3级冰塔', '200010', '3', '升级到等级 %u (Electrify nearby attackers) (Cost %u)', '69696', '0.3', '0', '62641', '7', '0', '1000', '0', '0', '6', '80');
+INSERT INTO `custom_td_base_levels` VALUES ('1级空气塔', '200011', '1', '升级到等级 %u (射出增加伤害的闪电箭) (Cost %u)', '0', '0.8', '0', '35504', '0', '0', '1000', '0', '0', '10', '20');
+INSERT INTO `custom_td_base_levels` VALUES ('2级空气塔', '200011', '2', '升级到等级 %u (2倍伤害+射程) (Cost %u)', '0', '1', '0', '74917', '0', '800', '2000', '0', '0', '11', '30');
+INSERT INTO `custom_td_base_levels` VALUES ('3级空气塔', '200011', '3', '升级到等级 %u (高伤害+射程+速度) (Cost %u)', '0', '1.2', '0', '74917', '12', '800', '5000', '0', '0', '12', '40');
+INSERT INTO `custom_td_base_levels` VALUES ('4级空气塔', '200011', '4', '升级到等级 %u (多个目标+ 5倍伤害+射程) (Cost %u)', '59244', '1.2', '27015', '74917', '14', '800', '12000', '0', '0', '21', '60');
+INSERT INTO `custom_td_base_levels` VALUES ('1级电塔', '200012', '1', '升级到等级 %u (2倍速度+范围) (Cost %u)', '0', '1.5', '0', '35838', '7', '1500', '1400', '0', '0', '13', '30');
+INSERT INTO `custom_td_base_levels` VALUES ('2级电塔', '200012', '2', '升级到等级 %u (可攻击空中单位+伤害) (Cost %u)', '0', '1.8', '0', '35838', '8', '1450', '2000', '1', '0', '14', '40');
+INSERT INTO `custom_td_base_levels` VALUES ('3级电塔', '200012', '3', '升级到等级 %u (高伤害+射程) (Cost %u)', '0', '2', '0', '62641', '9', '1400', '4000', '1', '0', '15', '60');
+INSERT INTO `custom_td_base_levels` VALUES ('4级电塔', '200012', '4', '升级到等级 %u (高伤害+速度+射程) (Cost %u)', '0', '2', '28418', '62641', '10', '1400', '8000', '0', '0', '20', '100');
+INSERT INTO `custom_td_base_levels` VALUES ('5级电塔', '200012', '5', '升级到等级 %u (更多目标+射程+伤害) (Cost %u)', '0', '2', '0', '62641', '11', '1350', '12000', '0', '0', '28', '120');
+INSERT INTO `custom_td_base_levels` VALUES ('1级Beam Tower', '200013', '1', '升级到等级 %u (2倍伤害+减速单位) (Cost %u)', '0', '1', '0', '0', '0', '3000', '7500', '0', '0', '16', '20');
+INSERT INTO `custom_td_base_levels` VALUES ('2级Beam Tower', '200013', '2', '升级到等级 %u (Higher Range 2.5x Damage) (Cost %u)', '0', '1.2', '0', '0', '10', '3000', '10000', '0', '0', '17', '40');
+INSERT INTO `custom_td_base_levels` VALUES ('3级Beam Tower', '200013', '3', '升级到等级 %u (3x Damage + Higher Range) (Cost %u)', '0', '0.1', '23835', '0', '12', '3000', '12500', '0', '0', '18', '60');
+INSERT INTO `custom_td_base_levels` VALUES ('4级Beam Tower', '200013', '4', '升级到等级 %u (2x Speed + 4x Damage) (Cost %u)', '0', '0.2', '23835', '0', '12', '2500', '15000', '0', '0', '19', '80');
+INSERT INTO `custom_td_base_levels` VALUES ('1级Sear Tower', '200014', '1', '升级到等级 %u (2x Damage) (Cost %u)', '0', '0.2', '0', '65630', '0', '0', '1500', '0', '0', '22', '10');
+INSERT INTO `custom_td_base_levels` VALUES ('2级Sear Tower', '200014', '2', '升级到等级 %u (2x Range) (Cost %u)', '0', '0.3', '0', '65630', '5', '0', '2000', '0', '0', '23', '20');
+INSERT INTO `custom_td_base_levels` VALUES ('3级Sear Tower', '200014', '3', '升级到等级 %u (2x Speed) (Cost %u)', '0', '0.3', '21262', '65630', '0', '3000', '3000', '0', '0', '24', '30');
+INSERT INTO `custom_td_base_levels` VALUES ('4级Sear Tower', '200014', '4', '升级到等级 %u (Higher Damage) (Cost %u)', '0', '0.3', '0', '65630', '0', '3000', '4000', '0', '0', '25', '40');
+INSERT INTO `custom_td_base_levels` VALUES ('5级Sear Tower', '200014', '5', '升级到等级 %u (More Targets + damage + speed) (Cost %u)', '0', '0.4', '0', '72521', '0', '2800', '5000', '0', '0', '26', '60');
+INSERT INTO `custom_td_base_levels` VALUES ('6级Sear Tower', '200014', '6', '升级到等级 %u (3x Damage + Range + Speed) (Cost %u)', '0', '0.55', '0', '72523', '5', '2200', '15000', '0', '0', '27', '150');
+INSERT INTO `custom_td_base_levels` VALUES ('1级Spit Tower', '200015', '1', '升级到等级 %u (More Range + 2x Damage) (Cost %u)', '0', '0.5', '0', '30987', '14', '2000', '1000', '0', '0', '31', '25');
+INSERT INTO `custom_td_base_levels` VALUES ('2级Spit Tower', '200015', '2', '升级到等级 %u (More Range + Speed + Minor Damage) (Cost %u)', '0', '0.65', '0', '30987', '16', '1500', '2000', '0', '0', '32', '35');
+INSERT INTO `custom_td_base_levels` VALUES ('3级Spit Tower', '200015', '3', '升级到等级 %u (More Range + Damage) (Cost %u)', '68003', '0.5', '23177', '0', '18', '1500', '3000', '0', '0', '33', '50');
+INSERT INTO `custom_td_base_levels` VALUES ('4级Spit Tower', '200015', '4', '升级到等级 %u (More Range + Speed + Damage) (Cost %u)', '68003', '0.6', '0', '35838', '20', '1000', '4000', '0', '0', '34', '70');
+INSERT INTO `custom_td_base_levels` VALUES ('5级Spit Tower', '200015', '5', '升级到等级 %u (SUPER RANGE + Damage + Can Attack Air) (Cost %u)', '68003', '0.7', '0', '35838', '25', '1000', '5000', '1', '0', '35', '90');
+INSERT INTO `custom_td_base_levels` VALUES ('6级Spit Tower', '200015', '6', '升级到等级 %u (DAT RANGE + MONSTER DAMAGE + SPEEDKING) (Cost %u)', '67632', '1.3', '20040', '25039', '30', '800', '10000', '1', '0', '36', '100');
+INSERT INTO `custom_td_base_levels` VALUES ('7级Spit Tower', '200015', '7', '升级到等级 %u (This is MADNESS) (Cost %u)', '67632', '1.4', '20040', '25039', '35', '500', '20000', '1', '0', '37', '200');
 
 -- ----------------------------
 -- Table structure for custom_td_base_spells
@@ -79,19 +79,19 @@ CREATE TABLE `custom_td_base_spells` (
   `spellOnCreatureNearCastTarget` int(12) NOT NULL DEFAULT '0',
   `spellAOECastTarget` int(12) NOT NULL DEFAULT '0',
   PRIMARY KEY (`uniqueId`,`creatureEntry`)
-) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_base_spells
 -- ----------------------------
-INSERT INTO `custom_td_base_spells` VALUES ('1', 'System - Teleport Visual Spell', '0', '41232', '0', '0', '0', '0', '0', '0', '0', '0');
-INSERT INTO `custom_td_base_spells` VALUES ('2', 'System - Base Health 25% Spell', '0', '50224', '0', '0', '0', '0', '0', '0', '0', '0');
-INSERT INTO `custom_td_base_spells` VALUES ('3', 'System - Base Health 30% Spell', '0', '61358', '0', '0', '0', '0', '0', '0', '0', '0');
-INSERT INTO `custom_td_base_spells` VALUES ('4', 'System - Guard Upgrade Visual Spell', '0', '62003', '0', '0', '0', '0', '0', '0', '0', '0');
-INSERT INTO `custom_td_base_spells` VALUES ('5', 'System - Sell Guard Visual', '0', '51802', '0', '0', '0', '0', '0', '0', '0', '0');
-INSERT INTO `custom_td_base_spells` VALUES ('100', 'Guard - Rock Tower', '200008', '38513', '0', '0', '0', '0', '0', '0', '0', '0');
-INSERT INTO `custom_td_base_spells` VALUES ('101', 'Guard - Fire Tower', '200009', '72163', '0', '0', '0', '0', '0', '0', '0', '0');
-INSERT INTO `custom_td_base_spells` VALUES ('102', 'Guard - Ice Tower', '200010', '48316', '26036', '0', '0', '26036', '0', '0', '0', '15571');
+INSERT INTO `custom_td_base_spells` VALUES ('1', '系统-传送视觉法术', '0', '41232', '0', '0', '0', '0', '0', '0', '0', '0');
+INSERT INTO `custom_td_base_spells` VALUES ('2', '系统-基础生命值25%法术', '0', '50224', '0', '0', '0', '0', '0', '0', '0', '0');
+INSERT INTO `custom_td_base_spells` VALUES ('3', '系统-基础生命值30%法术', '0', '61358', '0', '0', '0', '0', '0', '0', '0', '0');
+INSERT INTO `custom_td_base_spells` VALUES ('4', '系统-守卫升级可视法术', '0', '62003', '0', '0', '0', '0', '0', '0', '0', '0');
+INSERT INTO `custom_td_base_spells` VALUES ('5', '系统-销售警卫视觉', '0', '51802', '0', '0', '0', '0', '0', '0', '0', '0');
+INSERT INTO `custom_td_base_spells` VALUES ('100', '岗哨-岩石塔', '200008', '38513', '0', '0', '0', '0', '0', '0', '0', '0');
+INSERT INTO `custom_td_base_spells` VALUES ('101', '岗哨-火塔', '200009', '72163', '0', '0', '0', '0', '0', '0', '0', '0');
+INSERT INTO `custom_td_base_spells` VALUES ('102', '岗哨-冰塔', '200010', '48316', '26036', '0', '0', '26036', '0', '0', '0', '15571');
 INSERT INTO `custom_td_base_spells` VALUES ('103', 'Guard - Air Tower', '200011', '74414', '0', '0', '0', '0', '0', '0', '0', '0');
 INSERT INTO `custom_td_base_spells` VALUES ('104', 'Guard - Electric Tower', '200012', '46380', '0', '0', '0', '0', '0', '0', '0', '0');
 INSERT INTO `custom_td_base_spells` VALUES ('105', 'Guard - Beam Tower', '200013', '59211', '0', '0', '0', '0', '0', '0', '0', '0');
@@ -119,14 +119,14 @@ CREATE TABLE `custom_td_base_stats` (
   `creatureAttackSpeed` int(11) NOT NULL DEFAULT '1000',
   `creatureGround` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`Id`,`creatureEntry`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_base_stats
 -- ----------------------------
-INSERT INTO `custom_td_base_stats` VALUES ('1', 'Rock Tower', '200008', '15', '400', '6', '0', '0', '0', '45000', '1.1', '0', 'Guard', '800', '1');
-INSERT INTO `custom_td_base_stats` VALUES ('2', 'Fire Tower', '200009', '35', '600', '7', '0', '0', '0', '40000', '1.1', '0', 'Guard', '1000', '1');
-INSERT INTO `custom_td_base_stats` VALUES ('3', 'Ice Tower', '200010', '60', '0', '5', '0', '0', '0', '30000', '1.1', '0', 'Guard', '1000', '1');
+INSERT INTO `custom_td_base_stats` VALUES ('1', '岩石塔', '200008', '15', '400', '6', '0', '0', '0', '45000', '1.1', '0', 'Guard', '800', '1');
+INSERT INTO `custom_td_base_stats` VALUES ('2', '火塔', '200009', '35', '600', '7', '0', '0', '0', '40000', '1.1', '0', 'Guard', '1000', '1');
+INSERT INTO `custom_td_base_stats` VALUES ('3', '冰塔', '200010', '60', '0', '5', '0', '0', '0', '30000', '1.1', '0', 'Guard', '1000', '1');
 INSERT INTO `custom_td_base_stats` VALUES ('4', 'Air Tower', '200011', '20', '1000', '12', '1', '0', '0', '35000', '1.1', '0', 'Guard', '1000', '0');
 INSERT INTO `custom_td_base_stats` VALUES ('5', 'Tiny Mech-Soldier', '200508', '0', '0', '0', '0', '1', '1', '1200', '1.6', '0', 'Attacker', '1000', '1');
 INSERT INTO `custom_td_base_stats` VALUES ('6', 'Mechanostrider', '200505', '0', '0', '0', '0', '1', '1', '2000', '2.1', '1', 'Attacker', '1000', '1');
@@ -180,7 +180,7 @@ CREATE TABLE `custom_td_base_stats_copy` (
   `creatureAttackSpeed` int(11) NOT NULL DEFAULT '1000',
   `creatureGround` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`Id`,`creatureEntry`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_base_stats_copy
@@ -219,7 +219,7 @@ CREATE TABLE `custom_td_config` (
   `quitAfterWave` int(12) DEFAULT NULL,
   `disableFileLog` tinyint(1) DEFAULT NULL,
   `gobPlatformEntry` int(12) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_config
@@ -241,7 +241,7 @@ CREATE TABLE `custom_td_events` (
   `eventDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `eventFinished` tinyint(1) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13446 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=13446 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_events
@@ -13605,7 +13605,7 @@ CREATE TABLE `custom_td_players` (
   `eventsUnfinished` int(11) NOT NULL DEFAULT '0',
   `currentResources` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`playerGUID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_players
@@ -14984,7 +14984,7 @@ CREATE TABLE `custom_td_waves` (
   `waveId` int(12) unsigned NOT NULL AUTO_INCREMENT,
   `isBossWave` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`waveId`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_waves
@@ -15028,7 +15028,7 @@ CREATE TABLE `custom_td_waves_data` (
   `pathId` int(12) NOT NULL DEFAULT '0',
   `uniqueID` int(12) unsigned NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`uniqueID`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of custom_td_waves_data

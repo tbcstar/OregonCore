@@ -90,7 +90,7 @@ enum PMGossipMenuOptions
 };
 
 //GOSSIP TEXT STRING							  1			  2			3		  4			5
-std::string PM_MOUNT_TEXT [12] = {"Null(LeaveBlank)", "Ashes of Al'ar", "Argent Hippogryph", "Magnificent Flying Carpet", "Icebound Frostbrood Vanquisher", "Blazing Hippogryph", "Swift Orange Drake", "Swift Purple Drake", "Swift Red Drake", "Blue Cloud Serpent", "Celestial Serpent", "Purple Deepholm Dragon"};
+std::string PM_MOUNT_TEXT [12] = {"空(空白)", "奥的灰烬", "银色角鹰兽", "Magnificent Flying Carpet", "Icebound Frostbrood Vanquisher", "Blazing Hippogryph", "Swift Orange Drake", "Swift Purple Drake", "Swift Red Drake", "Blue Cloud Serpent", "Celestial Serpent", "Purple Deepholm Dragon"};
 //SPELL ID FOR THE MOUNT	          1      2      3     4      5
 uint32 PM_MOUNT_SPELL [12]	  = {0, 40192,63844,61309,72807,74856,93025,93026,93027,93054,93061,93065};
 //HK REQUIRED FOR MOUNT 	          1      2      3     4      5
