@@ -22,7 +22,7 @@ const char *TowerDefensePlayerStatFields[TD_PLAYER_STAT_MAX] =
 
 void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::LoadConfigData()
 {
-    QueryResult_AutoPtr queryResult = CharacterDatabase.Query("SELECT * FROM custom_td_config");
+    QueryResult* queryResult = CharacterDatabase.Query("SELECT * FROM custom_td_config");
     if(!queryResult){
         //RecordLog("TowerDefense: 无法加载所需的表，请检查您的角色数据库中是否有必要的表.");
         return;
@@ -47,7 +47,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::LoadConfigData()
             gobPlatformEntry    = Fields[12].GetUInt32();
     } 
 
-    if(QueryResult_AutoPtr IdResult = CharacterDatabase.Query("SELECT MAX(Id) FROM custom_td_events"))
+    if(QueryResult* IdResult = CharacterDatabase.Query("SELECT MAX(Id) FROM custom_td_events"))
         _highEventId = IdResult->Fetch()[0].GetUInt32();
     else
         _highEventId = 0;
@@ -58,7 +58,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::LoadConfigData()
 
 void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::LoadPastEvents()
 {
-    if(QueryResult_AutoPtr queryResult = CharacterDatabase.Query("SELECT * FROM custom_td_events"))
+    if(QueryResult* queryResult = CharacterDatabase.Query("SELECT * FROM custom_td_events"))
     {
         do
         {
@@ -72,7 +72,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::LoadPastEvents()
 
                 if(!finished)
                 {
-                    if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_players WHERE playerGUID = '%u'", playerGUID)){
+                    if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_players WHERE playerGUID = '%u'", playerGUID)){
                         UpdatePlayerStats(playerGUID, TD_PLAYER_STAT_EVENTS_UNFINISHED, 1);
                         UpdatePlayerStats(playerGUID, TD_PLAYER_STAT_CURRENT_RESOURCES, currentResources);
                     }
@@ -160,7 +160,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::OnUpdate(uint32 c
 void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SetupWaves()
 {
     CountDown = 0;
-    if(QueryResult_AutoPtr waveResult = CharacterDatabase.PQuery("SELECT waveId, isBossWave FROM custom_td_waves"))
+    if(QueryResult* waveResult = CharacterDatabase.PQuery("SELECT waveId, isBossWave FROM custom_td_waves"))
     {
         do
         {
@@ -168,7 +168,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SetupWaves()
             uint32 waveId = Fields[0].GetUInt32();
             uint32 isBossWave = Fields[1].GetBool();
             WaveInfo* Wave = new WaveInfo(waveId, isBossWave);
-            if(QueryResult_AutoPtr creatureResult = CharacterDatabase.PQuery("SELECT creatureEntry, creatureAmount, pathId FROM custom_td_waves_data WHERE waveId = '%u' ORDER BY creatureOrder ASC", waveId))
+            if(QueryResult* creatureResult = CharacterDatabase.PQuery("SELECT creatureEntry, creatureAmount, pathId FROM custom_td_waves_data WHERE waveId = '%u' ORDER BY creatureOrder ASC", waveId))
             {
                 do
                 {
@@ -290,7 +290,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SpawnGuard(uint32
     else
         eventFilter << ')';
 
-    QueryResult_AutoPtr queryResult = WorldDatabase.PQuery("SELECT gameobject.guid, id, position_x, position_y, position_z, orientation, map, phaseMask, "
+    QueryResult* queryResult = WorldDatabase.PQuery("SELECT gameobject.guid, id, position_x, position_y, position_z, orientation, map, phaseMask, "
         "(POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ FROM gameobject "
         "LEFT OUTER JOIN game_event_gameobject on gameobject.guid = game_event_gameobject.guid WHERE map = '%i' %s ORDER BY order_ ASC LIMIT 10",
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),player->GetMapId(), eventFilter.str().c_str());
@@ -333,7 +333,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SpawnGuard(uint32
         return;
     }else 
     {
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT creatureEntry FROM custom_td_base_stats WHERE creatureType = 'Guard' ORDER BY Id ASC LIMIT 1"))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT creatureEntry FROM custom_td_base_stats WHERE creatureType = 'Guard' ORDER BY Id ASC LIMIT 1"))
         {
             do
             {
@@ -348,7 +348,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SpawnGuard(uint32
             }while(queryResult->NextRow());
         }
 
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
         {
             Field *Fields = queryResult->Fetch();
             std::string creatureName = Fields[0].GetString();
@@ -386,7 +386,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::UpgradeGuardMenu(
         GuardInfo* guard = Guards[guid];
         currentLevel = guard->Level;
         uint32 newLevel = currentLevel +1;
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
         {
             uint32 UpgradeCost = guard->GetUpgradeCost();
             switch(GetEventMode())
@@ -398,7 +398,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::UpgradeGuardMenu(
                 UpgradeCost = UpgradeCost + (UpgradeCost/2);
                 break;
             }
-            if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_levels WHERE creatureEntry = '%u' AND creatureLevel = '%u'", entry, newLevel))
+            if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_levels WHERE creatureEntry = '%u' AND creatureLevel = '%u'", entry, newLevel))
             {
                 Field* Fields = queryResult->Fetch();
                 upgradeText = Fields[3].GetString();
@@ -427,7 +427,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::UpgradeGuard(uint
         GuardInfo* guard = Guards[guid];
         currentLevel = guard->Level;
         uint32 newLevel = currentLevel +1;
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
         {   
             uint32 UpgradeCost = guard->GetUpgradeCost();
             switch(GetEventMode())
@@ -443,7 +443,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::UpgradeGuard(uint
                 SendMessageToPlayer(TD_SYSTEM_MSG_MORE_RESOURCES_UPG, UpgradeCost - GetResources());
                 return;
             }
-            if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_levels WHERE creatureEntry = '%u' AND creatureLevel = '%u'", entry, newLevel))
+            if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_base_levels WHERE creatureEntry = '%u' AND creatureLevel = '%u'", entry, newLevel))
             {
                 creature->CastSpell(creature, GetSpellIdByUniqueId(4),true); // upgrade level visual
                 guard->SetLevel(newLevel);
@@ -507,7 +507,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SellGuard(uint64 
     if (Guards.find(guid) != Guards.end())
     {
         GuardInfo* guard = Guards[guid];
-        if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
+        if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
         {   
             creature->CastSpell(creature, GetSpellIdByUniqueId(5),true);
             uint32 SellPrice = guard->GetSellPrice(guard->GetLevel());
@@ -533,7 +533,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::GetGuardList()
     Player* player = GetPlayer();
     if(!player)
         return;
-    if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureType = 'Guard' ORDER BY Id ASC"))
+    if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT creatureName, creatureEntry, creatureCost FROM custom_td_base_stats WHERE creatureType = 'Guard' ORDER BY Id ASC"))
     {
         do
         {
@@ -557,7 +557,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SpawnFromGuardLis
 
 uint32 TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::GetSpellIdByUniqueId(uint32 uniqueId)
 {
-    if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT spellDefaultCastTarget FROM custom_td_base_spells WHERE uniqueId = '%u'", uniqueId))
+    if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT spellDefaultCastTarget FROM custom_td_base_spells WHERE uniqueId = '%u'", uniqueId))
     {
         Field* Fields = queryResult->Fetch();
         return Fields[0].GetUInt32();
@@ -596,7 +596,7 @@ uint32 TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::GetGuardResourc
 {
     if(!entry)
         return 0;
-    if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
+    if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT creatureCost FROM custom_td_base_stats WHERE creatureEntry = '%u'", entry))
     {
         Field* Fields = queryResult->Fetch();
         if(uint32 defCost = Fields[0].GetUInt32()){
@@ -748,7 +748,7 @@ uint32 TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::GetGuardSellPri
 uint32 TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::GetLastPointInPath(uint32 pathId)
 {
     uint32 lastPoint = 0;
-    if (QueryResult_AutoPtr queryResult = WorldDatabase.PQuery("SELECT MAX(point) FROM waypoint_data WHERE id = '%u'", pathId)){
+    if (QueryResult* queryResult = WorldDatabase.PQuery("SELECT MAX(point) FROM waypoint_data WHERE id = '%u'", pathId)){
         lastPoint = queryResult->Fetch()[0].GetUInt32();
         return --lastPoint;
     }else
@@ -942,7 +942,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::UpdatePlayerStats
         RecordLog("TowerDefense: UpdatePlayerStats statIndex out of range");
         return;
     }
-    if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT %s FROM custom_td_players WHERE %s = '%u'", TowerDefensePlayerStatFields[statIndex], TowerDefensePlayerStatFields[TD_PLAYER_STAT_GUID], playerGUID)){
+    if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT %s FROM custom_td_players WHERE %s = '%u'", TowerDefensePlayerStatFields[statIndex], TowerDefensePlayerStatFields[TD_PLAYER_STAT_GUID], playerGUID)){
         CharacterDatabase.PExecute("UPDATE custom_td_players SET %s = '%u' WHERE %s = '%u'", TowerDefensePlayerStatFields[statIndex], queryResult->Fetch()[0].GetUInt32()+statIncreaseValue, TowerDefensePlayerStatFields[TD_PLAYER_STAT_GUID], playerGUID);
         RecordLog("Updated stats for Player GUID: [%u], added [%u] to [%s].", playerGUID, statIncreaseValue, TowerDefensePlayerStatFields[statIndex]);
     }
@@ -994,7 +994,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SetupEventData()
 
 void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::SaveEventData()
 {
-    if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_events WHERE Id = '%u'", GetEventId())){
+    if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_events WHERE Id = '%u'", GetEventId())){
         CharacterDatabase.PExecute("UPDATE custom_td_events SET eventFinished = '%u'", GetFinished());
         RecordLog("TowerDefense: Updated Event Id: [%u], it is now set to finished!",GetEventId());
     }
@@ -1028,7 +1028,7 @@ void TowerDefenseInstanceScript::TowerDefenseInstanceScriptAI::GetRecords(Player
 {
     if(!player)
         return;
-    if(QueryResult_AutoPtr queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_players WHERE playerGUID = '%u'", player->GetGUIDLow()))
+    if(QueryResult* queryResult = CharacterDatabase.PQuery("SELECT * FROM custom_td_players WHERE playerGUID = '%u'", player->GetGUIDLow()))
     {
         Field *Fields = queryResult->Fetch();
         uint32 playerGUID = Fields[0].GetUInt32();
