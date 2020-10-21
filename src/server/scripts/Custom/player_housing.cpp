@@ -244,7 +244,7 @@ public:
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, "Scale Objects.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+14);
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE,"Kick Intruder!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
             } else {
-                QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT zone_name FROM player_house_taken WHERE player_guid=%u", player->GetGUIDLow());
+                QueryResult* result = CharacterDatabase.PQuery("SELECT zone_name FROM player_house_taken WHERE player_guid=%u", player->GetGUIDLow());
                 uint32 house_count = 1;
                 if(result)
                 {
@@ -765,7 +765,7 @@ public:
     {
         if(player->IsInCombat() || player->GetMap()->IsBattlegroundOrArena() || player->GetMap()->IsDungeon()){ return false; }
 
-        QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT map_id, spawn_x, spawn_y, spawn_z, spawn_o FROM player_house_taken WHERE player_guid=%u", player->GetGUIDLow());
+        QueryResult* result = CharacterDatabase.PQuery("SELECT map_id, spawn_x, spawn_y, spawn_z, spawn_o FROM player_house_taken WHERE player_guid=%u", player->GetGUIDLow());
         uint32 house_count = 1;
         do{
             if(house_count == selection) 
@@ -817,7 +817,7 @@ bool isCharacterInLand(Player *pPlayer)
     float playery = pPlayer->GetPositionY();
     uint32 mapid_multi = pPlayer->GetMap()->GetId();
 
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT map_id, bottom_x, top_x, left_y, right_y FROM player_house_taken WHERE player_guid=%u AND map_id=%u", pPlayer->GetGUID(), mapid_multi);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT map_id, bottom_x, top_x, left_y, right_y FROM player_house_taken WHERE player_guid=%u AND map_id=%u", pPlayer->GetGUID(), mapid_multi);
     if(!result) 
         return false;
 
@@ -843,7 +843,7 @@ bool isTargetInLand(Player *plrTarget, uint32 ownerName)
         float playery = plrTarget->GetPositionY();
         uint32 mapid_multi = plrTarget->GetMap()->GetId();
 
-        QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT map_id, bottom_x, top_x, left_y, right_y FROM player_house_taken WHERE player_guid=%u AND map_id=%u", ownerName, mapid_multi);
+        QueryResult* result = CharacterDatabase.PQuery("SELECT map_id, bottom_x, top_x, left_y, right_y FROM player_house_taken WHERE player_guid=%u AND map_id=%u", ownerName, mapid_multi);
         do{
             Field *fields = result->Fetch();
             mapid = fields[0].GetInt32();
@@ -870,7 +870,7 @@ bool isTargetInLand(Player *plrTarget, uint32 ownerName)
 
 bool isCharacterLandOwner(Player *pPlayer)
 {
-    QueryResult_AutoPtr result;
+    QueryResult* result;
     if(!ownsLand){
         result = CharacterDatabase.PQuery("SELECT * FROM player_house_taken WHERE player_guid=%u", pPlayer->GetGUIDLow());	
         if(result)
@@ -887,7 +887,7 @@ bool isCharacterLandOwner(Player *pPlayer)
 bool teleportToLand(Player *pPlayer)
 {
     if(pPlayer->IsInCombat() || pPlayer->GetMap()->IsBattlegroundOrArena() || pPlayer->GetMap()->IsDungeon()){ return false; }
-    QueryResult_AutoPtr spawnresult;
+    QueryResult* spawnresult;
     spawnresult = CharacterDatabase.PQuery("SELECT map_id, spawn_x, spawn_y, spawn_z, spawn_o FROM player_house_taken WHERE player_guid=%u", pPlayer->GetGUIDLow());	
     if(spawnresult){
         Field *fields = spawnresult->Fetch();
@@ -909,7 +909,7 @@ GAMEOBJECT METHODS
 
 bool isPossibleGo(uint32 gobjID)
 {
-    QueryResult_AutoPtr result;
+    QueryResult* result;
     result = CharacterDatabase.PQuery("SELECT * FROM player_house_objects where gobjID = %u", gobjID);
     if(result)
         return true;
@@ -934,7 +934,7 @@ bool getClosestObjectAndDelete(Player *pPlayer)
     float distance = 10;
     uint32 count = 0;
     uint32 gameguid, gameentry;
-    QueryResult_AutoPtr result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
+    QueryResult* result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
         "(POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ "
         "FROM gameobject WHERE map='%u' AND (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) <= '%f' ORDER BY order_ LIMIT 1",
         pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(),
@@ -982,7 +982,7 @@ bool getClosestObjectAndDelete(Player *pPlayer)
 
 bool hasPackage1(uint32 AccID, uint32 package)
 {
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT * FROM player_house WHERE package%u = 1 AND player_guid = %u", package, AccID);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM player_house WHERE package%u = 1 AND player_guid = %u", package, AccID);
     if(result)
         return true;
     return false;
@@ -1026,7 +1026,7 @@ bool spawnGoObject(Player *pPlayer, uint32 itemID)
 int getSpawnCount(uint32 plrName)
 {
     uint32 spawn = 0;
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT items_spawned FROM player_house WHERE player_guid = %u", plrName);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT items_spawned FROM player_house WHERE player_guid = %u", plrName);
     if(result)
     {
         spawn = (*result)[0].GetUInt32();
@@ -1041,7 +1041,7 @@ int getSpawnCount(uint32 plrName)
 int getSpawnCountBonus(uint32 plrName)
 {
     uint32 spawn = 0;
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT items_bonus FROM player_house WHERE player_guid = %u", plrName);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT items_bonus FROM player_house WHERE player_guid = %u", plrName);
     if(result)
     {
         spawn = (*result)[0].GetUInt32();
@@ -1067,7 +1067,7 @@ ADD NPC METHODS
 
 bool isPossibleNpc(uint32 npcId)
 {
-    QueryResult_AutoPtr result;
+    QueryResult* result;
     result = CharacterDatabase.PQuery("SELECT * FROM player_house_npcs where npcId = %u", npcId);
     if(result)
         return true;
@@ -1078,7 +1078,7 @@ bool isPossibleNpc(uint32 npcId)
 int getNPCCount(uint32 plrName)
 {
     uint32 npc = 0;
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT npcs_spawned FROM player_house WHERE player_guid = %u", plrName);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT npcs_spawned FROM player_house WHERE player_guid = %u", plrName);
     if(result)
     {
         npc = (*result)[0].GetUInt32();
@@ -1093,7 +1093,7 @@ int getNPCCount(uint32 plrName)
 int getNPCCountBonus(uint32 plrName)
 {
     uint32 npc = 0;
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT npcs_bonus FROM player_house WHERE player_guid = %u", plrName);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT npcs_bonus FROM player_house WHERE player_guid = %u", plrName);
     if(result)
     {
         npc = (*result)[0].GetUInt32();
@@ -1171,7 +1171,7 @@ bool deleteNPC(Player *pPlayer)
     float playery = creep->GetPositionY();
     uint32 mapid_multi = pPlayer->GetMap()->GetId();
 
-    QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT map_id, bottom_x, top_x, left_y, right_y FROM player_house_taken WHERE player_guid=%u AND map_id=%u", pPlayer->GetGUIDLow(), mapid_multi);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT map_id, bottom_x, top_x, left_y, right_y FROM player_house_taken WHERE player_guid=%u AND map_id=%u", pPlayer->GetGUIDLow(), mapid_multi);
     do{
         Field *fields = result->Fetch();
         mapid = fields[0].GetInt32();
@@ -1257,7 +1257,7 @@ public:
             price = 10;
 
         //Check to see how many locations are in the DB (10max)
-        QueryResult_AutoPtr result = CharacterDatabase.PQuery("SELECT * FROM player_house_available");
+        QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM player_house_available");
         if(result){
             if(result->GetRowCount() >= 20)
             {
