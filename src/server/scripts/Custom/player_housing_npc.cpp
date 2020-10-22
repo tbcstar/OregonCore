@@ -76,7 +76,6 @@ class player_housing_npc : public CreatureScript
 				player->PlayerTalkClass->ClearMenus();
 				do{
 					Field *fields = result->Fetch();
-					idStr[count] = Fields[0].GetUInt64();
 					id = fields[0].GetUInt32();
 					item = fields[1].GetString();
 					uint32 price = fields[2].GetUInt32();
