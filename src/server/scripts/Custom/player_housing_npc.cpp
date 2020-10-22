@@ -76,11 +76,8 @@ class player_housing_npc : public CreatureScript
 				player->PlayerTalkClass->ClearMenus();
 				do{
 					Field *fields = result->Fetch();
-<<<<<<< HEAD
 					idStr[count] = Fields[0].GetUInt64();
-=======
 					id = fields[0].GetUInt32();
->>>>>>> parent of 5d631494... Revert "Update player_housing_npc.cpp"
 					item = fields[1].GetString();
 					uint32 price = fields[2].GetUInt32();
 					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TAXI, item+" Price: "+UInt32ToString2(price)+" Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+count);
