@@ -29,6 +29,11 @@ void AddModuleScripts();
 void AddSC_StockExchange();
 void AddSC_npc_arena_spectator();
 void AddSC_custom_dualspec();
+void AddSC_TowerDefenseMisc();
+void AddSC_TowerDefenseInstanceScript();
+void AddSC_player_mount();
+void AddSC_PlayerHousing();
+void AddSC_npc_player_house();
 
 //world
 void AddSC_areatrigger_scripts();
@@ -440,6 +445,11 @@ void AddScripts()
     //    AddSC_test();
     AddSC_npc_arena_spectator();
 	AddSC_custom_dualspec();
+	AddSC_TowerDefenseMisc();
+	AddSC_TowerDefenseInstanceScript();
+	AddSC_player_mount();
+	AddSC_PlayerHousing();
+	AddSC_npc_player_house();
     AddModuleScripts();
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();
