@@ -380,9 +380,9 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
     return dump;
 }
 
-DumpReturn PlayerDumpWriter::WriteDump(const std::string& file, uint32 guid)
+DumpReturn PlayerDumpWriter::WriteDump(const char* file, uint32 guid)
 {
-    FILE* fout = fopen(file.c_str(), "w");
+    FILE* fout = fopen(file, "w");
     if (!fout)
         return DUMP_FILE_OPEN_ERROR;
 
@@ -396,14 +396,14 @@ DumpReturn PlayerDumpWriter::WriteDump(const std::string& file, uint32 guid)
 // Reading - High-level functions
 #define ROLLBACK(DR) {CharacterDatabase.RollbackTransaction(); fclose(fin); return (DR);}
 
-DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, std::string name, uint32 guid)
+DumpReturn PlayerDumpReader::LoadDump(const char* file, uint32 account, std::string name, uint32 guid)
 {
     // check character count
     uint32 charcount = sAccountMgr->GetCharactersCount(account);
     if (charcount >= 10)
         return DUMP_TOO_MANY_CHARS;
 
-    FILE* fin = fopen(file.c_str(), "r");
+    FILE* fin = fopen(file, "r");
     if (!fin)
         return DUMP_FILE_OPEN_ERROR;
 

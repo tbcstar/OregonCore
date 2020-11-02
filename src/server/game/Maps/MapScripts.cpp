@@ -946,8 +946,6 @@ void Map::ScriptsProcess()
                 }
             }
             break;
-			
-		 break;
 		 
         default:
             sLog.outError("未知的脚本命令 %s.", step.script->GetDebugInfo().c_str());

@@ -217,7 +217,7 @@ public:
                 }
             }
 
-            debug_log("OSCR: Instance Shattered Halls: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("OSCR: Instance Shattered Halls: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
 

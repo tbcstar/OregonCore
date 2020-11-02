@@ -229,12 +229,12 @@ void AuthSocket::OnRead()
         {
             if ((uint8)table[i].cmd == _cmd && table[i].status == _status)
             {
-                DEBUG_LOG("[Auth] got data for cmd %u recv length %u",
+                sLog.outDebug("[Auth] got data for cmd %u recv length %u",
                           (uint32)_cmd, (uint32)recv_len());
 
                 if (!(*this.*table[i].handler)())
                 {
-                    DEBUG_LOG("Command handler failed for cmd %u recv length %u",
+                    sLog.outDebug("Command handler failed for cmd %u recv length %u",
                               (uint32)_cmd, (uint32)recv_len());
 
                     return;
@@ -327,7 +327,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
 // Logon Challenge command handler
 bool AuthSocket::_HandleLogonChallenge()
 {
-    DEBUG_LOG("Entering _HandleLogonChallenge");
+    sLog.outDebug("Entering _HandleLogonChallenge");
     if (recv_len() < sizeof(sAuthLogonChallenge_C))
         return false;
 
@@ -339,7 +339,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
     EndianConvert(*((uint16*)(&buf[0])));
     uint16 remaining = ((sAuthLogonChallenge_C*)&buf[0])->size;
-    DEBUG_LOG("[AuthChallenge] got header, body is %#04x bytes", remaining);
+    sLog.outDebug("[AuthChallenge] got header, body is %#04x bytes", remaining);
 
     if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (recv_len() < remaining))
         return false;
@@ -353,8 +353,8 @@ bool AuthSocket::_HandleLogonChallenge()
 
     // Read the remaining of the packet
     recv((char*)&buf[4], remaining);
-    DEBUG_LOG("[AuthChallenge] got full packet, %#04x bytes", ch->size);
-    DEBUG_LOG("[AuthChallenge] name(%d): '%s'", ch->I_len, ch->I);
+    sLog.outDebug("[AuthChallenge] got full packet, %#04x bytes", ch->size);
+    sLog.outDebug("[AuthChallenge] name(%d): '%s'", ch->I_len, ch->I);
 
     // BigEndian code, nop in little endian case
     // size already converted
@@ -417,19 +417,19 @@ bool AuthSocket::_HandleLogonChallenge()
             bool locked = false;
             if ((*result)[2].GetUInt8() == 1)                // if ip is locked
             {
-                DEBUG_LOG("[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), (*result)[3].GetString());
-                DEBUG_LOG("[AuthChallenge] Player address is '%s'", getRemoteAddress().c_str());
+                sLog.outDebug("[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), (*result)[3].GetString());
+                sLog.outDebug("[AuthChallenge] Player address is '%s'", getRemoteAddress().c_str());
                 if ( strcmp((*result)[3].GetString(), getRemoteAddress().c_str()) )
                 {
-                    DEBUG_LOG("[AuthChallenge] Account IP differs");
+                    sLog.outDebug("[AuthChallenge] Account IP differs");
                     pkt << (uint8) WOW_FAIL_LOCKED_ENFORCED;
                     locked = true;
                 }
                 else
-                    DEBUG_LOG("[AuthChallenge] Account IP matches");
+                    sLog.outDebug("[AuthChallenge] Account IP matches");
             }
             else
-                DEBUG_LOG("[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
+                sLog.outDebug("[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
 
             if (!locked)
             {
@@ -458,7 +458,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     std::string databaseV = (*result)[5].GetCppString();
                     std::string databaseS = (*result)[6].GetCppString();
 
-                    DEBUG_LOG("database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
+                    sLog.outDebug("database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
 
                     // multiply with 2, bytes are stored as hexstring
                     if (databaseV.size() != s_BYTE_SIZE * 2 || databaseS.size() != s_BYTE_SIZE * 2)
@@ -552,7 +552,7 @@ bool AuthSocket::_HandleLogonChallenge()
 // Logon Proof command handler
 bool AuthSocket::_HandleLogonProof()
 {
-    DEBUG_LOG("Entering _HandleLogonProof");
+    sLog.outDebug("Entering _HandleLogonProof");
     // Read the packet
     sAuthLogonProof_C lp;
     if (!recv((char*)&lp, sizeof(sAuthLogonProof_C)))
@@ -584,8 +584,8 @@ bool AuthSocket::_HandleLogonProof()
             pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
             pkt << (uint8) 0x00;
             pkt << (uint8) WOW_FAIL_VERSION_INVALID;
-            DEBUG_LOG("[AuthChallenge] %u is not a valid client version!", _build);
-            DEBUG_LOG("[AuthChallenge] Patch %s not found", tmp);
+            sLog.outDebug("[AuthChallenge] %u is not a valid client version!", _build);
+            sLog.outDebug("[AuthChallenge] Patch %s not found", tmp);
             send((char const*)pkt.contents(), pkt.size());
             return true;
         }
@@ -806,7 +806,7 @@ bool AuthSocket::_HandleLogonProof()
 // Reconnect Challenge command handler
 bool AuthSocket::_HandleReconnectChallenge()
 {
-    DEBUG_LOG("Entering _HandleReconnectChallenge");
+    sLog.outDebug("Entering _HandleReconnectChallenge");
     if (recv_len() < sizeof(sAuthLogonChallenge_C))
         return false;
 
@@ -818,7 +818,7 @@ bool AuthSocket::_HandleReconnectChallenge()
 
     EndianConvert(*((uint16*)(&buf[0])));
     uint16 remaining = ((sAuthLogonChallenge_C*)&buf[0])->size;
-    DEBUG_LOG("[ReconnectChallenge] got header, body is %#04x bytes", remaining);
+    sLog.outDebug("[ReconnectChallenge] got header, body is %#04x bytes", remaining);
 
     if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (recv_len() < remaining))
         return false;
@@ -832,8 +832,8 @@ bool AuthSocket::_HandleReconnectChallenge()
 
     // Read the remaining of the packet
     recv((char*)&buf[4], remaining);
-    DEBUG_LOG("[ReconnectChallenge] got full packet, %#04x bytes", ch->size);
-    DEBUG_LOG("[ReconnectChallenge] name(%d): '%s'", ch->I_len, ch->I);
+    sLog.outDebug("[ReconnectChallenge] got full packet, %#04x bytes", ch->size);
+    sLog.outDebug("[ReconnectChallenge] name(%d): '%s'", ch->I_len, ch->I);
 
     _login = (const char*)ch->I;
 
@@ -880,7 +880,7 @@ bool AuthSocket::_HandleReconnectChallenge()
 // Reconnect Proof command handler
 bool AuthSocket::_HandleReconnectProof()
 {
-    DEBUG_LOG("Entering _HandleReconnectProof");
+    sLog.outDebug("Entering _HandleReconnectProof");
     // Read the packet
     sAuthReconnectProof_C lp;
     if (!recv((char*)&lp, sizeof(sAuthReconnectProof_C)))
@@ -925,7 +925,7 @@ bool AuthSocket::_HandleReconnectProof()
 // Realm List command handler
 bool AuthSocket::_HandleRealmList()
 {
-    DEBUG_LOG("Entering _HandleRealmList");
+    sLog.outDebug("Entering _HandleRealmList");
     if (recv_len() < 5)
         return false;
 
@@ -1092,7 +1092,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer& pkt, uint32 acctid)
 // Resume patch transfer
 bool AuthSocket::_HandleXferResume()
 {
-    DEBUG_LOG("Entering _HandleXferResume");
+    sLog.outDebug("Entering _HandleXferResume");
 
     if (recv_len() < 9)
         return false;
@@ -1130,7 +1130,7 @@ bool AuthSocket::_HandleXferResume()
 // Cancel patch transfer
 bool AuthSocket::_HandleXferCancel()
 {
-    DEBUG_LOG("Entering _HandleXferCancel");
+    sLog.outDebug("Entering _HandleXferCancel");
 
     recv_skip(1);
     close_connection();
@@ -1141,7 +1141,7 @@ bool AuthSocket::_HandleXferCancel()
 // Accept patch transfer
 bool AuthSocket::_HandleXferAccept()
 {
-    DEBUG_LOG("Entering _HandleXferAccept");
+    sLog.outDebug("Entering _HandleXferAccept");
 
     recv_skip(1);
 

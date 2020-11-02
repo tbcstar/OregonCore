@@ -752,11 +752,11 @@ void Battleground::EndBattleground(uint32 winner)
                 SetArenaTeamRatingChangeForTeam(HORDE, winner_change);
                 SetArenaTeamRatingChangeForTeam(ALLIANCE, loser_change);
             }
-            sLog.outArena("竞技场比赛类型: %u 对于队伍1ID: %u - 队伍2Id: %u 结束了。 获胜队伍ID: %u. Winner rating: %u, Loser rating: %u. RatingChange: %i.", m_ArenaType, m_ArenaTeamIds[BG_TEAM_ALLIANCE], m_ArenaTeamIds[BG_TEAM_HORDE], winner_arena_team->GetId(), winner_rating, loser_rating, winner_change);
+            DEBUG_LOG("竞技场比赛类型: %u 对于队伍1ID: %u - 队伍2Id: %u 结束了。 获胜队伍ID %u. 赢家评级: %u, 输家评级: %u. 评级变化: %i.", m_ArenaType, m_ArenaTeamIds[BG_TEAM_ALLIANCE], m_ArenaTeamIds[BG_TEAM_HORDE], winner_arena_team->GetId(), winner_rating, loser_rating, winner_change);
             if (sWorld.getConfig(CONFIG_ARENA_LOG_EXTENDED_INFO))
                 for (Battleground::BattlegroundScoreMap::const_iterator itr = GetPlayerScoresBegin(); itr != GetPlayerScoresEnd(); ++itr)
                     if (Player* player = sObjectMgr.GetPlayer(itr->first))
-                        sLog.outArena("统计 %s (GUID: " UI64FMTD ", 队伍: %d, IP: %s): %u 伤害， %u 治愈， %u 击杀数", player->GetName(), itr->first, player->GetArenaTeamId(m_ArenaType == 5 ? 2 : m_ArenaType == 3), player->GetSession()->GetRemoteAddress().c_str(), itr->second->DamageDone, itr->second->HealingDone, itr->second->KillingBlows);
+                        DEBUG_LOG("统计 %s (GUID: " UI64FMTD ", 队伍: %d, IP: %s): %u 伤害， %u 治愈， %u 击杀数", player->GetName(), itr->first, player->GetArenaTeamId(m_ArenaType == 5 ? 2 : m_ArenaType == 3), player->GetSession()->GetRemoteAddress().c_str(), itr->second->DamageDone, itr->second->HealingDone, itr->second->KillingBlows);
         }
         else
         {
@@ -1181,7 +1181,7 @@ void Battleground::StartBattleground()
     SetStartTime(0);
     SetLastResurrectTime(0);
     if (m_IsRated)
-        sLog.outArena("竞技场比赛类型: %u 对于队伍1 ID: %u - 队伍2 ID: %u 启动。", m_ArenaType, m_ArenaTeamIds[BG_TEAM_ALLIANCE], m_ArenaTeamIds[BG_TEAM_HORDE]);
+        DEBUG_LOG("竞技场比赛类型: %u 对于队伍1 ID: %u - 队伍2 ID: %u 启动。", m_ArenaType, m_ArenaTeamIds[BG_TEAM_ALLIANCE], m_ArenaTeamIds[BG_TEAM_HORDE]);
 
 #ifdef ELUNA
     sEluna->OnBGStart(this, (BattlegroundTypeId)GetTypeID(), GetInstanceID());

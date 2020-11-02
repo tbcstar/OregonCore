@@ -142,24 +142,24 @@ int WorldSocket::SendPacket (const WorldPacket& pct)
 #endif
 
     // Dump outgoing packet.
-    if (sLog.IsLogTypeEnabled(LOG_TYPE_NETWORK))
-    {
-        sLog.outNetwork ("SERVER:\nSOCKET: %u\nLENGTH: %u\nOPCODE: %s (0x%.4X)\nDATA:\n",
-                                   (uint32) get_handle(),
-                                   pct.size(),
-                                   LookupOpcodeName (pct.GetOpcode()),
-                                   pct.GetOpcode());
+   // if (sLog.IsLogTypeEnabled(LOG_TYPE_NETWORK))
+   // {
+     //   sLog.outNetwork ("SERVER:\nSOCKET: %u\nLENGTH: %u\nOPCODE: %s (0x%.4X)\nDATA:\n",
+     //                              (uint32) get_handle(),
+     //                              pct.size(),
+     //                              LookupOpcodeName (pct.GetOpcode()),
+     //                              pct.GetOpcode());
 
-        uint32 p = 0;
-        while (p < pct.size())
-        {
-            for (uint32 j = 0; j < 16 && p < pct.size(); j++)
-                sLog.outNetwork("%.2X ", const_cast<WorldPacket&>(pct)[p++]);
+     //   uint32 p = 0;
+     //   while (p < pct.size())
+     //   {
+      //      for (uint32 j = 0; j < 16 && p < pct.size(); j++)
+      //          sLog.outNetwork("%.2X ", const_cast<WorldPacket&>(pct)[p++]);
 
-            sLog.outNetwork("");
-        }
-        sLog.outNetwork("");
-    }
+      //      sLog.outNetwork("");
+      //  }
+      //  sLog.outNetwork("");
+   // }
 
 #ifdef ELUNA
     if (!sEluna->OnPacketSend(m_Session, pkt))
@@ -271,14 +271,14 @@ int WorldSocket::handle_input (ACE_HANDLE)
                 return Update();                           // interesting line ,isn't it ?
             }
 
-            DEBUG_LOG("WorldSocket::handle_input: Peer error closing connection errno = %s", ACE_OS::strerror (errno));
+            sLog.outDebug("WorldSocket::handle_input: Peer error closing connection errno = %s", ACE_OS::strerror (errno));
 
             errno = ECONNRESET;
             return -1;
         }
     case 0:
         {
-            DEBUG_LOG("WorldSocket::handle_input: Peer has closed connection");
+            sLog.outDebug("WorldSocket::handle_input: Peer has closed connection");
 
             errno = ECONNRESET;
             return -1;
@@ -576,24 +576,24 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
         return -1;
 
     // Dump received packet.
-    if (sLog.IsLogTypeEnabled(LOG_TYPE_NETWORK))
-    {
-        sLog.outNetwork ("CLIENT:\nSOCKET: %u\nLENGTH: %u\nOPCODE: %s (0x%.4X)\nDATA:\n",
-                                   (uint32) get_handle(),
-                                   new_pct->size(),
-                                   LookupOpcodeName (new_pct->GetOpcode()),
-                                   new_pct->GetOpcode());
+  //  if (sLog.IsLogTypeEnabled(LOG_TYPE_NETWORK))
+  //  {
+   //     sLog.outNetwork ("CLIENT:\nSOCKET: %u\nLENGTH: %u\nOPCODE: %s (0x%.4X)\nDATA:\n",
+   //                                (uint32) get_handle(),
+  //                                 new_pct->size(),
+   //                                LookupOpcodeName (new_pct->GetOpcode()),
+   //                                new_pct->GetOpcode());
 
-        uint32 p = 0;
-        while (p < new_pct->size())
-        {
-            for (uint32 j = 0; j < 16 && p < new_pct->size(); j++)
-                sLog.outNetwork ("%.2X ", (*new_pct)[p++]);
+   //     uint32 p = 0;
+    //    while (p < new_pct->size())
+    ////    {
+     //       for (uint32 j = 0; j < 16 && p < new_pct->size(); j++)
+    //            sLog.outNetwork ("%.2X ", (*new_pct)[p++]);
 
-            sLog.outNetwork ("");
-        }
-        sLog.outNetwork ("");
-    }
+    //        sLog.outNetwork ("");
+    //    }
+     //   sLog.outNetwork ("");
+   // }
 
     try
     {

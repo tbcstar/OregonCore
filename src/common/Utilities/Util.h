@@ -116,7 +116,8 @@ inline T RoundToInterval(T& num, T floor, T ceil)
 {
     return num = std::min(std::max(num, floor), ceil);
 }
-
+bool Utf8toWStrr(std::string const& utf8str, std::wstring& wstr, size_t max_len = 0);
+void vutf8printf(FILE* out, char const* str, va_list* ap);
 // UTF8 handling
 bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr);
 // in wsize==max size of buffer, out wsize==real string size

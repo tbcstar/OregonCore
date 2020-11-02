@@ -44,14 +44,14 @@ int RASocket::open(void*)
         return -1;
     }
 
-    sLog.outRemote("Incoming connection from %s", remote_addr.get_host_addr());
+    sLog.outError ("Incoming connection from %s", remote_addr.get_host_addr());
 
     return activate();
 }
 
 int RASocket::handle_close(ACE_HANDLE, ACE_Reactor_Mask)
 {
-    sLog.outRemote("Closing connection");
+    sLog.outError ("Closing connection");
     peer().close_reader();
     wait();
     destroy();
@@ -115,7 +115,7 @@ int RASocket::recv_line(std::string& out_line)
 
     if (recv_line(message_block) == -1)
     {
-        sLog.outRemote("Recv error %s", ACE_OS::strerror(errno));
+        sLog.outError ("Recv error %s", ACE_OS::strerror(errno));
         return -1;
     }
 
@@ -129,7 +129,7 @@ int RASocket::process_command(const std::string& command)
     if (command.length() == 0)
         return 0;
 
-    sLog.outRemote("Got command: %s", command.c_str());
+    sLog.outError ("Got command: %s", command.c_str());
 
     // handle quit, exit and logout commands to terminate connection
     if (command == "quit" || command == "exit" || command == "logout")
@@ -177,7 +177,7 @@ int RASocket::check_access_level(const std::string& user)
 
     if (!result)
     {
-        sLog.outRemote("User %s does not exist in database", user.c_str());
+        sLog.outError ("User %s does not exist in database", user.c_str());
         return -1;
     }
 
@@ -185,12 +185,12 @@ int RASocket::check_access_level(const std::string& user)
 
     if (fields[1].GetUInt32() < iMinLevel)
     {
-        sLog.outRemote("User %s has no privilege to login", user.c_str());
+        sLog.outError ("User %s has no privilege to login", user.c_str());
         return -1;
     }
     else if (fields[2].GetInt32() != -1)
     {
-        sLog.outRemote("User %s has to be assigned on all realms (with RealmID = '-1')", user.c_str());
+        sLog.outError ("User %s has to be assigned on all realms (with RealmID = '-1')", user.c_str());
         return -1;
     }
 
@@ -215,7 +215,7 @@ int RASocket::check_password(const std::string& user, const std::string& pass)
 
     if (!check)
     {
-        sLog.outRemote("Wrong password for user: %s", user.c_str());
+        sLog.outError ("Wrong password for user: %s", user.c_str());
         return -1;
     }
 
@@ -238,7 +238,7 @@ int RASocket::authenticate()
     if (recv_line(pass) == -1)
         return -1;
 
-    sLog.outRemote("Login attempt for user: %s", user.c_str());
+    sLog.outError ("Login attempt for user: %s", user.c_str());
 
     if (check_access_level(user) == -1)
         return -1;
@@ -246,7 +246,7 @@ int RASocket::authenticate()
     if (check_password(user, pass) == -1)
         return -1;
 
-    sLog.outRemote("User login: %s", user.c_str());
+    sLog.outError ("User login: %s", user.c_str());
 
     return 0;
 }
@@ -280,7 +280,7 @@ int RASocket::subnegotiate()
 
     if (n >= 1024)
     {
-        sLog.outRemote("RASocket::subnegotiate: allocated buffer 1024 bytes was too small for negotiation packet, size: %u", n);
+        sLog.outError ("RASocket::subnegotiate: allocated buffer 1024 bytes was too small for negotiation packet, size: %u", n);
         return -1;
     }
 
@@ -375,7 +375,7 @@ void RASocket::zprint(void* callbackArg, const char* szText)
 
     if (socket->putq(mb, const_cast<ACE_Time_Value*>(&ACE_Time_Value::zero)) == -1)
     {
-        sLog.outRemote("Failed to enqueue message, queue is full or closed. Error is %s", ACE_OS::strerror(errno));
+        sLog.outError ("Failed to enqueue message, queue is full or closed. Error is %s", ACE_OS::strerror(errno));
         mb->release();
     }
 }
@@ -396,7 +396,7 @@ void RASocket::commandFinished(void* callbackArg, bool /*success*/)
     if (socket->putq(mb) == -1)
     {
         // getting here is bad, command can't be marked as complete
-        sLog.outRemote("Failed to enqueue command end message. Error is %s", ACE_OS::strerror(errno));
+        sLog.outError ("Failed to enqueue command end message. Error is %s", ACE_OS::strerror(errno));
         mb->release();
     }
 }

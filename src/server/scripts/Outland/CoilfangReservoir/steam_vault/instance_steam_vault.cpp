@@ -121,7 +121,7 @@ public:
                 }
             }
 
-            debug_log("OSCR: Instance Steamvault: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("OSCR: Instance Steamvault: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
 
@@ -163,7 +163,7 @@ public:
 
             if (!player)
             {
-                debug_log("OSCR: Instance Steamvault: SetData (Type: %u Data %u) cannot find any player.", type, data);
+                sLog.outDebug("OSCR: Instance Steamvault: SetData (Type: %u Data %u) cannot find any player.", type, data);
                 return;
             }
 
@@ -180,7 +180,7 @@ public:
                         if (GameObject* _go = GameObject::GetGameObject(*player, MainChambersDoor))
                             _go->SetGoState(GO_STATE_ACTIVE);
                     }
-                    debug_log("OSCR: Instance Steamvault: Access panel used.");
+                    sLog.outDebug("OSCR: Instance Steamvault: Access panel used.");
                 }
                 Encounter[0] = data;
                 break;
@@ -195,7 +195,7 @@ public:
                         if (GameObject* _go = GameObject::GetGameObject(*player, MainChambersDoor))
                             _go->SetGoState(GO_STATE_ACTIVE);
                     }
-                    debug_log("OSCR: Instance Steamvault: Access panel used.");
+                    sLog.outDebug("OSCR: Instance Steamvault: Access panel used.");
                 }
                 Encounter[1] = data;
                 break;

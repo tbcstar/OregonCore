@@ -595,7 +595,7 @@ public:
                 if (pInstance)
                 {
                     pInstance->SetData(TYPE_RING_OF_LAW, DONE);
-                    debug_log("OSCR: npc_grimstone: event reached end and set complete.");
+                    sLog.outDebug("OSCR: npc_grimstone: event reached end and set complete.");
                 }
                 break;
             }

@@ -30,6 +30,7 @@
 #include "SharedDefines.h"
 #include "GameSystem/GridRefManager.h"
 #include "MapRefManager.h"
+#include "DataMap.h"
 
 #include "DynamicTree.h"
 #include "Models/GameObjectModel.h"
@@ -538,6 +539,7 @@ class Map : public GridRefManager<NGridType>, public Oregon::ObjectLevelLockable
         void Insert(const GameObjectModel& mdl) { m_dyn_tree.insert(mdl); }
         bool Contains(const GameObjectModel& mdl) const { return m_dyn_tree.contains(mdl);}
         bool getObjectHitPos(float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float &ry, float& rz, float modifyDist);
+        DataMap CustomData;
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);

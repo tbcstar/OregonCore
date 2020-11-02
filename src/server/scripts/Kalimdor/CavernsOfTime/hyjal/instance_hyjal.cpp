@@ -271,7 +271,7 @@ public:
                 break;
             }
 
-            debug_log("OSCR: Instance Hyjal: Instance data updated for event %u (Data=%u)", type, data);
+            sLog.outDebug("OSCR: Instance Hyjal: Instance data updated for event %u (Data=%u)", type, data);
 
             if (data == DONE)
                 SaveToDB();
@@ -315,7 +315,7 @@ public:
                         player->SendUpdateWorldState(id, state);
                 }
             }
-            else debug_log("OSCR: Instance Hyjal: UpdateWorldState, but PlayerList is empty!");
+            else sLog.outDebug("OSCR: Instance Hyjal: UpdateWorldState, but PlayerList is empty!");
         }
 
         std::string GetSaveData()
