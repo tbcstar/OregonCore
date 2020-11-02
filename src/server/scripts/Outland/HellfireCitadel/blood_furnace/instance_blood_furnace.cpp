@@ -183,7 +183,7 @@ public:
                 }
             }
 
-            debug_log("OSCR: Instance Blood Furnace: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("OSCR: Instance Blood Furnace: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
 

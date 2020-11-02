@@ -94,7 +94,7 @@ CreatureAI* selectAI(Creature* creature)
     // select NullCreatureAI if not another cases
     ainame = (ai_factory == NULL) ? "NullCreatureAI" : ai_factory->key();
 
-    DEBUG_LOG("Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str());
+    sLog.outDebug("Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str());
     return (ai_factory == NULL ? new NullCreatureAI(creature) : ai_factory->Create(creature));
 }
 
@@ -141,7 +141,7 @@ GameObjectAI* SelectGameObjectAI(GameObject* go)
 
     std::string ainame = (ai_factory == NULL) ? "NullGameObjectAI" : ai_factory->key();
 
-    DEBUG_LOG("GameObject %u used AI is %s.", go->GetGUIDLow(), ainame.c_str());
+    sLog.outDebug("GameObject %u used AI is %s.", go->GetGUIDLow(), ainame.c_str());
 
     return (ai_factory == NULL ? new NullGameObjectAI(go) : ai_factory->Create(go));
 }

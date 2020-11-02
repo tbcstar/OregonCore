@@ -39,7 +39,7 @@ void WaypointMgr::Load()
 {
     QueryResult* result = WorldDatabase.Query("SELECT COUNT(id) FROM waypoint_data");
     if (!result)
-        sLog.outFatal("加载表waypoint_data时发生错误(可能它不存在?)");
+          sLog.outError("加载表waypoint_data时发生错误(可能它不存在?)");
 
     result = WorldDatabase.Query("SELECT id, point, position_x, position_y, position_z, orientation, move_type, delay, action, action_chance FROM waypoint_data ORDER BY id, point");
     if (!result)
@@ -82,6 +82,7 @@ void WaypointMgr::Load()
     while (result->NextRow());
 
     sLog.outString(">> 加载 %u个 waypoints", count);
+	sLog.outString();
 }
 
 void WaypointMgr::ReloadPath(uint32 id)

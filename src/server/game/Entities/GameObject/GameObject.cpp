@@ -714,8 +714,8 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
     WorldDatabase.CommitTransaction();
 
-    if (sWorld.getConfig(CONFIG_CREATEUPDATE_FILE))
-        sLog.CreateUpdateFile(ss.str().c_str());
+   // if (sWorld.getConfig(CONFIG_CREATEUPDATE_FILE))
+     //   sLog.CreateUpdateFile(ss.str().c_str());
 }
 
 bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
@@ -802,8 +802,8 @@ void GameObject::DeleteFromDB()
     WorldDatabase.PExecuteLog("DELETE FROM gameobject WHERE guid = '%u'", m_DBTableGuid);
     WorldDatabase.PExecuteLog("DELETE FROM game_event_gameobject WHERE guid = '%u'", m_DBTableGuid);
 
-    if (sWorld.getConfig(CONFIG_CREATEUPDATE_FILE))
-        sLog.CreateUpdateFile(ss.str().c_str());
+    //if (sWorld.getConfig(CONFIG_CREATEUPDATE_FILE))
+      //  sLog.CreateUpdateFile(ss.str().c_str());
 }
 
 GameObject* GameObject::GetGameObject(WorldObject& object, uint64 guid)
@@ -1262,7 +1262,7 @@ void GameObject::Use(Unit* user)
                     int32 chance = skill - zone_skill + 5;
                     int32 roll = irand(1, 100);
 
-                    DEBUG_LOG("Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
+                    sLog.outDebug("Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
 
                     if (skill >= zone_skill && chance >= roll)
                     {

@@ -1612,6 +1612,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
     while (result->NextRow());
 
     sLog.outString(">> Loaded %u battlegrounds", count);
+	sLog.outString();
 }
 
 void BattlegroundMgr::InitAutomaticArenaPointDistribution()

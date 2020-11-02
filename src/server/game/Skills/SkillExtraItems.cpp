@@ -104,9 +104,13 @@ void LoadSkillExtraItemTable()
         while (result->NextRow());
 
         sLog.outString(">> 加载 %u个 spell specialization definitions", count);
+		sLog.outString();
     }
-    else
-        sLog.outString(">> 加载 0个 spell specialization definitions. DB table skill_extra_item_template is empty.");
+	else
+	{
+		sLog.outString(">> 加载 0个 spell specialization definitions. DB table skill_extra_item_template is empty.");
+		sLog.outString();
+	}
 }
 
 bool canCreateExtraItems(Player* player, uint32 spellId, float& additionalChance, uint8& additionalMax)

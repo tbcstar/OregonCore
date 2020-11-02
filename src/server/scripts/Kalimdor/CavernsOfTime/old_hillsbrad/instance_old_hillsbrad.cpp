@@ -130,7 +130,7 @@ public:
                 }
             }
     
-            debug_log("TSCR: Instance Old Hillsbrad: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("TSCR: Instance Old Hillsbrad: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
     
@@ -152,7 +152,7 @@ public:
                 }
             }
             else
-                debug_log("TSCR: Instance Old Hillsbrad: UpdateOHWorldState, but PlayerList is empty!");
+                sLog.outDebug("TSCR: Instance Old Hillsbrad: UpdateOHWorldState, but PlayerList is empty!");
         }
     
         void OnCreatureCreate(Creature *creature, bool add)
@@ -197,7 +197,7 @@ public:
     
             if (!player)
             {
-                debug_log("TSCR: Instance Old Hillsbrad: SetData (Type: %u Data %u) cannot find any player.", type, data);
+                sLog.outDebug("TSCR: Instance Old Hillsbrad: SetData (Type: %u Data %u) cannot find any player.", type, data);
                 return;
             }
     
@@ -213,7 +213,7 @@ public:
                         ++BarrelCount;
                         UpdateOHWorldState();
     
-                        debug_log("TSCR: Instance Old Hillsbrad: go_barrel_old_hillsbrad count %u", BarrelCount);
+                        sLog.outDebug("TSCR: Instance Old Hillsbrad: go_barrel_old_hillsbrad count %u", BarrelCount);
     
                         Encounter[0] = IN_PROGRESS;
     
@@ -265,7 +265,7 @@ public:
                         if (ThrallEventCount <= 20)
                         {
                             ThrallEventCount++;
-                            debug_log("TSCR: Instance Old Hillsbrad: Thrall event failed %u times.", ThrallEventCount);
+                            sLog.outDebug("TSCR: Instance Old Hillsbrad: Thrall event failed %u times.", ThrallEventCount);
     
                             Encounter[1] = NOT_STARTED;
     
@@ -292,29 +292,29 @@ public:
                             Encounter[6] = DONE;
                             Encounter[7] = DONE;
                             Encounter[8] = DONE;
-                            debug_log("TSCR: Instance Old Hillsbrad: Thrall event failed %u times. This is the end.", ThrallEventCount);
+                            sLog.outDebug("TSCR: Instance Old Hillsbrad: Thrall event failed %u times. This is the end.", ThrallEventCount);
                         }
                     }
                     else
                         Encounter[1] = data;
-                    debug_log("TSCR: Instance Old Hillsbrad: Thrall escort event adjusted to data %u.", data);
+                    sLog.outDebug("TSCR: Instance Old Hillsbrad: Thrall escort event adjusted to data %u.", data);
                     break;
                 }
                 case TYPE_THRALL_PART1:
                     Encounter[2] = data;
-                    debug_log("TSCR: Instance Old Hillsbrad: Thrall event part I adjusted to data %u.", data);
+                    sLog.outDebug("TSCR: Instance Old Hillsbrad: Thrall event part I adjusted to data %u.", data);
                     break;
                 case TYPE_THRALL_PART2:
                     Encounter[3] = data;
-                    debug_log("TSCR: Instance Old Hillsbrad: Thrall event part II adjusted to data %u.", data);
+                    sLog.outDebug("TSCR: Instance Old Hillsbrad: Thrall event part II adjusted to data %u.", data);
                     break;
                 case TYPE_THRALL_PART3:
                     Encounter[4] = data;
-                    debug_log("TSCR: Instance Old Hillsbrad: Thrall event part III adjusted to data %u.", data);
+                    sLog.outDebug("TSCR: Instance Old Hillsbrad: Thrall event part III adjusted to data %u.", data);
                     break;
                 case TYPE_THRALL_PART4:
                     Encounter[5] = data;
-                     debug_log("TSCR: Instance Old Hillsbrad: Thrall event part IV adjusted to data %u.", data);
+                     sLog.outDebug("TSCR: Instance Old Hillsbrad: Thrall event part IV adjusted to data %u.", data);
                     break;
                 case DATA_SKARLOC_DEATH:
                     if (Encounter[6] != DONE)

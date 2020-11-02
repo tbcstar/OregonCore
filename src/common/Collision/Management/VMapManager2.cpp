@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include "ObjectLifeTime.h"
 #include "VMapManager2.h"
 #include "Maps/MapTree.h"
 #include "Models/ModelInstance.h"
@@ -285,11 +286,11 @@ WorldModel* VMapManager2::acquireModelInstance(const std::string& basepath, cons
         WorldModel* worldmodel = new WorldModel();
         if (!worldmodel->readFile(basepath + filename + ".vmo"))
         {
-            ERROR_LOG("VMapManager2: could not load '%s%s.vmo'", basepath.c_str(), filename.c_str());
+            //sLog.outError("VMapManager2: could not load '%s%s.vmo'", basepath.c_str(), filename.c_str());
             delete worldmodel;
             return NULL;
         }
-        DEBUG_LOG("VMapManager2: loading file '%s%s'", basepath.c_str(), filename.c_str());
+        //sLog.outDebug("VMapManager2: loading file '%s%s'", basepath.c_str(), filename.c_str());
         model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(filename, ManagedModel())).first;
         model->second.setModel(worldmodel);
     }
@@ -305,12 +306,12 @@ void VMapManager2::releaseModelInstance(const std::string& filename)
     ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
     if (model == iLoadedModelFiles.end())
     {
-        ERROR_LOG("VMapManager2: trying to unload non-loaded file '%s'", filename.c_str());
+        //sLog.outError("VMapManager2: trying to unload non-loaded file '%s'", filename.c_str());
         return;
     }
     if (model->second.decRefCount() == 0)
     {
-        DEBUG_LOG("VMapManager2: unloading file '%s'", filename.c_str());
+        //sLog.outDebug("VMapManager2: unloading file '%s'", filename.c_str());
         delete model->second.getModel();
         iLoadedModelFiles.erase(model);
     }

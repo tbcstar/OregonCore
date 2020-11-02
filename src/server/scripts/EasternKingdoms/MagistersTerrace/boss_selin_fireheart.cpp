@@ -78,7 +78,7 @@ public:
                 for (uint8 i = 0; i < size; ++i)
                 {
                     uint64 guid = instance->GetData64(DATA_FEL_CRYSTAL);
-                    debug_log("OSCR: Selin: Adding Fel Crystal %llu to list", guid);
+                    sLog.outDebug("OSCR: Selin: Adding Fel Crystal %llu to list", guid);
                     Crystals.push_back(guid);
                 }
             }
@@ -125,7 +125,7 @@ public:
                 // Set Inst data for encounter
                 instance->SetData(DATA_SELIN_EVENT, NOT_STARTED);
             }
-            else error_log(ERROR_INST_DATA);
+			else sLog.outError(ERROR_INST_DATA);
 
             DrainLifeTimer = 3000 + rand() % 4000;
             DrainManaTimer = DrainLifeTimer + 5000;
@@ -225,7 +225,7 @@ public:
                 else
                 {
                     // Make an error message in case something weird happened here
-                    error_log("OSCR: Selin Fireheart unable to drain crystal as the crystal is either dead or despawned");
+                    sLog.outError("OSCR: Selin Fireheart unable to drain crystal as the crystal is either dead or despawned");
                     DrainingCrystal = false;
                 }
             }
@@ -371,7 +371,7 @@ public:
                     }
                 }
             }
-            else error_log(ERROR_INST_DATA);
+			else sLog.outError(ERROR_INST_DATA);
         }
     };
 

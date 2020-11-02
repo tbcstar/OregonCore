@@ -150,7 +150,7 @@ public:
                 }
             }
 
-            debug_log("OSCR: Instance Sethekk Halls: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("OSCR: Instance Sethekk Halls: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
 

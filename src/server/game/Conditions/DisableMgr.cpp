@@ -44,6 +44,7 @@ void DisableMgr::LoadDisables()
     if (!result)
     {
         sLog.outString(">> 加载 %u个 disables", total_count);
+		sLog.outString();
         return;
     }
 
@@ -54,7 +55,7 @@ void DisableMgr::LoadDisables()
         DisableType type = DisableType(fields[0].GetUInt32());
         if (uint32(type) >= MAX_DISABLE_TYPES)
         {
-            sLog.outErrorDb("Invalid type %u specified in `disables` table, skipped.", type);
+            sLog.outErrorDb("在“disables”表中指定的类型 %u 无效，已跳过。", type);
             continue;
         }
         uint32 entry = fields[1].GetUInt32();
@@ -156,6 +157,7 @@ void DisableMgr::LoadDisables()
     while (result->NextRow());
 
     sLog.outString(">> 加载 %u个 disables.", total_count);
+	sLog.outString();
 }
 
 void DisableMgr::CheckQuestDisables()

@@ -49,8 +49,8 @@ ConfVersion=2015071262
 ###############################################################################
 
 RealmID = 1
-DataDir = "/home/server/data"
-LogsDir = "/home/server/log"
+DataDir = "/data/server/data"
+LogsDir = "/data/server/log"
 LoginDatabase.Info              = "127.0.0.1;3310;root;A111111a;realmd"
 LoginDatabase.Connections       = 1
 LoginDatabase.WorkerThreads     = 1
@@ -124,7 +124,7 @@ EAIErrorLevel = 2
 #                 0 (不要卸载网格)
 #
 #    SocketSelectTime
-#        Socket select time (毫秒)
+#        Socket 选择时间 (毫秒)
 #        Default: 10000 (10 secs)
 #
 #    SocketTimeOutTime
@@ -157,6 +157,7 @@ EAIErrorLevel = 2
 #        在短时间内保留队伍中的离线玩家.
 #         (在短时间内)
 #        Default: 0 (禁用)
+#				  1 (启用)
 #
 #    vmap.enableLOS
 #    vmap.enableHeight
@@ -248,7 +249,7 @@ GridCleanUpDelay = 300000
 MapUpdateInterval = 100
 ChangeWeatherInterval = 600000
 PlayerSaveInterval = 60000
-DisconnectToleranceInterval = 0
+DisconnectToleranceInterval = 1
 vmap.enableLOS = 1
 vmap.enableHeight = 1
 vmap.ignoreSpellIds = ""
@@ -445,23 +446,51 @@ MapUpdate.Threads = 2
 #
 ###############################################################################
 
+LogSQL = 1
 PidFile = "./worldd.pid"
-LogMask = 4083
+LogLevel = 1
+LogTime = 1
 LogFile = "Server.log"
-ChatLogFile = "chat.log"
 LogTimestamp = 1
+LogFileLevel = 1
+LogFilter_TransportMoves = 1
+LogFilter_CreatureMoves = 1
+LogFilter_VisibilityChanges = 1
+LogFilter_Weather = 1
+LogFilter_PlayerStats = 1
+LogFilter_SQLText = 1
+LogFilter_PlayerMoves = 1
+LogFilter_PeriodicAffects = 1
+LogFilter_AIAndMovegens = 1
+LogFilter_Damage = 1
+LogFilter_Combat = 1
+LogFilter_SpellCast = 1
+LogFilter_DbStrictedCheck = 1
+LogFilter_Pathfinding = 1
+LogFilter_Honor = 1
+WardenLogFile = "warden.log"
+WardenLogTimestamp = 1
 WorldLogFile = "Network.log"
-DBErrorLogFile = "db_errors.log"
-CharLogFile = "characters.log"
+WorldLogTimestamp = 1
+HonorLogFile = "Honor.Log"
+HonorLogTimestamp = 1
+DBErrorLogFile = "DBErrors.log"
+DBErrorFixFile = "DBErrorFix.log"
+ClientIdsLogFile = "client.log"
+LootsLogFile = "loot.log"
+LevelupLogFile = "levelup.log"
+LogMoneyTrades = "trades.log"
+LogMoneyTreshold = 10000
+CharLogFile = "Char.log"
 CharLogTimestamp = 1
-GmLogFile = "gm_commands.log"
+CharLogDump = 1
+GmLogFile = "Gm.Log"
 GmLogTimestamp = 1
 GmLogPerAccount = 1
-RaLogFile = "ra_commands.log"
-ArenaLogFile = "arena.log"
-ArenaLogExtendedInfo = 1
-LogColors = "14 11 4 3 1 1 2 7 5 0 4 0 1 3 2 4 0"
-DBLogMask = 115
+CriticalCommandsLogFile = "CriticalCommands.Log"
+RaLogFile = "Ra.Log"
+LogColors = "13 7 11 9 0"
+DBLogMask = 4083
 LogSQLFilename = "logSQL.sql"
 LogSQLTimestamp = 1
 ChatLogs.Channel      = 1
@@ -2088,7 +2117,7 @@ Warden.LogFile = "warden.log"
 #
 ###############################################################################
 
-RAF.LevelLimit = 60
+RAF.LevelLimit = 69
 RAF.BonusXPGain = 3
 RAF.GrantableLevelsPerLevel = 0.5
 
@@ -2117,8 +2146,8 @@ RAF.GrantableLevelsPerLevel = 0.5
 ###############################################################################
 
 DatabaseUpdater.Enabled = 1
-DatabaseUpdater.PathToUpdates = "/home/OregonCore/sql/updates"
-DatabaseUpdater.ModPathToUpdates = "/home/OregonCore/modules/"
+DatabaseUpdater.PathToUpdates = "/data/OregonCore/sql/updates"
+DatabaseUpdater.ModPathToUpdates = "/data/OregonCore/modules/"
 
 ###################################################################################################################
 #  ELUNA SETTINGS
@@ -2143,7 +2172,7 @@ DatabaseUpdater.ModPathToUpdates = "/home/OregonCore/modules/"
 
 Eluna.Enabled = 1
 Eluna.TraceBack = false
-Eluna.ScriptPath = "/home/server/bin/lua_scripts"
+Eluna.ScriptPath = "/data/server/bin/lua_scripts"
 
 ###############################################################################
 #

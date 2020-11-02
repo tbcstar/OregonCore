@@ -926,6 +926,27 @@ void Map::ScriptsProcess()
                 pSource->PlayerTalkClass->CloseGossip();
             break;
 
+        case SCRIPT_COMMAND_MOVEMENT:
+            // Source must be Creature.
+            if (Creature* cSource = _GetScriptCreature(source, true, step.script))
+            {
+                if (!cSource->IsAlive())
+                    return;
+
+                cSource->GetMotionMaster()->MoveIdle();
+
+                switch (step.script->Movement.MovementType)
+                {
+                    case RANDOM_MOTION_TYPE:
+                        cSource->GetMotionMaster()->MoveRandom((float)step.script->Movement.MovementDistance);
+                        break;
+                    case WAYPOINT_MOTION_TYPE:
+                        cSource->GetMotionMaster()->MovePath(step.script->Movement.Path, false);
+                        break;
+                }
+            }
+            break;
+		 
         default:
             sLog.outError("未知的脚本命令 %s.", step.script->GetDebugInfo().c_str());
             break;

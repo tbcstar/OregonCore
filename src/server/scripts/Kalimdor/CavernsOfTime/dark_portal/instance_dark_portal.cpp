@@ -121,7 +121,7 @@ public:
                 }
             }
     
-            debug_log("OSCR: Instance Black Portal: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("OSCR: Instance Black Portal: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
     
@@ -137,7 +137,7 @@ public:
                         player->SendUpdateWorldState(id, state);
                 }
             }
-            else debug_log("OSCR: Instance Black Portal: UpdateBMWorldState, but PlayerList is empty!");
+            else sLog.outDebug("OSCR: Instance Black Portal: UpdateBMWorldState, but PlayerList is empty!");
         }
     
         void InitWorldState(bool Enable = true)
@@ -201,7 +201,7 @@ public:
     
             if (!player)
             {
-                debug_log("OSCR: Instance Black Portal: SetData (Type: %u Data %u) cannot find any player.", type, data);
+                sLog.outDebug("OSCR: Instance Black Portal: SetData (Type: %u Data %u) cannot find any player.", type, data);
                 return;
             }
     
@@ -230,7 +230,7 @@ public:
                 {
                     if (data == IN_PROGRESS)
                     {
-                        debug_log("OSCR: Instance Dark Portal: Starting event.");
+                        sLog.outDebug("OSCR: Instance Dark Portal: Starting event.");
                         InitWorldState();
                         Encounter[1] = IN_PROGRESS;
                         NextPortal_Timer = 15000;
@@ -292,7 +292,7 @@ public:
             if (entry == RIFT_BOSS)
                 entry = RandRiftBoss();
     
-            debug_log("OSCR: Instance Dark Portal: Summoning rift boss entry %u.", entry);
+            sLog.outDebug("OSCR: Instance Dark Portal: Summoning rift boss entry %u.", entry);
     
             Position pos = source->GetRandomNearPosition(10.0f);
     
@@ -302,7 +302,7 @@ public:
             if (Unit* summon = source->SummonCreature(entry, pos, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                 return summon;
     
-            debug_log("OSCR: Instance Dark Portal: what just happened there? No boss, no loot, no fun...");
+            sLog.outDebug("OSCR: Instance Dark Portal: what just happened there? No boss, no loot, no fun...");
             return NULL;
         }
     
@@ -319,7 +319,7 @@ public:
                     int tmp = rand() % 4;
                     if (tmp != CurrentRiftId)
                     {
-                        debug_log("OSCR: Instance Dark Portal: Creating Time Rift at locationId %i (old locationId was %u).", tmp, CurrentRiftId);
+                        sLog.outDebug("OSCR: Instance Dark Portal: Creating Time Rift at locationId %i (old locationId was %u).", tmp, CurrentRiftId);
     
                         CurrentRiftId = tmp;
     

@@ -73,13 +73,13 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget)
 {
     if (!pSource)
     {
-        error_log("OSCR: DoScriptText entry %i, invalid Source pointer.", iTextEntry);
+        sLog.outError("OSCR: DoScriptText entry %i, invalid Source pointer.", iTextEntry);
         return;
     }
 
     if (iTextEntry >= 0)
     {
-        error_log("OSCR: DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process text entry %i, but text entry must be negative.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), iTextEntry);
+        sLog.outError("OSCR: DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process text entry %i, but text entry must be negative.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), iTextEntry);
         return;
     }
 
@@ -87,18 +87,18 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget)
 
     if (!pData)
     {
-        error_log("OSCR: DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), iTextEntry);
+        sLog.outError("OSCR: DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), iTextEntry);
         return;
     }
 
-    debug_log("OSCR: DoScriptText: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u", iTextEntry, pData->uiSoundId, pData->uiType, pData->uiLanguage, pData->uiEmote);
+    sLog.outDebug("OSCR: DoScriptText: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u", iTextEntry, pData->uiSoundId, pData->uiType, pData->uiLanguage, pData->uiEmote);
 
     if (pData->uiSoundId)
     {
         if (GetSoundEntriesStore()->LookupEntry(pData->uiSoundId))
             pSource->SendPlaySound(pData->uiSoundId, false);
         else
-            error_log("OSCR: DoScriptText entry %i tried to process invalid sound id %u.", iTextEntry, pData->uiSoundId);
+            sLog.outError("OSCR: DoScriptText entry %i tried to process invalid sound id %u.", iTextEntry, pData->uiSoundId);
     }
 
     if (pData->uiEmote)
@@ -106,7 +106,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget)
         if (pSource->GetTypeId() == TYPEID_UNIT || pSource->GetTypeId() == TYPEID_PLAYER)
             ((Unit*)pSource)->HandleEmoteCommand(pData->uiEmote);
         else
-            error_log("OSCR: DoScriptText entry %i tried to process emote for invalid TypeId (%u).", iTextEntry, pSource->GetTypeId());
+            sLog.outError("OSCR: DoScriptText entry %i tried to process emote for invalid TypeId (%u).", iTextEntry, pSource->GetTypeId());
     }
 
     switch (pData->uiType)
@@ -128,7 +128,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget)
             if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER)
                 pSource->MonsterWhisper(iTextEntry, pTarget->GetGUID());
             else
-                error_log("OSCR: DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
+                sLog.outError("OSCR: DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
         }
         break;
     case CHAT_TYPE_BOSS_WHISPER:
@@ -136,7 +136,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget)
             if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER)
                 pSource->MonsterWhisper(iTextEntry, pTarget->GetGUID(), true);
             else
-                error_log("OSCR: DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
+                sLog.outError("OSCR: DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
         }
         break;
     case CHAT_TYPE_ZONE_YELL:
@@ -187,14 +187,14 @@ ScriptMgr::~ScriptMgr()
 }
 void ScriptMgr::ScriptsInit()
 {
-    outstring_log("   ____                              _____           _       _   ");
-    outstring_log("  / __ \\                            / ____|         (_)     | |  ");
-    outstring_log(" | |  | |_ __ ___  __ _  ___  _ __ | (___   ___ _ __ _ _ __ | |_ ");
-    outstring_log(" | |  | | '__/ _ \\/ _` |/ _ \\| '_ \\ \\___ \\ / __| '__| | '_ \\| __|");
-    outstring_log(" | |__| | | |  __/ (_| | (_) | | | |____) | (__| |  | | |_) | |_ ");
-    outstring_log("  \\____/|_|  \\___|\\__, |\\___/|_| |_|_____/ \\___|_|  |_| .__/ \\__|");
-    outstring_log("                   __/ |                              | |        ");
-    outstring_log("                  |___/                               |_|  \n");
+     sLog.outString("   ____                              _____           _       _   ");
+     sLog.outString("  / __ \\                            / ____|         (_)     | |  ");
+     sLog.outString(" | |  | |_ __ ___  __ _  ___  _ __ | (___   ___ _ __ _ _ __ | |_ ");
+     sLog.outString(" | |  | | '__/ _ \\/ _` |/ _ \\| '_ \\ \\___ \\ / __| '__| | '_ \\| __|");
+     sLog.outString(" | |__| | | |  __/ (_| | (_) | | | |____) | (__| |  | | |_) | |_ ");
+     sLog.outString("  \\____/|_|  \\___|\\__, |\\___/|_| |_|_____/ \\___|_|  |_| .__/ \\__|");
+     sLog.outString("                   __/ |                              | |        ");
+     sLog.outString("                  |___/                               |_|  \n");
 
     //Load database (must be called after SD2Config.SetSource).
     LoadDatabase();
@@ -203,9 +203,11 @@ void ScriptMgr::ScriptsInit()
 
     AddScripts();
 
-    outstring_log(">> 加载 %i个 C++ Scripts.", sScriptMgr.GetScriptCount());
+     sLog.outString(">> 加载 %i个 C++ Scripts.", sScriptMgr.GetScriptCount());
+	 sLog.outString();
 
-    sLog.outString(">> 加载 Overriden SQL Data.");
+    sLog.outString(">> 加载覆盖SQL数据。");
+	sLog.outString();
     LoadOverridenSQLData();
 }
 
@@ -532,6 +534,8 @@ void ScriptMgr::OnPlayerEnter(Map* map, Player* player)
 
     FOREACH_SCRIPT(PlayerScript)->OnMapChanged(player);
 
+    FOREACH_SCRIPT(AllMapScript)->OnPlayerEnterAll(map, player);
+
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsContinent);
     itr->second->OnPlayerEnter(map, player);
     SCR_MAP_END;
@@ -545,6 +549,8 @@ void ScriptMgr::OnPlayerLeave(Map* map, Player* player)
 {
     ASSERT(map);
     ASSERT(player);
+
+    FOREACH_SCRIPT(AllMapScript)->OnPlayerLeaveAll(map, player);
 
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsContinent);
     itr->second->OnPlayerLeave(map, player);
@@ -1208,6 +1214,12 @@ GuildScript::GuildScript(const char* name)
     ScriptMgr::ScriptRegistry<GuildScript>::AddScript(this);
 }
 
+AllMapScript::AllMapScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptMgr::ScriptRegistry<AllMapScript>::AddScript(this);
+}
+
 // Group
 void ScriptMgr::OnGroupAddMember(Group* group, Player* guid)
 {
@@ -1596,6 +1608,7 @@ template class ScriptMgr::ScriptRegistry<MovementHandlerScript>;
 template class ScriptMgr::ScriptRegistry<BGScript>;
 template class ScriptMgr::ScriptRegistry<GuildScript>;
 template class ScriptMgr::ScriptRegistry<UnitScript>;
+template class ScriptMgr::ScriptRegistry<AllMapScript>;
 
 // Undefine utility macros.
 #undef GET_SCRIPT_RET

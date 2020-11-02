@@ -277,6 +277,7 @@ void AuctionHouseMgr::LoadAuctionItems()
     if (!result)
     {
         sLog.outString(">> 已加载0件拍卖物品");
+		sLog.outString();
         return;
     }
 
@@ -313,6 +314,7 @@ void AuctionHouseMgr::LoadAuctionItems()
     while (result->NextRow());
 
     sLog.outString(">> 已加载%u件拍卖物品", count);
+	sLog.outString();
 }
 
 void AuctionHouseMgr::LoadAuctions()
@@ -320,7 +322,8 @@ void AuctionHouseMgr::LoadAuctions()
     QueryResult* result = CharacterDatabase.Query("SELECT COUNT(*) FROM auctionhouse");
     if (!result)
     {
-        sLog.outString(">> Loaded 0 auctions. DB table auctionhouse is empty.");
+        sLog.outString(">> 已加载0件拍卖物品。DB表auctionhouse是空的。");
+		sLog.outString();
         return;
     }
 
@@ -329,14 +332,16 @@ void AuctionHouseMgr::LoadAuctions()
 
     if (!AuctionCount)
     {
-        sLog.outString(">> Loaded 0 auctions. DB table auctionhouse is empty.");
+        sLog.outString(">> 已加载0件拍卖物品。DB表auctionhouse是空的。");
+		sLog.outString();
         return;
     }
 
     result = CharacterDatabase.Query("SELECT id,auctioneerguid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit FROM auctionhouse");
     if (!result)
     {
-        sLog.outString(">> Loaded 0 auctions. DB table auctionhouse is empty.");
+        sLog.outString(">> 已加载0件拍卖物品。DB表auctionhouse是空的。");
+		sLog.outString();
         return;
     }
 
@@ -365,7 +370,7 @@ void AuctionHouseMgr::LoadAuctions()
         if (!auctioneerData)
         {
             aItem->DeleteFromDB();
-            sLog.outError("Auction %u has invalid auctioneer (GUID : %u)", aItem->Id, aItem->auctioneer);
+            sLog.outError("拍卖物品%u无效(GUID: %u)", aItem->Id, aItem->auctioneer);
             delete aItem;
             continue;
         }
@@ -374,7 +379,7 @@ void AuctionHouseMgr::LoadAuctions()
         if (!auctioneerInfo)
         {
             aItem->DeleteFromDB();
-            sLog.outError("Auction %u has invalid auctioneer (GUID : %u Entry: %u)", aItem->Id, aItem->auctioneer, auctioneerData->id);
+            sLog.outError("拍卖物品%u无效(GUID: %u Entry:%u)", aItem->Id, aItem->auctioneer, auctioneerData->id);
             delete aItem;
             continue;
         }
@@ -405,6 +410,7 @@ void AuctionHouseMgr::LoadAuctions()
     while (result->NextRow());
 
     sLog.outString(">> Loaded %u auctions", AuctionCount);
+	sLog.outString();
 }
 
 void AuctionHouseMgr::AddAItem(Item* it)
