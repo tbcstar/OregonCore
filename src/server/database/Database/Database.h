@@ -67,6 +67,7 @@ class SqlConnection
         virtual bool CommitTransaction() { return true; }
         // can't rollback without transaction support
         virtual bool RollbackTransaction() { return true; }
+        virtual bool ExecuteFile(char const* file) { return true; }
 
         //methods to work with prepared statements
         bool ExecuteStmt(int nIndex, SqlStmtParameters const& id);
@@ -155,6 +156,7 @@ class Database
 
         bool DirectPExecute(char const* format,...) ATTR_PRINTF(2,3);
 
+
         /// Async queries and query holders, implemented in DatabaseImpl.h
 
         // Query / member
@@ -240,7 +242,8 @@ class Database
         //get prepared statement format string
         std::string GetStmtString(int const stmtId) const;
 
-        operator bool () const { return !m_pQueryConnections.empty() && m_pAsyncConn != 0; }
+        operator bool() const { return mMysql != NULL && !m_pQueryConnections.empty() && m_pAsyncConn != 0; }
+
 
         //escape string generation
         void escape_string(std::string& str);
@@ -268,6 +271,7 @@ class Database
 
         inline void AddToSerialDelayQueue(int workerId, SqlOperation* op) { m_serialDelayQueue[workerId]->add(op); }
         bool NextSerialDelayedOperation(int workerId, SqlOperation*& op);
+
 
         bool HasAsyncQuery();
 
@@ -356,9 +360,10 @@ class Database
         int m_iStmtIndex;
 
     private:
-
         bool m_logSQL;
         std::string m_logsDir;
         uint32 m_pingIntervallms;
+
+        MYSQL* mMysql;
 };
 #endif

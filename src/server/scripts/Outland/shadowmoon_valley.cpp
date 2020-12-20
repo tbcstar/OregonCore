@@ -1381,7 +1381,7 @@ public:
             nodes.resize(2);
             nodes[0] = 161;                                     // From Karynaku
             nodes[1] = 162;                                     // To Mordenai
-            error_log("OSCR: Player %s started quest 10870 which has disabled taxi node, need to be fixed in core", player->GetName());
+            sLog.outError("OSCR: Player %s started quest 10870 which has disabled taxi node, need to be fixed in core", player->GetName());
             //player->ActivateTaxiPathTo(nodes, 20811);
         }
     
@@ -1937,7 +1937,7 @@ public:
                 }
                 CAST_CRE(CoilskarAssassin)->AI()->AttackStart(me);
             }
-            else error_log("OSCR ERROR: Coilskar Assassin couldn't be summmoned");
+            else sLog.outError("OSCR ERROR: Coilskar Assassin couldn't be summmoned");
         }
     
         void JustDied(Unit* /*killer*/)

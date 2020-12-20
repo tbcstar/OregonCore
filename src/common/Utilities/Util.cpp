@@ -279,6 +279,65 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
     return true;
 }
 
+bool Utf8toWStrr(std::string const& utf8str, std::wstring& wstr, size_t max_len)
+{
+	if (utf8str.empty())
+	{
+		wstr = std::wstring();
+		return true;
+	}
+
+	try
+	{
+		// A UTF8 string can have a maximum of 4 octets per character
+		// A 4 octet char can take up to two UTF16 characters (4*8 = 32 / 16 = 2)
+		// The UTF8 string may also actually be ASCII, in which case no truncation
+		// takes place! The final string length is therefore unknown. Reserve
+		// as long as the OG string, and back-insert
+		wstr.resize(utf8str.size());
+
+		auto end = utf8::utf8to16(utf8str.cbegin(), utf8str.cend(), wstr.begin());
+
+		if (end != wstr.end())
+			wstr.erase(end, wstr.end());
+
+		// truncate to max len
+		if (!!max_len && wstr.size() > max_len)
+		{
+			wstr.resize(max_len);
+		}
+	}
+	catch (std::exception)
+	{
+		wstr = L"";
+		return false;
+	}
+
+	return true;
+}
+
+void vutf8printf(FILE* out, char const* str, va_list* ap)
+{
+#if PLATFORM == PLATFORM_WINDOWS
+	std::string temp_buf;
+	temp_buf.resize(32 * 1024);
+	std::wstring wtemp_buf;
+
+	vsnprintf(&temp_buf[0], 32 * 1024, str, *ap);
+	temp_buf.resize(strlen(temp_buf.c_str())); // Resize to match the formatted string
+
+	if (!temp_buf.empty())
+	{
+		Utf8toWStrr(temp_buf, wtemp_buf, 32 * 1024);
+		wtemp_buf.push_back('\0');
+
+		CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], wtemp_buf.size());
+	}
+	fprintf(out, "%s", temp_buf.c_str());
+#else
+	vfprintf(out, str, *ap);
+#endif
+}
 bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr)
 {
     wstr.clear();

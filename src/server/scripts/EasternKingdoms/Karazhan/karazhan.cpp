@@ -419,7 +419,7 @@ public:
     
         void PrepareEncounter()
         {
-            debug_log("OSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+            sLog.outDebug("OSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
     
@@ -548,17 +548,17 @@ public:
         case GOSSIP_ACTION_INFO_DEF+3:
             pPlayer->CLOSE_GOSSIP_MENU();
             pBarnesAI->m_uiEventId = EVENT_OZ;
-            outstring_log("OSCR: player (GUID %llu) manually set Opera event to EVENT_OZ", pPlayer->GetGUID());
+             sLog.outString("OSCR: player (GUID %llu) manually set Opera event to EVENT_OZ", pPlayer->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+4:
             pPlayer->CLOSE_GOSSIP_MENU();
             pBarnesAI->m_uiEventId = EVENT_HOOD;
-            outstring_log("OSCR: player (GUID %llu) manually set Opera event to EVENT_HOOD", pPlayer->GetGUID());
+             sLog.outString("OSCR: player (GUID %llu) manually set Opera event to EVENT_HOOD", pPlayer->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+5:
             pPlayer->CLOSE_GOSSIP_MENU();
             pBarnesAI->m_uiEventId = EVENT_RAJ;
-            outstring_log("OSCR: player (GUID %llu) manually set Opera event to EVENT_RAJ", pPlayer->GetGUID());
+             sLog.outString("OSCR: player (GUID %llu) manually set Opera event to EVENT_RAJ", pPlayer->GetGUID());
             break;
         }
     

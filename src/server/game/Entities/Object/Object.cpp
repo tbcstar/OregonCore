@@ -589,7 +589,7 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
                         {
                             if (index == UNIT_FIELD_BYTES_2)
                             {
-                                DEBUG_LOG("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (flag)", target->GetName(), ToPlayer()->GetName());
+                                sLog.outDebug("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (flag)", target->GetName(), ToPlayer()->GetName());
                                 *data << (m_uint32Values[ index ] & ((UNIT_BYTE2_FLAG_SANCTUARY | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5) << 8)); // this flag is at uint8 offset 1 !!
 
                                 ch = true;
@@ -602,7 +602,7 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
                                 if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2))
                                 {
                                     uint32 faction = target->ToPlayer()->GetFaction(); // pretend that all other HOSTILE players have own faction, to allow follow, heal, rezz (trade wont work)
-                                    DEBUG_LOG("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (faction %u)", target->GetName(), ToPlayer()->GetName(), faction);
+                                    sLog.outDebug("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (faction %u)", target->GetName(), ToPlayer()->GetName(), faction);
                                     *data << uint32(faction);
                                     ch = true;
                                 }
@@ -2582,7 +2582,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     // Prevent invalid coordinates here, position is unchanged
     if (!Oregon::IsValidMapCoord(destx, desty))
     {
-        sLog.outFatal("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+          sLog.outError("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
     }
 

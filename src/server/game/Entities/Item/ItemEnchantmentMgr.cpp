@@ -72,9 +72,13 @@ void LoadRandomEnchantmentsTable()
         while (result->NextRow());
 
         sLog.outString(">> Loaded %u Item Enchantment definitions", count);
+		sLog.outString();
     }
-    else
-        sLog.outErrorDb(">> Loaded 0 Item Enchantment definitions. DB table item_enchantment_template is empty.");
+	else
+	{
+		sLog.outErrorDb(">> Loaded 0 Item Enchantment definitions. DB table item_enchantment_template is empty.");
+		sLog.outString();
+	}
 }
 
 uint32 GetItemEnchantMod(uint32 entry)

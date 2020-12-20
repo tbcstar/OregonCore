@@ -275,7 +275,7 @@ public:
 
         void SetData64(uint32 type, uint64 data)
         {
-            debug_log("OSCR: Instance Blackrock Depths: SetData64 update (Type: %u Data %llu)", type, data);
+            sLog.outDebug("OSCR: Instance Blackrock Depths: SetData64 update (Type: %u Data %llu)", type, data);
 
             switch (type)
             {
@@ -291,7 +291,7 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            debug_log("OSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
+            sLog.outDebug("OSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
 
             switch (type)
             {

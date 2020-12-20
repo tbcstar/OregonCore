@@ -310,10 +310,18 @@ struct ScriptInfo
             uint32 ModelID;         // datalong
         } Model;
 
-        // SCRIPT_COMMAND_CLOSE_GOSSIP (33)
+                                    // SCRIPT_COMMAND_CLOSE_GOSSIP (33)
+ 
+        struct                      // SCRIPT_COMMAND_MOVEMENT (35)
+        {
+            uint32 MovementType;    // datalong
+            uint32 MovementDistance;// datalong2
+            int32  Path;            // dataint
+        } Movement;
     };
 
     std::string GetDebugInfo() const;
+
 };
 
 typedef std::multimap<uint32, ScriptInfo> ScriptMap;

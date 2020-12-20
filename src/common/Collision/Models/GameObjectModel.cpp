@@ -19,7 +19,7 @@
 #include "Management/VMapManager2.h"
 #include "VMapDefinitions.h"
 #include "WorldModel.h"
-
+#include "Log.h"
 #include "GameObjectModel.h"
 #include "GameObject.h"
 #include "Creature.h"
@@ -49,7 +49,7 @@ void LoadGameObjectModelList()
     FILE* model_list_file = fopen((sWorld.GetDataPath() + "vmaps/" + VMAP::GAMEOBJECT_MODELS).c_str(), "rb");
     if (!model_list_file)
     {
-        ERROR_LOG("Unable to open '%s' file.", VMAP::GAMEOBJECT_MODELS);
+        sLog.outError("Unable to open '%s' file.", VMAP::GAMEOBJECT_MODELS);
         return;
     }
 
@@ -68,7 +68,7 @@ void LoadGameObjectModelList()
             || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
             || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
         {
-            ERROR_LOG("File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
+            sLog.outError("File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
             break;
         }
 
@@ -170,7 +170,7 @@ bool GameObjectModel::Relocate(const GameObject& go)
     // ignore models with no bounds
     if (mdl_box == G3D::AABox::zero())
     {
-        sLog.outVMap("GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
+       sLog.outError("GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
         return false;
     }
 

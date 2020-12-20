@@ -120,6 +120,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast
   ${CMAKE_SOURCE_DIR}/src/framework
   ${CMAKE_SOURCE_DIR}/src/framework/Platform
+  ${CMAKE_SOURCE_DIR}/src/framework/Policies
   ${CMAKE_SOURCE_DIR}/src/server/shared
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_BINARY_DIR}

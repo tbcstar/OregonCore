@@ -119,7 +119,7 @@ public:
                 return true;
             }
     
-            debug_log("OSCR: Instance Stratholme: Cannot open slaugther square yet.");
+            sLog.outDebug("OSCR: Instance Stratholme: Cannot open slaugther square yet.");
             return false;
         }
     
@@ -223,7 +223,7 @@ public:
                         break;
                     Encounter[0] = data;
                     BaronRun_Timer = 2700000;
-                    debug_log("OSCR: Instance Stratholme: Baron run in progress.");
+                    sLog.outDebug("OSCR: Instance Stratholme: Baron run in progress.");
                     break;
                 case FAIL:
                     //may add code to remove aura from players, but in theory the time should be up already and removed.
@@ -281,10 +281,10 @@ public:
                         //UpdateGoState(ziggurat4GUID,0,true);
                         if (Creature* pBaron = instance->GetCreature(baronGUID))
                             pBaron->SummonCreature(C_RAMSTEIN, 4032.84f, -3390.24f, 119.73f, 4.71f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
-                        debug_log("OSCR: Instance Stratholme: Ramstein spawned.");
+                        sLog.outDebug("OSCR: Instance Stratholme: Ramstein spawned.");
                     }
                     else
-                        debug_log("OSCR: Instance Stratholme: %u Abomnation left to kill.", count);
+                        sLog.outDebug("OSCR: Instance Stratholme: %u Abomnation left to kill.", count);
                 }
     
                 if (data == NOT_STARTED)
@@ -293,7 +293,7 @@ public:
                 if (data == DONE)
                 {
                     SlaugtherSquare_Timer = 300000;
-                    debug_log("OSCR: Instance Stratholme: Slaugther event will continue in 5 minutes.");
+                    sLog.outDebug("OSCR: Instance Stratholme: Slaugther event will continue in 5 minutes.");
                 }
                 Encounter[4] = data;
                 break;
@@ -434,7 +434,7 @@ public:
                     if (GetData(TYPE_BARON_RUN) != DONE)
                         SetData(TYPE_BARON_RUN, FAIL);
                     BaronRun_Timer = 0;
-                    debug_log("OSCR: Instance Stratholme: Baron run event reached end. Event has state %u.", GetData(TYPE_BARON_RUN));
+                    sLog.outDebug("OSCR: Instance Stratholme: Baron run event reached end. Event has state %u.", GetData(TYPE_BARON_RUN));
                 }
                 else BaronRun_Timer -= diff;
             }
@@ -450,7 +450,7 @@ public:
     
                         HandleGameObject(ziggurat4GUID, true);
                         HandleGameObject(ziggurat5GUID, true);
-                        debug_log("OSCR: Instance Stratholme: Black guard sentries spawned. Opening gates to baron.");
+                        sLog.outDebug("OSCR: Instance Stratholme: Black guard sentries spawned. Opening gates to baron.");
                     }
                     SlaugtherSquare_Timer = 0;
                 }

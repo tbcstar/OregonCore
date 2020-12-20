@@ -452,6 +452,21 @@ public:
     virtual void OnUpdate(TMap* map, uint32 diff) { }
 };
 
+class AllMapScript : public ScriptObject
+{
+protected:
+
+    AllMapScript(const char* name);
+
+public:
+
+    // Called when a player enters any Map
+    virtual void OnPlayerEnterAll(Map* /*map*/, Player* /*player*/) { }
+
+    // Called when a player leave any Map
+    virtual void OnPlayerLeaveAll(Map* /*map*/, Player* /*player*/) { }
+};
+
 class WorldMapScript : public ScriptObject, public MapScript<Map>
 {
 protected:
@@ -956,6 +971,12 @@ public: /* TransportScript */
 public: /*MovementInfo*/
 
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
+
+public: /* AllMapScript */
+
+        //listener functions are called by OnPlayerEnterMap and OnPlayerLeaveMap
+        //void OnPlayerEnterAll(Map* map, Player* player);
+        //void OnPlayerLeaveAll(Map* map, Player* player);
 
 public: /* BGScript */
 
