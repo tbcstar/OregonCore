@@ -157,7 +157,7 @@ public:
                         return plr;
                 }
             }
-            debug_log("OSCR: Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("OSCR: Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
     

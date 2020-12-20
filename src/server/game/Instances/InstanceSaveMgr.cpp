@@ -331,6 +331,7 @@ void InstanceSaveManager::CleanupInstances()
     //execute transaction directly
     CharacterDatabase.CommitTransaction();
     sLog.outString(">> Initialized %u instances", (uint32)InstanceSet.size());
+	sLog.outString();
 }
 
 void InstanceSaveManager::PackInstances()
@@ -399,6 +400,7 @@ void InstanceSaveManager::PackInstances()
     CharacterDatabase.Execute("DEALLOCATE PREPARE stmt6");
 
     sLog.outString(">> Instance numbers remapped, next instance id is %u", InstanceNumber);
+	sLog.outString();
 }
 
 void InstanceSaveManager::LoadResetTimes()

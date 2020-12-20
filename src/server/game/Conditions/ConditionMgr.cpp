@@ -817,6 +817,7 @@ void ConditionMgr::LoadConditions(bool isReload)
 
     sLog.outString();
     sLog.outString(">> Loaded %u conditions", count);
+	sLog.outString();
 }
 
 bool ConditionMgr::addToLootTemplate(Condition* cond, LootTemplate* loot)

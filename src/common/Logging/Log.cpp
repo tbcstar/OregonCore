@@ -1,126 +1,285 @@
 /*
- * This file is part of the OregonCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
+ * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
+ * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include "Common.h"
 #include "Log.h"
 #include "Configuration/Config.h"
-#include "Utilities/Util.h"
-
+#include "Util.h"
+#include "ByteBuffer.h"
+#include "ProgressBar.h"
+#include <stdarg.h>
 #include <fstream>
+#include <iostream>
 #include <stdarg.h>
 #include <stdio.h>
 #include "ace/OS.h"
 
-extern uint32 realmID;
-
-static const ColorTypes colorPrefixTable[MAX_COLORS]
-    =
-// prefix color  msg color
-{
-    BLACK,    // BLACK
-    LRED,     // RED
-    LGREEN,   // GREEN
-    YELLOW,   // BROWN
-    LBLUE,    // BLUE
-    LMAGENTA, // MAGENTA
-    LCYAN,    // CYAN
-    LGREY,    // LGREY
-    LGREY,    // GREY
-    LRED,     // LRED
-    LGREEN,   // LGREEN
-    YELLOW,   // YELLOW
-    LBLUE,    // LBLUE
-    LMAGENTA, // LMAGENTA
-    LCYAN,    // LCYAN
-    WHITE     // WHITE
-};
+#include "ace/OS_NS_unistd.h"
 
 INSTANTIATE_SINGLETON_1(Log);
 
-Log::Log() : m_gmlog_per_account(false), m_logMask(0), m_logMaskDatabase(0)
+LogFilterData logFilterData[LOG_FILTER_COUNT] =
 {
-    memset(m_logFiles, 0, sizeof(m_logFiles));
-    memset(m_colors, 0, sizeof(m_colors));
+    { "transport_moves",     "LogFilter_TransportMoves",     true  },
+    { "creature_moves",      "LogFilter_CreatureMoves",      true  },
+    { "visibility_changes",  "LogFilter_VisibilityChanges",  true  },
+    { "",                    "",                             true  },
+    { "weather",             "LogFilter_Weather",            true  },
+    { "player_stats",        "LogFilter_PlayerStats",        false },
+    { "sql_text",            "LogFilter_SQLText",            false },
+    { "player_moves",        "LogFilter_PlayerMoves",        false },
+    { "periodic_effects",    "LogFilter_PeriodicAffects",    false },
+    { "ai_and_movegens",     "LogFilter_AIAndMovegens",      false },
+    { "damage",              "LogFilter_Damage",             false },
+    { "combat",              "LogFilter_Combat",             false },
+    { "spell_cast",          "LogFilter_SpellCast",          false },
+    { "db_stricted_check",   "LogFilter_DbStrictedCheck",    true  },
+    { "pathfinding",         "LogFilter_Pathfinding",        false },
+    { "honor",               "LogFilter_Honor",              true  },
+};
 
+Log::Log() :
+    logfile(nullptr), gmLogfile(nullptr), dberLogfile(nullptr),
+    wardenLogfile(nullptr), anticheatLogfile(nullptr), honorLogfile(nullptr), m_colored(false), m_includeTime(false), m_wardenDebug(false), m_gmlog_per_account(false)
+{
+    for (int i = 0; i < LOG_MAX_FILES; ++i)
+    {
+        logFiles[i] = nullptr;
+        timestampPrefix[i] = true;
+    }
     Initialize();
 }
 
-Log::~Log()
+void Log::InitColors(std::string const& str)
 {
-    std::set<FILE*> openfiles;
-
-    for (size_t i = 0; i < MAX_LOG_TYPES; ++i)
-        if (m_logFiles[i])
-            openfiles.insert(m_logFiles[i]);
-
-    for (std::set<FILE*>::iterator i = openfiles.begin(); i != openfiles.end(); ++i)
+    if (str.empty())
     {
-        fflush(*i);
-        fclose(*i);
+        m_colored = false;
+        return;
+    }
+
+    int color[LOG_TYPE_MAX];
+
+    std::istringstream ss(str);
+
+    for(int i = 0; i < LOG_TYPE_MAX; ++i)
+    {
+        ss >> color[i];
+
+        if(!ss)
+            return;
+
+        if(color[i] < 0 || color[i] >= Color_count)
+            return;
+    }
+
+    for(int i = 0; i < LOG_TYPE_MAX; ++i)
+        m_colors[i] = Color(color[i]);
+
+    m_colored = true;
+}
+
+void Log::InitSmartlogEntries(std::string const& str)
+{
+    m_smartlogExtraEntries.clear();
+
+    if (str.empty())
+        return;
+
+    uint32 entry;
+    std::istringstream ss(str);
+
+    while (ss)
+    {
+        ss >> entry;
+        m_smartlogExtraEntries.push_back(entry);
     }
 }
 
-void Log::SetLogMask(unsigned long mask)
+void Log::InitSmartlogGuids(std::string const& str)
 {
-    m_logMask = mask;
+    m_smartlogExtraGuids.clear();
+
+    if (str.empty())
+        return;
+
+    uint32 entry;
+    std::istringstream ss(str);
+
+    while (ss)
+    {
+        ss >> entry;
+        m_smartlogExtraGuids.push_back(entry);
+    }
 }
 
-void Log::SetDBLogMask(unsigned long mask)
+void Log::SetColor(bool stdout_stream, Color color)
 {
-    m_logMaskDatabase = mask;
+    #if PLATFORM == PLATFORM_WINDOWS
+
+    static WORD WinColorFG[Color_count] =
+    {
+        0,                                                  // BLACK
+        FOREGROUND_RED,                                     // RED
+        FOREGROUND_GREEN,                                   // GREEN
+        FOREGROUND_RED | FOREGROUND_GREEN,                  // BROWN
+        FOREGROUND_BLUE,                                    // BLUE
+        FOREGROUND_RED |                    FOREGROUND_BLUE,// MAGENTA
+        FOREGROUND_GREEN | FOREGROUND_BLUE,                 // CYAN
+        FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,// WHITE
+                                                            // YELLOW
+        FOREGROUND_RED | FOREGROUND_GREEN |                   FOREGROUND_INTENSITY,
+                                                            // RED_BOLD
+        FOREGROUND_RED |                                      FOREGROUND_INTENSITY,
+                                                            // GREEN_BOLD
+        FOREGROUND_GREEN |                   FOREGROUND_INTENSITY,
+        FOREGROUND_BLUE | FOREGROUND_INTENSITY,             // BLUE_BOLD
+                                                            // MAGENTA_BOLD
+        FOREGROUND_RED |                    FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+                                                            // CYAN_BOLD
+        FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+                                                            // WHITE_BOLD
+        FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
+    };
+
+    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+    SetConsoleTextAttribute(hConsole, WinColorFG[color]);
+    #else
+
+    enum ANSITextAttr
+    {
+        TA_NORMAL=0,
+        TA_BOLD=1,
+        TA_BLINK=5,
+        TA_REVERSE=7
+    };
+
+    enum ANSIFgTextAttr
+    {
+        FG_BLACK=30, FG_RED,  FG_GREEN, FG_BROWN, FG_BLUE,
+        FG_MAGENTA,  FG_CYAN, FG_WHITE, FG_YELLOW
+    };
+
+    enum ANSIBgTextAttr
+    {
+        BG_BLACK=40, BG_RED,  BG_GREEN, BG_BROWN, BG_BLUE,
+        BG_MAGENTA,  BG_CYAN, BG_WHITE
+    };
+
+    static uint8 UnixColorFG[Color_count] =
+    {
+        FG_BLACK,                                           // BLACK
+        FG_RED,                                             // RED
+        FG_GREEN,                                           // GREEN
+        FG_BROWN,                                           // BROWN
+        FG_BLUE,                                            // BLUE
+        FG_MAGENTA,                                         // MAGENTA
+        FG_CYAN,                                            // CYAN
+        FG_WHITE,                                           // WHITE
+        FG_YELLOW,                                          // YELLOW
+        FG_RED,                                             // LRED
+        FG_GREEN,                                           // LGREEN
+        FG_BLUE,                                            // LBLUE
+        FG_MAGENTA,                                         // LMAGENTA
+        FG_CYAN,                                            // LCYAN
+        FG_WHITE                                            // LWHITE
+    };
+
+    fprintf((stdout_stream? stdout : stderr), "\x1b[%d%sm",UnixColorFG[color],(color>=YELLOW&&color<Color_count ?";1":""));
+    #endif
+}
+
+void Log::ResetColor(bool stdout_stream)
+{
+    #if PLATFORM == PLATFORM_WINDOWS
+    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+    #else
+    fprintf((stdout_stream ? stdout : stderr), "\x1b[0m");
+    #endif
+}
+
+void Log::SetLogLevel(char* level)
+{
+    int32 newLevel =atoi((char*)level);
+
+    if (newLevel < LOG_LVL_MINIMAL)
+        newLevel = LOG_LVL_MINIMAL;
+    else if (newLevel > LOG_LVL_DEBUG)
+        newLevel = LOG_LVL_DEBUG;
+
+    m_logLevel = LogLevel(newLevel);
+
+    printf("LogLevel is %d\n", m_logLevel);
+}
+
+void Log::SetLogFileLevel(char* level)
+{
+    int32 newLevel =atoi((char*)level);
+
+    if (newLevel < LOG_LVL_MINIMAL)
+        newLevel = LOG_LVL_MINIMAL;
+    else if (newLevel > LOG_LVL_DEBUG)
+        newLevel = LOG_LVL_DEBUG;
+
+    m_logFileLevel = LogLevel(newLevel);
+
+    printf("LogFileLevel is %d\n", m_logFileLevel);
 }
 
 void Log::Initialize()
 {
-    // Common log files data
-    m_logsDir = sConfig.GetStringDefault("LogsDir", "0 6 4 3 1 1 2 7 5 0 4 0 1 3 2 4 0");
+    /// Common log files data
+    m_logsDir = sConfig.GetStringDefault("LogsDir","");
     if (!m_logsDir.empty())
-        if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
+    {
+        if ((m_logsDir.at(m_logsDir.length()-1)!='/') && (m_logsDir.at(m_logsDir.length()-1)!='\\'))
             m_logsDir.append("/");
+    }
+
+    m_bIsChatLogFileActivated = sConfig.GetBoolDefault("ChatLogEnable", false);
 
     m_logsTimestamp = "_" + GetTimestampStr();
 
-    // Open specific log files
-    FILE* logfile = openLogFile("LogFile", "LogTimestamp", "wb");
+    /// Open specific log files
+    logfile = openLogFile("LogFile","LogTimestamp","w");
 
-    for (int i = 0; i < MAX_LOG_TYPES; ++i)
-        if (!m_logFiles[i])
-            m_logFiles[i] = logfile;
-
-    InitColors(sConfig.GetStringDefault("LogColors", "0 6 4 3 1 1 2 7 5 0 4 0 1 3 2 4 0"));
-
-    m_gmlog_per_account = sConfig.GetBoolDefault("GmLogPerAccount", false);
+    m_gmlog_per_account = sConfig.GetBoolDefault("GmLogPerAccount",false);
     if (!m_gmlog_per_account)
-        m_logFiles[LOG_TYPE_COMMAND] = openLogFile("GMLogFile", "GmLogTimestamp", "ab");
+        gmLogfile = openLogFile("GMLogFile","GmLogTimestamp","a");
     else
     {
         // GM log settings for per account case
         m_gmlog_filename_format = sConfig.GetStringDefault("GMLogFile", "");
         if (!m_gmlog_filename_format.empty())
         {
-            bool m_gmlog_timestamp = sConfig.GetBoolDefault("GmLogTimestamp", false);
+            bool m_gmlog_timestamp = sConfig.GetBoolDefault("GmLogTimestamp",false);
 
-            size_t dot_pos = m_gmlog_filename_format.find_last_of(".");
-            if (dot_pos != m_gmlog_filename_format.npos)
+            size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
+            if (dot_pos!=m_gmlog_filename_format.npos)
             {
                 if (m_gmlog_timestamp)
-                    m_gmlog_filename_format.insert(dot_pos, m_logsTimestamp);
+                    m_gmlog_filename_format.insert(dot_pos,m_logsTimestamp);
 
-                m_gmlog_filename_format.insert(dot_pos, "_#%u");
+                m_gmlog_filename_format.insert(dot_pos,"_#%u");
             }
             else
             {
@@ -134,138 +293,80 @@ void Log::Initialize()
         }
     }
 
-    m_logFiles[LOG_TYPE_CHAR]     = openLogFile("CharLogFile", "CharLogTimestamp", "ab");
-    m_logFiles[LOG_TYPE_ERROR_DB] = openLogFile("DBErrorLogFile", NULL, "ab");
-    m_logFiles[LOG_TYPE_REMOTE]   = openLogFile("RaLogFile", NULL, "ab");
-    m_logFiles[LOG_TYPE_CHAT]     = openLogFile("ChatLogFile", "ChatLogTimestamp", "ab");
-    m_logFiles[LOG_TYPE_ARENA]    = openLogFile("ArenaLogFile", NULL, "ab");
-    m_logFiles[LOG_TYPE_WARDEN]   = openLogFile("Warden.LogFile", NULL, "ab");
-    m_logFiles[LOG_TYPE_NETWORK]  = openLogFile("WorldLogFile", NULL, "ab");
-    m_logFiles[LOG_TYPE_SQL]      = openLogFile("LogSQLFilename", "LogSQLTimestamp", "ab");
+    dberLogfile             = openLogFile("DBErrorLogFile", nullptr, "a");
+    worldLogfile            = openLogFile("WorldLogFile", "WorldLogTimestamp", "a");
+    nostalriusLogFile       = openLogFile("NostalriusLogFile", "NostalriusLogTimestamp", "a");
+    honorLogfile            = openLogFile("HonorLogFile", "HonorLogTimestamp", "a");
+    wardenLogfile           = openLogFile("WardenLogFile", "WardenLogTimestamp", "a");
+    anticheatLogfile         = openLogFile("AnticheatLogFile", "AnticheatLogTimestamp", "a");
+    logFiles[LOG_CHAT]      = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
+    logFiles[LOG_BG]        = openLogFile("BgLogFile", "BgLogTimestamp", "a");
+    logFiles[LOG_CHAR]      = openLogFile("CharLogFile", "CharLogTimestamp", "a");
+    logFiles[LOG_RA]        = openLogFile("RaLogFile", nullptr, "a");
+    logFiles[LOG_DBERRFIX]  = openLogFile("DBErrorFixFile", nullptr, "w+");
+    logFiles[LOG_CLIENT_IDS]= openLogFile("ClientIdsLogFile", nullptr, "a");
+    logFiles[LOG_LOOTS]     = openLogFile("LootsLogFile", nullptr, "a");
+    logFiles[LOG_LEVELUP]   = openLogFile("LevelupLogFile", nullptr, "a");
+    logFiles[LOG_PERFORMANCE]   = openLogFile("PerformanceLog.File", nullptr, "a");
+    logFiles[LOG_MONEY_TRADES]  = openLogFile("LogMoneyTrades", nullptr, "a");
+    logFiles[LOG_GM_CRITICAL]   = openLogFile("CriticalCommandsLogFile", nullptr, "a");
+    logFiles[LOG_CHAT_SPAM]     = openLogFile("ChatSpamLogFile", nullptr, "a");
+    logFiles[LOG_EXPLOITS]      = openLogFile("ExploitsLogFile", nullptr, "a");
 
-    m_logMask = sConfig.GetIntDefault("LogMask", 51);
-    m_logMaskDatabase = sConfig.GetIntDefault("DBLogMask", 0);
-
-    // -------------------------------------------------------------------
-    // Deprecated, kept for backward compatibilty - @todo remove in future
-    // -------------------------------------------------------------------
+    timestampPrefix[LOG_DBERRFIX] = false;
 
     // Main log file settings
-    switch (sConfig.GetIntDefault("LogLevel", -1))
-    {
-        case LOGL_MINIMAL:
-            m_logMask = LOG_TYPE_STRING | LOG_TYPE_COMMAND | LOG_TYPE_ERROR | LOG_TYPE_ERROR_DB;
-            break;
-        case LOGL_BASIC:
-            m_logMask = LOG_TYPE_STRING | LOG_TYPE_COMMAND | LOG_TYPE_ERROR | LOG_TYPE_ERROR_DB;
-            m_logMask |= LOG_TYPE_BASIC | LOG_TYPE_WARDEN;
-            break;
-        case LOGL_DETAIL:
-            m_logMask = LOG_TYPE_STRING | LOG_TYPE_COMMAND | LOG_TYPE_ERROR | LOG_TYPE_ERROR_DB;
-            m_logMask |= LOG_TYPE_BASIC | LOG_TYPE_WARDEN;
-            m_logMask |= LOGL_BASIC | LOG_TYPE_DETAIL | LOG_TYPE_SQL | LOG_TYPE_REMOTE | LOG_TYPE_CHAR;
-            break;
-        case LOGL_DEBUG:
-            m_logMask = LOG_TYPE_STRING | LOG_TYPE_COMMAND | LOG_TYPE_ERROR | LOG_TYPE_ERROR_DB;
-            m_logMask |= LOG_TYPE_BASIC | LOG_TYPE_WARDEN;
-            m_logMask |= LOGL_BASIC | LOG_TYPE_DETAIL | LOG_TYPE_SQL | LOG_TYPE_REMOTE | LOG_TYPE_CHAR;
-            m_logMask |= LOGL_DETAIL | LOG_TYPE_DEBUG | LOG_TYPE_MAP | LOG_TYPE_VMAP | LOG_TYPE_MMAP | LOG_TYPE_WARDEN | LOG_TYPE_ARENA | LOG_TYPE_NETWORK;
-            break;
-        case -1:
-            break;
-    }
+    m_wardenDebug  = sConfig.GetBoolDefault("Warden.DebugLog", false);
+    m_includeTime  = sConfig.GetBoolDefault("LogTime", false);
+    m_logLevel     = LogLevel(sConfig.GetIntDefault("LogLevel", 0));
+    m_logFileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 0));
+    InitColors(sConfig.GetStringDefault("LogColors", ""));
 
-    switch (sConfig.GetIntDefault("DBLogLevel", -1))
-    {
-        case LOGL_MINIMAL:
-            m_logMaskDatabase = LOG_TYPE_STRING | LOG_TYPE_COMMAND | LOG_TYPE_ERROR | LOG_TYPE_ERROR_DB;
-            break;
-        case LOGL_BASIC:
-            m_logMaskDatabase = LOG_TYPE_STRING | LOG_TYPE_COMMAND | LOG_TYPE_ERROR | LOG_TYPE_ERROR_DB;
-            m_logMaskDatabase |= LOG_TYPE_BASIC | LOG_TYPE_WARDEN;
-            break;
-        case LOGL_DETAIL:
-            m_logMaskDatabase = LOG_TYPE_STRING | LOG_TYPE_COMMAND | LOG_TYPE_ERROR | LOG_TYPE_ERROR_DB;
-            m_logMaskDatabase |= LOG_TYPE_BASIC | LOG_TYPE_WARDEN;
-            m_logMaskDatabase |= LOGL_BASIC | LOG_TYPE_DETAIL | LOG_TYPE_SQL | LOG_TYPE_REMOTE | LOG_TYPE_CHAR;
-            break;
-        case LOGL_DEBUG:
-            m_logMaskDatabase = LOG_TYPE_STRING | LOG_TYPE_COMMAND | LOG_TYPE_ERROR | LOG_TYPE_ERROR_DB;
-            m_logMaskDatabase |= LOG_TYPE_BASIC | LOG_TYPE_WARDEN;
-            m_logMaskDatabase |= LOGL_BASIC | LOG_TYPE_DETAIL | LOG_TYPE_SQL | LOG_TYPE_REMOTE | LOG_TYPE_CHAR;
-            m_logMaskDatabase |= LOGL_DETAIL | LOG_TYPE_DEBUG | LOG_TYPE_MAP | LOG_TYPE_VMAP | LOG_TYPE_MMAP | LOG_TYPE_WARDEN | LOG_TYPE_ARENA | LOG_TYPE_NETWORK;
-            break;
-        case -1:
-            break;
-    }
+    // Smartlog data
+    InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
+    InitSmartlogGuids(sConfig.GetStringDefault("Smartlog.ExtraGuids", ""));
 
-    // Check whether we'll log GM commands/RA events/character outputs/chat stuffs
-    m_logMaskDatabase |= static_cast<unsigned char>(sConfig.GetBoolDefault("LogDB.Char", false)) << LOG_TYPE_CHAR;
-    m_logMaskDatabase |= static_cast<unsigned char>(sConfig.GetBoolDefault("LogDB.RA",   false)) << LOG_TYPE_REMOTE;
-    m_logMaskDatabase |= static_cast<unsigned char>(sConfig.GetBoolDefault("LogDB.GM",   false)) << LOG_TYPE_COMMAND;
-    m_logMaskDatabase |= static_cast<unsigned char>(sConfig.GetBoolDefault("LogDB.Chat", false)) << LOG_TYPE_CHAT;
+    m_logFilter = 0;
+    for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+        if (*logFilterData[i].name)
+            if (sConfig.GetBoolDefault(logFilterData[i].configName, logFilterData[i].defaultState))
+                m_logFilter |= (1 << i);
+
+    // Char log settings
+    m_charLog_Dump = sConfig.GetBoolDefault("CharLogDump", false);
 }
 
-
-FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode)
+FILE* Log::openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode)
 {
-    std::string logfn = sConfig.GetStringDefault(configFileName, "");
+    std::string logfn=sConfig.GetStringDefault(configFileName, "");
     if (logfn.empty())
-        return NULL;
+        return nullptr;
 
-    if (configTimeStampFlag && sConfig.GetBoolDefault(configTimeStampFlag, false))
+    if (configTimeStampFlag && sConfig.GetBoolDefault(configTimeStampFlag,false))
     {
-        size_t dot_pos = logfn.find_last_of(".");
-        if (dot_pos != logfn.npos)
-            logfn.insert(dot_pos, m_logsTimestamp);
+        size_t dot_pos = logfn.find_last_of('.');
+        if (dot_pos!=logfn.npos)
+            logfn.insert(dot_pos,m_logsTimestamp);
         else
             logfn += m_logsTimestamp;
     }
 
-    return fopen((m_logsDir + logfn).c_str(), mode);
+    return fopen((m_logsDir+logfn).c_str(), mode);
 }
 
-/**
-  * Opens appropriate log for GM account
-  * @param account account id
-  * @returns the open file
-  */
-FILE* Log::openGmlogPerAccount(uint64 account)
+FILE* Log::openGmlogPerAccount(uint32 account)
 {
     if (m_gmlog_filename_format.empty())
-        return NULL;
+        return nullptr;
 
     char namebuf[OREGON_PATH_MAX];
-    snprintf(namebuf, sizeof(namebuf), m_gmlog_filename_format.c_str(), account);
-    return fopen(namebuf, "ab");
-}
-
-void Log::CreateUpdateFile(const char* str)
-{
-    time_t t = time(NULL);
-    tm* aTm = localtime(&t);
-    uint32 year = aTm->tm_year + 1900;
-    uint32 month = aTm->tm_mon + 1;
-    uint32 day = aTm->tm_mday;
-    uint32 hour = aTm->tm_hour;
-    uint32 minutes = aTm->tm_min;
-    uint32 sec = aTm->tm_sec;
-
-    ofstream(file_);
-    std::ostringstream stream;
-    stream << year << "_" << month << "_" << day <<".sql";
-    file_.open(stream.str().c_str(), std::ios::out | std::ios::app);
-
-    if (file_.is_open())
-    {
-        file_ << str << "\n" << std::endl;
-        file_.close();
-    }
+    snprintf(namebuf, OREGON_PATH_MAX,m_gmlog_filename_format.c_str(),account);
+    return fopen(namebuf, "a");
 }
 
 void Log::outTimestamp(FILE* file)
 {
-    time_t t = time(NULL);
+    time_t t = time(nullptr);
     tm* aTm = localtime(&t);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
@@ -273,301 +374,636 @@ void Log::outTimestamp(FILE* file)
     //       HH     hour (2 digits 00-23)
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
-    fprintf(file, "%-4d-%02d-%02d %02d:%02d:%02d ", aTm->tm_year + 1900, aTm->tm_mon + 1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
+    fprintf(file,"%-4d-%02d-%02d %02d:%02d:%02d ",aTm->tm_year+1900,aTm->tm_mon+1,aTm->tm_mday,aTm->tm_hour,aTm->tm_min,aTm->tm_sec);
 }
 
-void Log::InitColors(const std::string& str)
+void Log::outTime(FILE* where)
 {
-    std::stringstream ss(str);
-    
-    for (uint8 i = 0; i < MAX_LOG_TYPES; ++i)
-    {
-        int color;
-        ss >> color;
-
-        if (ss.eof() || ss.fail() || ss.bad())
-            break;
-
-        if (color < 0 || color >= MAX_COLORS)
-            break;
-        
-        m_colors[i] = ColorTypes (color);
-    }
-    }
-
-/// Sets color for upcoming output
-void Log::SetColor(ColorTypes color)
-{
-
-    #if PLATFORM == PLATFORM_WINDOWS
-    static WORD WinColorFG[MAX_COLORS] =
-    {
-        0,                                                  // BLACK
-        FOREGROUND_RED,                                     // RED
-        FOREGROUND_GREEN,                                   // GREEN
-        FOREGROUND_RED | FOREGROUND_GREEN,                  // BROWN
-        FOREGROUND_BLUE,                                    // BLUE
-        FOREGROUND_RED |                    FOREGROUND_BLUE,// MAGENTA
-        FOREGROUND_GREEN | FOREGROUND_BLUE,                 // CYAN
-        FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,// WHITE
-        FOREGROUND_INTENSITY,                                                            // BLACK, BOLD (GREY?)
-        FOREGROUND_RED   | FOREGROUND_INTENSITY,                                         // RED, BOLD
-        FOREGROUND_GREEN | FOREGROUND_INTENSITY,                                         // GREEN, BOLD
-		FOREGROUND_RED   | FOREGROUND_GREEN     | FOREGROUND_INTENSITY,                  // YELLOW
-        FOREGROUND_BLUE  | FOREGROUND_INTENSITY,                                         // BLUE, BOLD
-        FOREGROUND_RED   | FOREGROUND_BLUE      | FOREGROUND_INTENSITY,                  // MAGENTA, BOLD
-        FOREGROUND_GREEN | FOREGROUND_BLUE      | FOREGROUND_INTENSITY,                  // CYAN, BOLD
-        FOREGROUND_RED   | FOREGROUND_GREEN     | FOREGROUND_BLUE | FOREGROUND_INTENSITY // WHITE, BOLD
-    };
-
-    SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), WinColorFG[color]);
-    #else
-
-    enum ANSIFgTextAttr
-    {
-        FG_BLACK = 30,
-        FG_RED,
-        FG_GREEN,
-        FG_YELLOW,
-        FG_BLUE,
-        FG_MAGENTA,
-        FG_CYAN,
-        FG_WHITE
-    };
-
-    static uint8 UnixColorFG[MAX_COLORS] =
-    {
-        FG_BLACK,                                           // BLACK
-        FG_RED,                                             // RED
-        FG_GREEN,                                           // GREEN
-        FG_YELLOW,                                          // BROWN
-        FG_BLUE,                                            // BLUE
-        FG_MAGENTA,                                         // MAGENTA
-        FG_CYAN,                                            // CYAN
-        FG_WHITE,                                           // LGREY
-        FG_BLACK,                                           // GREY
-        FG_RED,                                             // LRED
-        FG_GREEN,                                           // LGREEN
-        FG_YELLOW,                                          // YELLOW
-        FG_BLUE,                                            // LBLUE
-        FG_MAGENTA,                                         // LMAGENTA
-        FG_CYAN,                                            // LCYAN
-        FG_WHITE                                            // LWHITE
-    };
-
-    fprintf(stderr, "\x1b[%s%dm", ((color > 7) ? "01;" : "00;"), UnixColorFG[color]);
-    #endif
-}
-
-/// Resets output color to normal
-void Log::ResetColor()
-{
-
-    #if PLATFORM == PLATFORM_WINDOWS
-    SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
-    #else
-    fprintf(stderr, "\x1b[0m");
-    #endif
-}
-
-std::string Log::GetTimestampStr()
-{
-    time_t t = time(NULL);
+    time_t t = time(nullptr);
     tm* aTm = localtime(&t);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
     //       DD     day (2 digits 01-31)
+    //       HH     hour (2 digits 00-23)
+    //       MM     minutes (2 digits 00-59)
+    //       SS     seconds (2 digits 00-59)
+    fprintf(where, "%02d:%02d:%02d ",aTm->tm_hour,aTm->tm_min,aTm->tm_sec);
+}
+
+std::string Log::GetTimestampStr()
+{
+    time_t t = time(nullptr);
+    tm* aTm = localtime(&t);
+    //       YYYY   year
+    //       MM     month (2 digits 01-12)
+    //       DD     day (2 digits 01-31)
+    //       HH     hour (2 digits 00-23)
+    //       MM     minutes (2 digits 00-59)
+    //       SS     seconds (2 digits 00-59)
     char buf[20];
-    snprintf(buf, 20, "%04d-%02d-%02d", aTm->tm_year + 1900, aTm->tm_mon + 1, aTm->tm_mday);
+    snprintf(buf,20,"%04d-%02d-%02d_%02d-%02d-%02d",aTm->tm_year+1900,aTm->tm_mon+1,aTm->tm_mday,aTm->tm_hour,aTm->tm_min,aTm->tm_sec);
     return std::string(buf);
 }
 
-void Log::outDB(LogTypes type, const char* str)
+void Log::outString()
 {
-    //if (!LoginDatabase.IsConnected())
-    //    return;
-
-    std::string new_str(str);
-    LoginDatabase.escape_string(new_str);
-    LoginDatabase.PExecute("INSERT INTO logs (time, realm, type, string) "
-                           "VALUES (" UI64FMTD ", %u, %u, '%s');", uint64(time(0)), realmID, type, new_str.c_str());
-}
-
-/**
-  * Performs logging.
-  * @param type one value of the \ref LogTypes
-  * @param newline set if newline should be put after the message
-  * @param prefix prefix, usually the LogTypes as string
-  * @param fmt printf-like formatting message
-  * @param ap list of arguments
-  * @param file if set, use this file instead of m_logFiles[type]
-  */
-void Log::DoLog(LogTypes type, bool newline, const char* prefix, const char* fmt, va_list ap, FILE* file)
-{
-    va_list ap2;
-    va_copy(ap2, ap);
-
-    size_t len = vsnprintf(NULL, 0, fmt, ap2) + 1;
-    char* buffer = (char*) ((len > 1024) ? malloc(len * sizeof(char)) : alloca(len * sizeof(char)));
-    
-	va_end(ap2);
-	vsprintf(buffer, fmt, ap);
-
-    if (m_logMaskDatabase & (1 << type))
+    if (m_includeTime)
+        outTime(stdout);
+    printf("\n");
+    if (logfile)
     {
-        // we don't want empty strings in the DB
-        if (*buffer && *buffer != ' ' && *buffer != '\n')
-            outDB(type, buffer);
+        outTimestamp(logfile);
+        fprintf(logfile, "\n");
+        fflush(logfile);
     }
 
-    if (m_logMask & (1 << type))
+    fflush(stdout);
+}
+
+void Log::outString(char const* str, ...)
+{
+    if (!str)
+        return;
+
+    if (m_colored)
+        SetColor(true,m_colors[LogNormal]);
+
+    if (m_includeTime)
+        outTime(stdout);
+
+    va_list ap;
+
+    va_start(ap, str);
+    vutf8printf(stdout, str, &ap);
+    va_end(ap);
+
+    if (m_colored)
+        ResetColor(true);
+
+    printf("\n");
+
+
+    if (logfile)
     {
-        if (FILE* logFile = (file ? file : m_logFiles[type]))
-        {
-            outTimestamp(logFile);
-            fwrite(buffer, len-1, 1, logFile);
-            if (newline)
-                fputc('\n', logFile);
-            fflush(logFile);
-        }
+        outTimestamp(logfile);
 
-        if (prefix)
-        {
-            if (colorPrefixTable[m_colors[type]])
-                SetColor(colorPrefixTable[m_colors[type]]);
+        va_start(ap, str);
+        vfprintf(logfile, str, ap);
+        fprintf(logfile, "\n");
+        va_end(ap);
 
-            fprintf(stderr, "[%s] ", prefix);
-        }
+        fflush(logfile);
+    }
 
-        if (m_colors[type])
-            SetColor(m_colors[type]);
+    fflush(stdout);
+}
 
-        #if PLATFORM == PLATFORM_WINDOWS
-        wchar_t* wtemp_buf = (wchar_t*) _malloca(len * sizeof(wchar_t));
-        size_t siz = len - 1;
-        if (Utf8toWStr(buffer, len-1, wtemp_buf, siz))
-        {
-            CharToOemBuffW(wtemp_buf, buffer, siz);
-            fwrite(buffer, siz, 1, stderr);
-        }
-        _freea(wtemp_buf);
-        #else
-        fwrite(buffer, len-1, 1, stderr);
-        #endif
+void Log::outInfo(char const* str, ...)
+{
+    if (!str)
+        return;
+    va_list ap;
+    va_start(ap, str);
+    vutf8printf(stdout, str, &ap);
+    va_end(ap);
 
-        if (m_colors[type])
-            ResetColor();
+    printf ("\n");
+    if (nostalriusLogFile)
+    {
+        outTimestamp(nostalriusLogFile);
 
-        if (newline)
-            fputc('\n', stderr);
-        
-        // just to be sure, stderr should be unbuffered anyway
+        va_start(ap, str);
+        vfprintf(nostalriusLogFile, str, ap);
+        fprintf(nostalriusLogFile, "\n");
+        fflush(nostalriusLogFile);
+        va_end(ap);
+
+        fflush(nostalriusLogFile);
+    }
+    fflush(stdout);
+}
+
+void Log::outHonor(char const* str, ...)
+{
+    if (!str)
+        return;
+
+    if (!HasLogFilter(LOG_FILTER_HONOR))
+    {
+        if (m_colored)
+            SetColor(false, m_colors[LogNormal]);
+
+        if (m_includeTime)
+            outTime(stdout);
+
+        va_list ap;
+
+        va_start(ap, str);
+        vutf8printf(stderr, str, &ap);
+        va_end(ap);
+
+        if (m_colored)
+            ResetColor(false);
+
+        fprintf(stderr, "\n");
         fflush(stderr);
     }
 
-    if (len > 1024)
-        free(buffer);
+    if (honorLogfile)
+    {
+        outTimestamp(honorLogfile);
+        fprintf(honorLogfile, "%s", "");
+
+        va_list ap;
+
+        va_start(ap, str);
+        vfprintf(honorLogfile, str, ap);
+        va_end(ap);
+
+        fprintf(honorLogfile, "\n");
+        fflush(honorLogfile);
+    }
 }
 
-void Log::outFatal(const char* err, ...)
+void Log::out(LogFile type, char const* str, ...)
 {
-    va_list ap;
-    va_start(ap, err);
-    size_t len = vsnprintf(NULL, 0, err, ap) + 1;
-    char* buffer = (char*) alloca(len);
-    buffer[len - 1] = '\0';
-    va_end(ap);
-    va_start(ap, err);
-    vsprintf(buffer, err, ap);
-    va_end(ap);
-
-    m_logMask |= LOG_TYPE_ERROR;
-    outError("%s", buffer);
-
-    exit (EXIT_FAILURE);
-}
-
-void Log::outCommand(uint64 account, const char* str, ...)
-{
-    if (!((m_logMask | m_logMaskDatabase) & (1 << LOG_TYPE_COMMAND)))
+    ASSERT(type < LOG_MAX_FILES)
+    if (!str)
         return;
 
-    FILE* file;
-    if (m_gmlog_per_account)
-        file = openGmlogPerAccount(account);
-    else
-        file = m_logFiles[LOG_TYPE_COMMAND];
-
-    va_list ap;
-    va_start(ap, str);
-    DoLog(LOG_TYPE_COMMAND, true, "CMD", str, ap, file);
-    va_end(ap);
-
-    if (m_gmlog_per_account)
+    if (logFiles[type])
     {
-        fflush(file);
-        fclose(file);
+        if (timestampPrefix[type])
+            outTimestamp(logFiles[type]);
+
+        va_list ap;
+        va_start(ap, str);
+        vfprintf(logFiles[type], str, ap);
+        fprintf(logFiles[type], "\n");
+        fflush(logFiles[type]);
+        va_end(ap);
+
+        fflush(logFiles[type]);
     }
+    fflush(stdout);
 }
 
-void Log::outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name)
+void Log::outError(char const* err, ...)
 {
-    if (m_logFiles[LOG_TYPE_CHAR])
+    if (!err)
+        return;
+
+    if (m_colored)
+        SetColor(false,m_colors[LogError]);
+
+    if (m_includeTime)
+        outTime(stderr);
+
+    va_list ap;
+
+   // va_start(ap, err);
+   // vutf8printf(stderr, err, &ap);
+   // va_end(ap);
+
+   // if (m_colored)
+       // ResetColor(false);
+
+   // fprintf(stderr, "\n");
+    if (logfile)
     {
-        fprintf(m_logFiles[LOG_TYPE_CHAR], "== START DUMP == (account: %u guid: %u name: %s)\n%s\n== END DUMP ==\n", account_id, guid, name, str);
-        fflush(m_logFiles[LOG_TYPE_CHAR]);
+        outTimestamp(logfile);
+        fprintf(logfile, "ERROR:");
+
+        va_start(ap, err);
+        vfprintf(logfile, err, ap);
+        va_end(ap);
+
+        fprintf(logfile, "\n");
+        fflush(logfile);
     }
+
+    fflush(stderr);
+}
+
+void Log::outErrorDb()
+{
+    if (m_includeTime)
+        outTime(stderr);
+
+    fprintf(stderr, "\n");
+
+    if (logfile)
+    {
+        outTimestamp(logfile);
+        fprintf(logfile, "ERROR:\n");
+        fflush(logfile);
+    }
+
+    if (dberLogfile)
+    {
+        outTimestamp(dberLogfile);
+        fprintf(dberLogfile, "\n");
+        fflush(dberLogfile);
+    }
+
+    fflush(stderr);
+}
+
+void Log::outErrorDb(char const* err, ...)
+{
+    if (!err)
+        return;
+
+    if (m_colored)
+        SetColor(false,m_colors[LogError]);
+
+    if (m_includeTime)
+        outTime(stderr);
+
+    va_list ap;
+
+   // va_start(ap, err);
+   // vutf8printf(stderr, err, &ap);
+   // va_end(ap);
+
+    //if (m_colored)
+       // ResetColor(false);
+
+   // fprintf(stderr, "\n");
+
+    if (logfile)
+    {
+        outTimestamp(logfile);
+        fprintf(logfile, "ERROR:");
+
+        va_start(ap, err);
+        vfprintf(logfile, err, ap);
+        va_end(ap);
+
+        fprintf(logfile, "\n");
+        fflush(logfile);
+    }
+
+    if (dberLogfile)
+    {
+        outTimestamp(dberLogfile);
+
+        va_list ap;
+        va_start(ap, err);
+        vfprintf(dberLogfile, err, ap);
+        va_end(ap);
+
+        fprintf(dberLogfile, "\n");
+        fflush(dberLogfile);
+    }
+
+    fflush(stderr);
+}
+
+void Log::outBasic(char const* str, ...)
+{
+    if (!str)
+        return;
+
+    if (m_logLevel >= LOG_LVL_BASIC)
+    {
+        if (m_colored)
+            SetColor(true,m_colors[LogDetails]);
+
+        if (m_includeTime)
+            outTime(stdout);
+
+        va_list ap;
+        va_start(ap, str);
+        vutf8printf(stdout, str, &ap);
+        va_end(ap);
+
+        if (m_colored)
+            ResetColor(true);
+
+        printf("\n");
+    }
+
+    if (logfile && m_logFileLevel >= LOG_LVL_BASIC)
+    {
+        va_list ap;
+        outTimestamp(logfile);
+        va_start(ap, str);
+        vfprintf(logfile, str, ap);
+        fprintf(logfile, "\n");
+        va_end(ap);
+        fflush(logfile);
+    }
+
+    fflush(stdout);
+}
+
+void Log::outDetail(char const* str, ...)
+{
+    if (!str)
+        return;
+
+    if (m_logLevel >= LOG_LVL_DETAIL)
+    {
+
+        if (m_colored)
+            SetColor(true,m_colors[LogDetails]);
+
+        if (m_includeTime)
+            outTime(stdout);
+
+        va_list ap;
+        va_start(ap, str);
+        vutf8printf(stdout, str, &ap);
+        va_end(ap);
+
+        if (m_colored)
+            ResetColor(true);
+
+        printf("\n");
+    }
+
+    if (logfile && m_logFileLevel >= LOG_LVL_DETAIL)
+    {
+        outTimestamp(logfile);
+
+        va_list ap;
+        va_start(ap, str);
+        vfprintf(logfile, str, ap);
+        va_end(ap);
+
+        fprintf(logfile, "\n");
+        fflush(logfile);
+    }
+
+    fflush(stdout);
+}
+
+void Log::outDebug(char const* str, ...)
+{
+    if (!str)
+        return;
+
+    if (m_logLevel >= LOG_LVL_DEBUG)
+    {
+        if (m_colored)
+            SetColor(true,m_colors[LogDebug]);
+
+        if (m_includeTime)
+            outTime(stdout);
+
+        va_list ap;
+        va_start(ap, str);
+        vutf8printf(stdout, str, &ap);
+        va_end(ap);
+
+        if (m_colored)
+            ResetColor(true);
+
+        printf("\n");
+    }
+
+    if (logfile && m_logFileLevel >= LOG_LVL_DEBUG)
+    {
+        outTimestamp(logfile);
+
+        va_list ap;
+        va_start(ap, str);
+        vfprintf(logfile, str, ap);
+        va_end(ap);
+
+        fprintf(logfile, "\n");
+        fflush(logfile);
+    }
+
+    fflush(stdout);
+}
+
+void Log::outWarden(char const* wrd, ...)
+{
+    if (!wrd)
+        return;
+
+    if (m_colored)
+        SetColor(true, m_colors[LogWarden]);
+
+    if (m_includeTime)
+        outTime(stdout);
+
+    // Append tag to console warden messages.
+    printf("[Warden] ");
+
+    va_list ap;
+    va_start(ap, wrd);
+    vutf8printf(stdout, wrd, &ap);
+    va_end(ap);
+
+    if (m_colored)
+        ResetColor(true);
+
+    printf("\n");
+
+    if (wardenLogfile)
+    {
+        outTimestamp(wardenLogfile);
+        fprintf(wardenLogfile, "[Warden] ");
+
+        va_list ap;
+        va_start(ap, wrd);
+        vfprintf(wardenLogfile, wrd, ap);
+        va_end(ap);
+
+        fprintf(wardenLogfile, "\n");
+        fflush(wardenLogfile);
+    }
+
+    fflush(stdout);
+}
+
+void Log::outWardenDebug(char const* wrd, ...)
+{
+    if (!m_wardenDebug)
+        return;
+
+    if (!wrd)
+        return;
+
+    if (m_colored)
+        SetColor(true, m_colors[LogWarden]);
+
+    if (m_includeTime)
+        outTime(stdout);
+
+    // Append tag to console warden messages.
+    printf("[Warden] ");
+
+    va_list ap;
+    va_start(ap, wrd);
+    vutf8printf(stdout, wrd, &ap);
+    va_end(ap);
+
+    if (m_colored)
+        ResetColor(true);
+
+    printf("\n");
+
+    if (wardenLogfile)
+    {
+        outTimestamp(wardenLogfile);
+        fprintf(wardenLogfile, "[Warden] ");
+
+        va_list ap;
+        va_start(ap, wrd);
+        vfprintf(wardenLogfile, wrd, ap);
+        va_end(ap);
+
+        fprintf(wardenLogfile, "\n");
+        fflush(wardenLogfile);
+    }
+
+    fflush(stdout);
+}
+
+void Log::outAnticheat(char const* detector, char const* player, char const* reason, char const* penalty)
+{
+    if (!detector || !player || !reason || !penalty)
+        return;
+
+    if (m_colored)
+        SetColor(true, m_colors[LogWarden]);
+
+    if (m_includeTime)
+        outTime(stdout);
+
+    printf("[%s] Player %s, Cheat: %s, Penalty: %s", detector, player, reason, penalty);
+
+    if (m_colored)
+        ResetColor(true);
+
+    printf("\n");
+
+    if (anticheatLogfile)
+    {
+        outTimestamp(anticheatLogfile);
+        fprintf(anticheatLogfile, "[%s] Player %s, Cheat: %s, Penalty: %s", detector, player, reason, penalty);
+        fprintf(anticheatLogfile, "\n");
+        fflush(anticheatLogfile);
+    }
+
+    fflush(stdout);
+}
+
+void Log::outCommand(uint32 account, char const* str, ...)
+{
+    if (!str)
+        return;
+
+    if (m_logLevel >= LOG_LVL_DETAIL)
+    {
+        if (m_colored)
+            SetColor(true,m_colors[LogDetails]);
+
+        if (m_includeTime)
+            outTime(stdout);
+
+        va_list ap;
+        va_start(ap, str);
+        vutf8printf(stdout, str, &ap);
+        va_end(ap);
+
+        if (m_colored)
+            ResetColor(true);
+
+        printf("\n");
+    }
+
+    if (logfile && m_logFileLevel >= LOG_LVL_DETAIL)
+    {
+        ACE_OS::sleep(1);
+    }
+
+    if (m_gmlog_per_account)
+    {
+        if (FILE* per_file = openGmlogPerAccount (account))
+        {
+            va_list ap;
+            outTimestamp(per_file);
+            va_start(ap, str);
+            vfprintf(per_file, str, ap);
+            fprintf(per_file, "\n");
+            va_end(ap);
+            fclose(per_file);
+        }
+    }
+    else if (gmLogfile)
+    {
+        va_list ap;
+        outTimestamp(gmLogfile);
+        va_start(ap, str);
+        vfprintf(gmLogfile, str, ap);
+        fprintf(gmLogfile, "\n");
+        va_end(ap);
+        fflush(gmLogfile);
+    }
+
+    fflush(stdout);
+}
+
+void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
+                             char const* opcodeName, ByteBuffer const* packet,
+                             bool incoming)
+{
+    if (!worldLogfile)
+        return;
+
+    outTimestamp(worldLogfile);
+
+    fprintf(worldLogfile,
+            "\n%s:\nSOCKET: %p\nLENGTH: %zu\nOPCODE: %s (0x%.4X)\nDATA:\n",
+            incoming ? "CLIENT" : "SERVER", socketHandle, packet->size(),
+            opcodeName, opcode);
+
+    size_t p = 0;
+    while (p < packet->size())
+    {
+        for (size_t j = 0; j < 16 && p < packet->size(); ++j)
+            fprintf(worldLogfile, "%.2X ", (*packet)[p++]);
+
+        fprintf(worldLogfile, "\n");
+    }
+
+    fprintf(worldLogfile, "\n\n");
+    fflush(worldLogfile);
 }
 
 void Log::WaitBeforeContinueIfNeed()
 {
     int mode = sConfig.GetIntDefault("WaitAtStartupError",0);
 
-    printf("\nWait %d secs for continue.\n", mode);
-
-    for (int i = 0; i < mode; ++i)
+    if (mode < 0)
     {
-        ACE_OS::sleep(1);
-        
+        printf("\nPress <Enter> for continue\n");
+
+        std::string line;
+        std::getline (std::cin, line);
+    }
+    else if (mode > 0)
+    {
+        printf("\nWait %d secs for continue.\n",mode);
+        BarGoLink bar(mode);
+        for(int i = 0; i < mode; ++i)
+        {
+            bar.step();
+            ACE_OS::sleep(1);
+        }
     }
 }
+void Log::SetLogMask(unsigned long mask)
+{
+	m_logMask = mask;
+}
 
-
-#define logFunctionImpl(name, type, newline, prefix)                  \
-            void Log::name(const char* fmt, ...)                      \
-            {                                                         \
-                if (!((m_logMask | m_logMaskDatabase) & (1 << type))) \
-                    return;                                    \
-                                                               \
-                va_list ap;                                    \
-                va_start(ap, fmt);                             \
-                DoLog(type, newline, prefix, fmt, ap, NULL);   \
-                va_end(ap);                                    \
-            }                                                          
-
-logFunctionImpl(outString, LOG_TYPE_STRING,  true, NULL)
-logFunctionImpl(outBasic,  LOG_TYPE_BASIC,   true, NULL)
-logFunctionImpl(outDetail, LOG_TYPE_DETAIL,  true, "Detail")
-logFunctionImpl(outDebug,  LOG_TYPE_DEBUG,   true, "Dbg")
-
-logFunctionImpl(outError,  LOG_TYPE_ERROR,    true, "Err")
-logFunctionImpl(outErrorDb,LOG_TYPE_ERROR_DB, true, "ErrDB")
-logFunctionImpl(outSQL,    LOG_TYPE_SQL,      true, "SQL")
-
-logFunctionImpl(outArena,  LOG_TYPE_ARENA,   true, "Arena")
-logFunctionImpl(outWarden, LOG_TYPE_WARDEN,  true, "Warden")
-logFunctionImpl(outChat,   LOG_TYPE_CHAT,    true,  "Chat")
-logFunctionImpl(outCommand,LOG_TYPE_COMMAND, true, "CMD")
-
-logFunctionImpl(outChar,   LOG_TYPE_CHAR,   true, "Char")
-logFunctionImpl(outRemote, LOG_TYPE_REMOTE, true, "Remote")
-
-logFunctionImpl(outMap, LOG_TYPE_MAP,  true, "Map")
-logFunctionImpl(outVMap,LOG_TYPE_VMAP, true, "VMap")
-logFunctionImpl(outMMap,LOG_TYPE_MMAP, true, "MMap")
-
-logFunctionImpl(outNetwork, LOG_TYPE_NETWORK, true, "NET")
-
-logFunctionImpl(outDebugInLine, LOG_TYPE_DEBUG, false, "Dbg")
-
-#undef logFunctionImpl
+void Log::SetDBLogMask(unsigned long mask)
+{
+	m_logMaskDatabase = mask;
+}

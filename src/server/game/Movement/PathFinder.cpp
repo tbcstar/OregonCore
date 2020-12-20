@@ -54,7 +54,7 @@ bool PathInfo::Update(float destX, float destY, float destZ, bool forceDest)
 
     if (!Oregon::IsValidMapCoord(destX, destY, destZ) || !Oregon::IsValidMapCoord(x, y, z))
     {
-        sLog.outMMap("PathInfo::Update() called with invalid map coords, destX: %f destY: %f destZ: %f x: %f y: %f z: %f for creature %u", destX, destY, destZ, x, y, z, m_sourceUnit->GetGUIDLow());
+        DEBUG_LOG("PathInfo::Update() called with invalid map coords, destX: %f destY: %f destZ: %f x: %f y: %f z: %f for creature %u", destX, destY, destZ, x, y, z, m_sourceUnit->GetGUIDLow());
         m_type = PATHFIND_NOPATH;
         return false;
     }
@@ -68,7 +68,7 @@ bool PathInfo::Update(float destX, float destY, float destZ, bool forceDest)
 
     m_forceDestination = forceDest;
 
-    sLog.outMMap("PathInfo::Update() for %u \n", m_sourceUnit->GetGUIDLow());
+    DEBUG_LOG("PathInfo::Update() for %u \n", m_sourceUnit->GetGUIDLow());
 
     // make sure navMesh works - we can run on map w/o mmap
     // check if the start and end point have a .mmtile loaded (can we pass via not loaded tile on the way?)
@@ -170,7 +170,7 @@ void PathInfo::BuildPolyPath(const Vector3& startPos, const Vector3& endPos)
     // its up to caller how he will use this info
     if (startPoly == INVALID_POLYREF || endPoly == INVALID_POLYREF)
     {
-        sLog.outMMap("BuildPolyPath :: (startPoly == 0 || endPoly == 0)\n");
+        DEBUG_LOG("BuildPolyPath :: (startPoly == 0 || endPoly == 0)\n");
         BuildShortcut();
 
         bool path = m_sourceUnit->GetTypeId() == TYPEID_UNIT && m_sourceUnit->ToCreature()->CanFly();
@@ -199,7 +199,7 @@ void PathInfo::BuildPolyPath(const Vector3& startPos, const Vector3& endPos)
     bool farFromPoly = (distToStartPoly > 7.0f || distToEndPoly > 7.0f);
     if (farFromPoly)
     {
-        sLog.outMMap("BuildPolyPath :: farFromPoly distToStartPoly=%.3f distToEndPoly=%.3f\n", distToStartPoly, distToEndPoly);
+        DEBUG_LOG("BuildPolyPath :: farFromPoly distToStartPoly=%.3f distToEndPoly=%.3f\n", distToStartPoly, distToEndPoly);
 
         bool buildShotrcut = false;
         if (m_sourceUnit->GetTypeId() == TYPEID_UNIT)
@@ -209,13 +209,13 @@ void PathInfo::BuildPolyPath(const Vector3& startPos, const Vector3& endPos)
             Vector3 p = (distToStartPoly > 7.0f) ? startPos : endPos;
             if (m_sourceUnit->GetMap()->IsUnderWater(p.x, p.y, p.z))
             {
-                sLog.outMMap("BuildPolyPath :: underwater case\n");
+                DEBUG_LOG("BuildPolyPath :: underwater case\n");
                 if (owner->CanSwim())
                     buildShotrcut = true;
             }
             else
             {
-                sLog.outMMap("BuildPolyPath :: flying case\n");
+                DEBUG_LOG("BuildPolyPath :: flying case\n");
                 if (owner->CanFly())
                     buildShotrcut = true;
             }
@@ -247,7 +247,7 @@ void PathInfo::BuildPolyPath(const Vector3& startPos, const Vector3& endPos)
     // just need to move in straight line
     if (startPoly == endPoly)
     {
-        sLog.outMMap("BuildPolyPath :: (startPoly == endPoly)\n");
+        DEBUG_LOG("BuildPolyPath :: (startPoly == endPoly)\n");
 
         BuildShortcut();
 
@@ -255,7 +255,7 @@ void PathInfo::BuildPolyPath(const Vector3& startPos, const Vector3& endPos)
         m_polyLength = 1;
 
         m_type = farFromPoly ? PATHFIND_INCOMPLETE : PATHFIND_NORMAL;
-        sLog.outMMap("BuildPolyPath :: path type %d\n", m_type);
+        DEBUG_LOG("BuildPolyPath :: path type %d\n", m_type);
         return;
     }
 
@@ -273,7 +273,7 @@ void PathInfo::BuildPolyPath(const Vector3& startPos, const Vector3& endPos)
             // here to catch few bugs
             if (m_pathPolyRefs[pathStartIndex] == INVALID_POLYREF)
             {
-                sLog.outMMap("Invalid poly ref in BuildPolyPath.");
+                DEBUG_LOG("Invalid poly ref in BuildPolyPath.");
                 break;
             }
 
@@ -444,14 +444,14 @@ void PathInfo::BuildPointPath(const float* startPoint, const float* endPoint)
         // only happens if pass bad data to findStraightPath or navmesh is broken
         // single point paths can be generated here
         // TODO : check the exact cases
-        sLog.outMMap("PathInfo::BuildPointPath FAILED! path sized %d returned\n", pointCount);
+        DEBUG_LOG("PathInfo::BuildPointPath FAILED! path sized %d returned\n", pointCount);
         BuildShortcut();
         m_type = PATHFIND_NOPATH;
         return;
     }
     else if (pointCount == m_pointPathLimit)
     {
-        sLog.outMMap("PathInfo::BuildPointPath pointCount %u == m_pointPathLimit\n", pointCount);
+        DEBUG_LOG("PathInfo::BuildPointPath pointCount %u == m_pointPathLimit\n", pointCount);
         BuildShortcut();
         m_type = PATHFIND_SHORT;
         return;

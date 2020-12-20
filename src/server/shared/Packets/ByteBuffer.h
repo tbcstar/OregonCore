@@ -426,73 +426,78 @@ class ByteBuffer
             memcpy(&_storage[pos], src, cnt);
         }
 
-        void print_storage() const
-        {
-            if (!sLog.IsOutDebug())                          // optimize disabled debug output
-                return;
+		void print_storage() const
+		{
+			if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
+				return;
 
-            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
-            for (uint32 i = 0; i < size(); ++i)
-                sLog.outDebugInLine("%u - ", read<uint8>(i) );
-            sLog.outDebug(" ");
-        }
+			std::ostringstream ss;
+			ss << "STORAGE_SIZE: " << size() << "\n";
 
-        void textlike() const
-        {
-            if (!sLog.IsOutDebug())                          // optimize disabled debug output
-                return;
+			if (sLog.IsIncludeTime())
+				ss << "         ";
 
-            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
-            for (uint32 i = 0; i < size(); ++i)
-                sLog.outDebugInLine("%c", read<uint8>(i) );
-            sLog.outDebug(" ");
-        }
+			for (size_t i = 0; i < size(); ++i)
+				ss << uint32(read<uint8>(i)) << " - ";
 
-        void hexlike() const
-        {
-            if (!sLog.IsOutDebug())                          // optimize disabled debug output
-                return;
+			DEBUG_LOG(ss.str().c_str());
+		}
 
-            uint32 j = 1, k = 1;
-            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
+		void textlike() const
+		{
+			if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
+				return;
 
-            for (uint32 i = 0; i < size(); ++i)
-            {
-                if ((i == (j * 8)) && ((i != (k * 16))))
-                {
-                    if (read<uint8>(i) < 0x10)
-                        sLog.outDebugInLine("| 0%X ", read<uint8>(i) );
-                    else
-                        sLog.outDebugInLine("| %X ", read<uint8>(i) );
-                    ++j;
-                }
-                else if (i == (k * 16))
-                {
-                    if (read<uint8>(i) < 0x10)
-                    {
-                        sLog.outDebugInLine("\n");
+			std::ostringstream ss;
+			ss << "STORAGE_SIZE: " << size() << "\n";
 
-                        sLog.outDebugInLine("0%X ", read<uint8>(i) );
-                    }
-                    else
-                    {
-                        sLog.outDebugInLine("\n");
+			if (sLog.IsIncludeTime())
+				ss << "         ";
 
-                        sLog.outDebugInLine("%X ", read<uint8>(i) );
-                    }
+			for (size_t i = 0; i < size(); ++i)
+				ss << read<uint8>(i);
 
-                    ++k;
-                    ++j;
-                }
-                else
-                {
-                    if (read<uint8>(i) < 0x10)
-                        sLog.outDebugInLine("0%X ", read<uint8>(i) );
-                    else
-                        sLog.outDebugInLine("%X ", read<uint8>(i) );
-                }
-            }
-            sLog.outDebugInLine("\n");
+			DEBUG_LOG(ss.str().c_str());
+		}
+
+		void hexlike() const
+		{
+			if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
+				return;
+
+			std::ostringstream ss;
+			ss << "STORAGE_SIZE: " << size() << "\n";
+
+			if (sLog.IsIncludeTime())
+				ss << "         ";
+
+			size_t j = 1, k = 1;
+
+			for (size_t i = 0; i < size(); ++i)
+			{
+				if ((i == (j * 8)) && ((i != (k * 16))))
+				{
+					ss << "| ";
+					++j;
+				}
+				else if (i == (k * 16))
+				{
+					ss << "\n";
+
+					if (sLog.IsIncludeTime())
+						ss << "         ";
+
+					++k;
+					++j;
+				}
+
+				char buf[4];
+				snprintf(buf, 4, "%02X", read<uint8>(i));
+				ss << buf << " ";
+
+			}
+			DEBUG_LOG(ss.str().c_str());
+		
         }
     private:
         // limited for internal use because can "append" any unexpected type (like pointer and etc) with hard detection problem

@@ -424,6 +424,7 @@ void World::LoadModuleConfig()
     }
 
     sLog.outString(">> Loaded %lu module config", count);
+	sLog.outString();
 
 }
 
@@ -1173,7 +1174,7 @@ void World::LoadSQLUpdates()
 
         // Change current directory to sql/updates/(path)
         if (-1 == ACE_OS::chdir(path.c_str()))
-            sLog.outFatal("Can't change directory to %s: %s", path.c_str(), strerror(errno));
+              sLog.outError("Can't change directory to %s: %s", path.c_str(), strerror(errno));
 
         // get files in sql/updates/(path)/ directory
         if (ACE_DIR* dir = ACE_OS::opendir(path.c_str()))
@@ -1188,7 +1189,7 @@ void World::LoadSQLUpdates()
             ACE_OS::closedir(dir);
         }
         else
-            sLog.outFatal("Can't open %s: %s", path.c_str(), strerror(errno));
+              sLog.outError("Can't open %s: %s", path.c_str(), strerror(errno));
 
         // sort our files in ascending order
         std::sort(files.begin(), files.end());
@@ -1206,12 +1207,12 @@ void World::LoadSQLUpdates()
                 updates[i].db->DirectPExecute("INSERT INTO `updates` VALUES ('%s', NOW())", files[j].c_str());
             }
             else
-                sLog.outFatal("Failed to apply %s. See db_errors.log for more details.", files[j].c_str());
+                  sLog.outError("Failed to apply %s. See db_errors.log for more details.", files[j].c_str());
         }
 
         // Return to original working directory
         if (-1 == ACE_OS::chdir(cwd))
-            sLog.outFatal("Can't change directory to %s: %s", cwd, strerror(errno));
+              sLog.outError("Can't change directory to %s: %s", cwd, strerror(errno));
     }
 }
 
@@ -1244,7 +1245,8 @@ void World::LoadModSQLUpdates()
     std::set<std::string> alreadyAppliedFiles;
 
     if (m_ModSQLUpdatesPath.empty()) {
-        outstring_log(">> Skipping modules SQL updates.");
+         sLog.outString(">> Skipping modules SQL updates.");
+		 sLog.outString();
         return;
     }
 
@@ -1272,7 +1274,7 @@ void World::LoadModSQLUpdates()
             ACE_stat stat_buf;
             if (ACE_OS::lstat(path.c_str(), &stat_buf) == -1)
             {
-                sLog.outFatal("directory error %s: %s", path.c_str(), strerror(errno));
+                  sLog.outError("directory error %s: %s", path.c_str(), strerror(errno));
                 continue;
 			}
 
@@ -1341,7 +1343,7 @@ void World::LoadModSQLUpdates()
                         ACE_OS::closedir(dir);
                     }
                     else
-                        sLog.outFatal("Can't open %s: %s", pathsql.c_str(), strerror(errno));
+                          sLog.outError("Can't open %s: %s", pathsql.c_str(), strerror(errno));
 
                     // sort our files in ascending order
                     std::sort(files.begin(), files.end());
@@ -1359,12 +1361,12 @@ void World::LoadModSQLUpdates()
                             updates[i].db->DirectPExecute("INSERT INTO `updates` VALUES ('%s', NOW())", files[j].c_str());
                         }
                         else
-                            sLog.outFatal("Failed to apply %s. See db_errors.log for more details.", files[j].c_str());
+                              sLog.outError("Failed to apply %s. See db_errors.log for more details.", files[j].c_str());
                     }
 
                     // Return to original working directory
                     if (-1 == ACE_OS::chdir(cwd))
-                        sLog.outFatal("Can't change directory to %s: %s", cwd, strerror(errno));
+                          sLog.outError("Can't change directory to %s: %s", cwd, strerror(errno));
                 }
             }
             break;
@@ -1376,7 +1378,7 @@ void World::LoadModSQLUpdates()
         ACE_OS::closedir(dira);
     }
     else
-        sLog.outFatal("Can't open %s: %s", m_ModSQLUpdatesPath.c_str(), strerror(errno));
+          sLog.outError("Can't open %s: %s", m_ModSQLUpdatesPath.c_str(), strerror(errno));
 
 
 
@@ -1487,6 +1489,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadGossipMenuItemsLocales();
     sObjectMgr.SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
     sLog.outString(">>> Localization strings loaded");
+	sLog.outString();
 	
 #ifdef ELUNA
     ///- Initialize Lua Engine
@@ -1924,7 +1927,7 @@ void World::DetectDBCLang()
         default_locale = m_lang_confid;
 
     if (default_locale >= MAX_LOCALE)
-        sLog.outFatal("Unable to determine your DBC Locale! (corrupt DBC?)");
+          sLog.outError("Unable to determine your DBC Locale! (corrupt DBC?)");
 
     m_defaultDbcLocale = LocaleConstant(default_locale);
 
@@ -1966,6 +1969,7 @@ void World::LoadAutobroadcasts()
     if (!result)
     {
         sLog.outString(">> Loaded 0 autobroadcasts definitions");
+		sLog.outString();
         return;
     }
 
@@ -1982,6 +1986,7 @@ void World::LoadAutobroadcasts()
     while (result->NextRow());
 
     sLog.outString(">> Loaded %u autobroadcasts definitions", count);
+	sLog.outString();
 }
 
 
@@ -1997,6 +2002,7 @@ void World::LoadIp2nation()
     }
 
     sLog.outString(">> Loaded %u ip2nation definitions", count);
+	sLog.outString();
 }
 
 void World::LoadOpcodeProtection()
@@ -2027,6 +2033,7 @@ void World::LoadOpcodeProtection()
     }
 
     sLog.outString(">> Loaded %lu opcode protections.", count);
+	sLog.outString();
 }
 
 ProtectedOpcodeProperties const& World::GetProtectedOpcodeProperties(uint32 opcode)
@@ -2670,7 +2677,7 @@ void World::ShutdownMsg(bool show, Player* player)
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 
         SendServerMessage(msgid, str.c_str(), player);
-        DEBUG_LOG("Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutting down"), str.c_str());
+        sLog.outDebug("Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutting down"), str.c_str());
     }
 }
 
@@ -2688,7 +2695,7 @@ void World::ShutdownCancel()
     m_ExitCode = SHUTDOWN_EXIT_CODE;                       // to default value
     SendServerMessage(msgid);
 
-    DEBUG_LOG("Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"));
+    sLog.outDebug("Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"));
 	
 #ifdef ELUNA
     ///- Used by Eluna

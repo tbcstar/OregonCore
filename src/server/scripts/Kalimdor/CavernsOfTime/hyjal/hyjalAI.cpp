@@ -486,7 +486,7 @@ void hyjalAI::Reset()
             pInstance->SetData(DATA_RESET_TRASH_COUNT, 0);
         }
     }
-    else error_log(ERROR_INST_DATA);
+	else sLog.outError(ERROR_INST_DATA);
 
     //Visibility
     DoHide = true;
@@ -617,7 +617,7 @@ void hyjalAI::SummonNextWave(Wave wave[18], uint32 Count, float Base[4][3])
 
     if (!pInstance)
     {
-        error_log(ERROR_INST_DATA);
+	 sLog.outError(ERROR_INST_DATA);
         return;
     }
     InfernalCount = 0;//reset infernal count every new wave
@@ -644,7 +644,7 @@ void hyjalAI::SummonNextWave(Wave wave[18], uint32 Count, float Base[4][3])
         else
         {
             NextWaveTimer = 15000;
-            debug_log("OSCR: HyjalAI: debug mode is enabled. Next Wave in 15 seconds");
+            sLog.outDebug("OSCR: HyjalAI: debug mode is enabled. Next Wave in 15 seconds");
         }
     }
     else
@@ -684,7 +684,7 @@ uint32 hyjalAI::GetInstanceData(uint32 Event)
 {
     if (pInstance)
         return pInstance->GetData(Event);
-    else error_log(ERROR_INST_DATA);
+    else sLog.outError(ERROR_INST_DATA);
 
     return 0;
 }
@@ -738,7 +738,7 @@ void hyjalAI::UpdateWorldState(uint32 id, uint32 state)
                 player->SendUpdateWorldState(id, state);
         }
     }
-    else debug_log("OSCR: HyjalAI: UpdateWorldState, but PlayerList is empty");
+    else sLog.outDebug("OSCR: HyjalAI: UpdateWorldState, but PlayerList is empty");
 }
 
 void hyjalAI::Retreat()

@@ -183,7 +183,7 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* pSource, uint32 uiSoundId)
 
     if (!GetSoundEntriesStore()->LookupEntry(uiSoundId))
     {
-        error_log("OSCR: Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", uiSoundId, pSource->GetTypeId(), pSource->GetGUIDLow());
+        sLog.outError("OSCR: Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", uiSoundId, pSource->GetTypeId(), pSource->GetGUIDLow());
         return;
     }
 
@@ -342,7 +342,7 @@ void ScriptedAI::DoResetThreat()
 {
     if (!me->CanHaveThreatList() || me->getThreatManager().isThreatListEmpty())
     {
-        error_log("OSCR: DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = %d)", me->GetEntry());
+        sLog.outError("OSCR: DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = %d)", me->GetEntry());
         return;
     }
 
@@ -391,7 +391,7 @@ void ScriptedAI::DoTeleportPlayer(Unit* pUnit, float fX, float fY, float fZ, flo
     if (!pUnit || pUnit->GetTypeId() != TYPEID_PLAYER)
     {
         if (pUnit)
-            error_log("OSCR: Creature " UI64FMTD " (Entry: %u) Tried to teleport non-player unit (Type: %u GUID: " UI64FMTD ") to x: %f y:%f z: %f o: %f. Aborted.", me->GetGUID(), me->GetEntry(), pUnit->GetTypeId(), pUnit->GetGUID(), fX, fY, fZ, fO);
+            sLog.outError("OSCR: Creature " UI64FMTD " (Entry: %u) Tried to teleport non-player unit (Type: %u GUID: " UI64FMTD ") to x: %f y:%f z: %f o: %f. Aborted.", me->GetGUID(), me->GetEntry(), pUnit->GetTypeId(), pUnit->GetGUID(), fX, fY, fZ, fO);
         return;
     }
 
@@ -527,7 +527,7 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(const uint32 uiDiff)
             return false;
         break;
     default:
-        error_log("OSCR: EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition.", me->GetEntry());
+        sLog.outError("OSCR: EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition.", me->GetEntry());
         return false;
     }
 

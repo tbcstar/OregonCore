@@ -416,6 +416,7 @@ enum ScriptCommands
     SCRIPT_COMMAND_EQUIP                 = 31,               // soucre = Creature, datalong = equipment id
     SCRIPT_COMMAND_MODEL                 = 32,               // source = Creature, datalong = model id
     SCRIPT_COMMAND_CLOSE_GOSSIP          = 33,               // source = Player
+    SCRIPT_COMMAND_MOVEMENT              = 35,               // source = Creature, datalong = MovementType, datalong2 = MovementDistance (spawndist f.ex.), dataint = pathid
 };
 
 // Storage class for commands issued for delayed execution

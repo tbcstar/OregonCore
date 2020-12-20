@@ -385,7 +385,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
         data << title;
     }
     pSession->SendPacket(&data);
-    DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC Guid=%u", GUID_LOPART(npcGUID));
+    sLog.outDebug("WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC Guid=%u", GUID_LOPART(npcGUID));
 }
 
 void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, uint64 npcGUID)
@@ -395,7 +395,7 @@ void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, uint64 npcGUID)
     data << uint8(questStatus);
 
     pSession->SendPacket(&data);
-    DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_STATUS NPC Guid=%u, status=%u", GUID_LOPART(npcGUID), questStatus);
+    sLog.outDebug("WORLD: Sent SMSG_QUESTGIVER_STATUS NPC Guid=%u, status=%u", GUID_LOPART(npcGUID), questStatus);
 }
 
 void PlayerMenu::SendQuestGiverQuestDetails(Quest const* pQuest, uint64 npcGUID, bool ActivateAccept)
@@ -494,7 +494,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* pQuest, uint64 npcGUID,
     }
     pSession->SendPacket(&data);
 
-    DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPCGuid=%u, questid=%u", GUID_LOPART(npcGUID), pQuest->GetQuestId());
+    sLog.outDebug("WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPCGuid=%u, questid=%u", GUID_LOPART(npcGUID), pQuest->GetQuestId());
 }
 
 void PlayerMenu::SendQuestQueryResponse(Quest const* pQuest)
@@ -612,7 +612,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* pQuest)
         data << ObjectiveText[iI];
 
     pSession->SendPacket(&data);
-    DEBUG_LOG("WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", pQuest->GetQuestId());
+    sLog.outDebug("WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", pQuest->GetQuestId());
 }
 
 void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, uint64 npcGUID, bool EnableNext)
