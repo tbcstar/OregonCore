@@ -340,7 +340,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
 }
 void WorldSession::HandlePetStopAttack(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: Received CMSG_PET_STOP_ATTACK");
+    sLog.outDebug("WORLD: Received CMSG_PET_STOP_ATTACK");
 
     ObjectGuid petGuid;
     recv_data >> petGuid;

@@ -261,7 +261,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
 
     recv_data >> guid;
 
-    DEBUG_LOG("WORLD: Recvd CMSG_GAMEOBJ_USE Message [guid=%u]", GUID_LOPART(guid));
+    sLog.outDebug("WORLD: Recvd CMSG_GAMEOBJ_USE Message [guid=%u]", GUID_LOPART(guid));
 
     GameObject* obj = GetPlayer()->GetMap()->GetGameObject(guid);
     if (!obj)
@@ -285,7 +285,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     recvPacket >> spellId;
     recvPacket >> cast_count;
 
-    DEBUG_LOG("WORLD: got cast spell packet, spellId - %u, cast_count: %u data length = %i",
+    sLog.outDebug("WORLD: got cast spell packet, spellId - %u, cast_count: %u data length = %i",
               spellId, cast_count, recvPacket.size());
 
     SpellEntry const* spellInfo = sSpellStore.LookupEntry(spellId);
@@ -462,7 +462,7 @@ void WorldSession::HandleTotemDestroy(WorldPacket& recvPacket)
 
 void WorldSession::HandleSelfResOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_LOG("WORLD: CMSG_SELF_RES");                  // empty opcode
+    sLog.outDebug("WORLD: CMSG_SELF_RES");                  // empty opcode
 
     if (_player->GetUInt32Value(PLAYER_SELF_RES_SPELL))
     {
@@ -476,7 +476,7 @@ void WorldSession::HandleSelfResOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
 {
-    DEBUG_LOG("WORLD: Recvd CMSG_GET_MIRRORIMAGE_DATA Message");
+    sLog.outDebug("WORLD: Recvd CMSG_GET_MIRRORIMAGE_DATA Message");
 
     uint64 guid;
     recvData >> guid;
@@ -563,7 +563,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
 
 void WorldSession::HandleSpellClick(WorldPacket& recvData)
 {
-    DEBUG_LOG("WORLD: Recvd CMSG_SPELLCLICK Message");
+    sLog.outDebug("WORLD: Recvd CMSG_SPELLCLICK Message");
 
     uint64 guid;
     recvData >> guid;

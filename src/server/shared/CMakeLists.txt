@@ -66,6 +66,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/sockets/include
   ${CMAKE_SOURCE_DIR}/dep/utf8cpp
   ${CMAKE_SOURCE_DIR}/src/framework
+  ${CMAKE_SOURCE_DIR}/src/framework/Policies
   ${CMAKE_SOURCE_DIR}/src
 
   ${CMAKE_SOURCE_DIR}/src/common

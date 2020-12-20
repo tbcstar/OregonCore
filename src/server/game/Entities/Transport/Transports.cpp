@@ -33,6 +33,7 @@ void MapManager::LoadTransports()
     if (!result)
     {
         sLog.outString(">> Loaded %u transports", count);
+		sLog.outString();
         return;
     }
 
@@ -104,6 +105,7 @@ void MapManager::LoadTransports()
     while (result->NextRow());
 
     sLog.outString(">> Loaded %u transports", count);
+	sLog.outString();
 
     // check transport data DB integrity
     result = WorldDatabase.Query("SELECT gameobject.guid,gameobject.id,transports.name FROM gameobject,transports WHERE gameobject.id = transports.entry");
@@ -521,9 +523,9 @@ void Transport::Update(uint32 p_time)
 
         #ifdef OREGON_DEBUG
         if (m_curr == m_WayPoints.begin())
-            DEBUG_LOG(" ************ BEGIN ************** %s", this->m_name.c_str());
+            sLog.outDebug(" ************ BEGIN ************** %s", this->m_name.c_str());
 
-            DEBUG_LOG("%s moved to %d %f %f %f %d", this->m_name.c_str(), m_curr->second.id, m_curr->second.x, m_curr->second.y, m_curr->second.z, m_curr->second.mapid);
+            sLog.outDebug("%s moved to %d %f %f %f %d", this->m_name.c_str(), m_curr->second.id, m_curr->second.x, m_curr->second.y, m_curr->second.z, m_curr->second.mapid);
         #endif
 
         //Transport Event System
@@ -568,7 +570,7 @@ void Transport::DoEventIfAny(WayPointMap::value_type const& node, bool departure
 {
     if (uint32 eventid = departure ? node.second.departureEventID : node.second.arrivalEventID)
     {
-        DEBUG_LOG("Taxi %s event %u of node %u of %s (%s) path", departure ? "departure" : "arrival", eventid, node.first, GetName(), GetObjectGUID().GetString().c_str());
+        sLog.outDebug("Taxi %s event %u of node %u of %s (%s) path", departure ? "departure" : "arrival", eventid, node.first, GetName(), GetObjectGUID().GetString().c_str());
         GetMap()->ScriptsStart(sEventScripts, eventid, this, this);
     }
 }

@@ -568,7 +568,7 @@ void Creature::Update(uint32 diff)
             else if (m_corpseRemoveTime <= time(NULL))
             {
                 RemoveCorpse(false);
-                DEBUG_LOG("Removing corpse... %u ", GetUInt32Value(OBJECT_FIELD_ENTRY));
+                sLog.outDebug("Removing corpse... %u ", GetUInt32Value(OBJECT_FIELD_ENTRY));
             }
             break;
         }
@@ -1181,8 +1181,8 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 
     WorldDatabase.CommitTransaction();
 
-    if (sWorld.getConfig(CONFIG_CREATEUPDATE_FILE))
-        sLog.CreateUpdateFile(ss.str().c_str());
+   // if (sWorld.getConfig(CONFIG_CREATEUPDATE_FILE))
+    //    sLog.CreateUpdateFile(ss.str().c_str());
 }
 
 void Creature::SelectLevel()
@@ -1518,8 +1518,8 @@ void Creature::DeleteFromDB()
     WorldDatabase.PExecuteLog("DELETE FROM game_event_model_equip WHERE guid = '%u'", m_DBTableGuid);
     WorldDatabase.CommitTransaction();
 
-    if (sWorld.getConfig(CONFIG_CREATEUPDATE_FILE))
-        sLog.CreateUpdateFile(statement.str().c_str());
+   // if (sWorld.getConfig(CONFIG_CREATEUPDATE_FILE))
+   //     sLog.CreateUpdateFile(statement.str().c_str());
 
     sObjectMgr.DeleteCreatureData(m_DBTableGuid);
 }
@@ -1714,7 +1714,7 @@ void Creature::Respawn(bool force)
         if (m_DBTableGuid)
             sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid, GetInstanceId(), 0);
 
-        DEBUG_LOG("Respawning creature %s (GuidLow: %u, Full GUID: " UI64FMTD " Entry: %u)", GetName(), GetGUIDLow(), GetGUID(), GetEntry());
+        sLog.outDebug("Respawning creature %s (GuidLow: %u, Full GUID: " UI64FMTD " Entry: %u)", GetName(), GetGUIDLow(), GetGUID(), GetEntry());
         m_respawnTime = 0;
         ResetPickPocketRefillTimer();
         loot.clear();

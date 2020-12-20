@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "Configuration/Config.h"
 #include "Database/SqlOperations.h"
+#include "DatabaseMysql.h"
 
 #include <ctime>
 #include <iostream>
@@ -360,8 +361,8 @@ bool Database::PExecuteLog(char const* format,...)
 
 bool Database::ExecuteFile(const char* file)
 {
-    //TBD
-    return true;
+    SqlConnection::Lock _guard(getAsyncConnection());
+    return _guard->ExecuteFile(file);
 }
 
 QueryResult* Database::PQuery(char const* format,...)

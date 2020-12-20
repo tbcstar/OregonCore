@@ -3177,7 +3177,7 @@ void Spell::SendSpellStart()
     if (!m_isNeedSendToClient)
         return;
 
-    DEBUG_LOG("Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
+    sLog.outDebug("Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN1;
     if (IsRangedSpell())
@@ -3210,7 +3210,7 @@ void Spell::SendSpellGo()
     if (!m_isNeedSendToClient)
         return;
 
-    DEBUG_LOG("Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
+    sLog.outDebug("Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
 
     //Unit* target = m_targets.getUnitTarget() ? m_targets.getUnitTarget() : m_caster;
 
@@ -3759,7 +3759,7 @@ void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOT
 
     uint8 eff = m_spellInfo->Effect[i];
 
-    DEBUG_LOG("Spell: Effect : %u", eff);
+    sLog.outDebug("Spell: Effect : %u", eff);
 
     //we do not need DamageMultiplier here.
     damage = CalculateDamage(i, NULL);
@@ -5891,7 +5891,7 @@ void Spell::DelayedChannel()
     else
         m_timer -= delaytime;
 
-    DEBUG_LOG("Spell %u partially interrupted for %i ms, new duration: %u ms", m_spellInfo->Id, delaytime, m_timer);
+    sLog.outDebug("Spell %u partially interrupted for %i ms, new duration: %u ms", m_spellInfo->Id, delaytime, m_timer);
 
     for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {

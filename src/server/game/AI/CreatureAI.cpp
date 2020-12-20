@@ -52,7 +52,7 @@ void CreatureAI::DoZoneInCombatWithPlayers(bool force)
     {
         if (!me->CanHaveThreatList() || me->getThreatManager().isThreatListEmpty())
         {
-            error_log("CreatureAI::DoZoneInCombatWithPlayers called for a creature that either cannot have a threat list or has empty threat list (creature entry = %u)", me->GetEntry());
+            sLog.outError("CreatureAI::DoZoneInCombatWithPlayers called for a creature that either cannot have a threat list or has empty threat list (creature entry = %u)", me->GetEntry());
             return;
         }
     }

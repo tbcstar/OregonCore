@@ -63,7 +63,7 @@ public:
                         return plr;
                 }
             }
-            debug_log("OSCR: Instance Razorfen Kraul: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("OSCR: Instance Razorfen Kraul: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
     

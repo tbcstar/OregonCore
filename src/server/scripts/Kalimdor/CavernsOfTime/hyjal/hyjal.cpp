@@ -135,7 +135,7 @@ public:
             break;
         case GOSSIP_ACTION_INFO_DEF:
             ai->Debug = !ai->Debug;
-            debug_log("OSCR: HyjalAI - Debug mode has been toggled");
+            sLog.outDebug("OSCR: HyjalAI - Debug mode has been toggled");
             break;
         }
         return true;
@@ -214,7 +214,7 @@ public:
             break;
         case GOSSIP_ACTION_INFO_DEF:
             ai->Debug = !ai->Debug;
-            debug_log("OSCR: HyjalAI - Debug mode has been toggled");
+            sLog.outDebug("OSCR: HyjalAI - Debug mode has been toggled");
             break;
         }
         return true;

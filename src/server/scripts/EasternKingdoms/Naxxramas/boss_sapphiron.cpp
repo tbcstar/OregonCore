@@ -133,7 +133,7 @@ public:
                     {
                         DoCast(pTarget, SPELL_ICEBOLT);
                         ++Icebolt_Count;
-                        error_log("Count incremented");
+                        sLog.outError("Count incremented");
                     }
                     FrostBreath_Timer = 6000;
                     Icebolt_Timer = 4000;

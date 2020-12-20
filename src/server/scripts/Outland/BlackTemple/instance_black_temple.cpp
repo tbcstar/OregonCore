@@ -135,7 +135,7 @@ public:
                 }
             }
     
-            debug_log("OSCR: Instance Black Temple: GetPlayerInMap, but PlayerList is empty!");
+            sLog.outDebug("OSCR: Instance Black Temple: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
     

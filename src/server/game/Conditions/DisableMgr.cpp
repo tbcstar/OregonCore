@@ -44,6 +44,7 @@ void DisableMgr::LoadDisables()
     if (!result)
     {
         sLog.outString(">> Loaded %u disables", total_count);
+		sLog.outString();
         return;
     }
 
@@ -156,6 +157,7 @@ void DisableMgr::LoadDisables()
     while (result->NextRow());
 
     sLog.outString(">> Loaded %u disables.", total_count);
+	sLog.outString();
 }
 
 void DisableMgr::CheckQuestDisables()

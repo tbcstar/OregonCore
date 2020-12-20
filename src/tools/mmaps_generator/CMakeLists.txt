@@ -35,6 +35,9 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/src/server/shared
   ${CMAKE_SOURCE_DIR}/src/common/Collision
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/Models
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/Management
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/Maps
   ${CMAKE_SOURCE_DIR}/src/common
   ${CMAKE_SOURCE_DIR}/src/common/Configuration
   ${CMAKE_SOURCE_DIR}/src/common/Cryptography
@@ -46,6 +49,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/shared/Packets
   
   ${CMAKE_SOURCE_DIR}/src/framework
+  ${CMAKE_SOURCE_DIR}/src/framework/Policies
   ${CMAKE_SOURCE_DIR}/src/server/game
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement/MovementGenerators
@@ -65,6 +69,8 @@ target_link_libraries(movements_extractor
   Recast
   Detour
   collision
+ # shared
+  oregonframework
   g3dlib
 )
 

@@ -481,7 +481,7 @@ public:
 
         if (altarOfTheKeeperCounter < NUMBER_NEEDED_TO_ACTIVATE)
         {
-            //error_log("not enough people yet, altarOfTheKeeperCounter = %d", altarOfTheKeeperCounter);
+            //sLog.outError("not enough people yet, altarOfTheKeeperCounter = %d", altarOfTheKeeperCounter);
             return false; // not enough people yet
         }
 
@@ -491,7 +491,7 @@ public:
         for (uint8 x = 0; x < 5; ++x)
         {
             pTarget = Unit::GetUnit(*pPlayer, altarOfTheKeeperCount[x]);
-            //error_log("number of people currently activating it: %d", x+1);
+            //sLog.outError("number of people currently activating it: %d", x+1);
             if (!pTarget)
                 continue;
             if (pTarget->IsNonMeleeSpellCast(true))
@@ -502,7 +502,7 @@ public:
 
         if (count < NUMBER_NEEDED_TO_ACTIVATE)
         {
-            //error_log("still not enough people");
+            //sLog.outError("still not enough people");
             return true; // not enough people
         }
 

@@ -367,7 +367,7 @@ public:
 
             if (!m_auiAdvisorGuid[0] || !m_auiAdvisorGuid[1] || !m_auiAdvisorGuid[2] || !m_auiAdvisorGuid[3])
             {
-                error_log("OSCR: Kael'Thas One or more advisors missing, Skipping Phases 1-3");
+                sLog.outError("OSCR: Kael'Thas One or more advisors missing, Skipping Phases 1-3");
 
                 DoScriptText(SAY_PHASE4_INTRO2, me);
                 Phase = 4;
@@ -707,7 +707,7 @@ public:
                     {
                         Advisor = (Creature*)(Unit::GetUnit((*me), m_auiAdvisorGuid[i]));
                         if (!Advisor)
-                            error_log("OSCR: Kael'Thas Advisor %u does not exist. Possibly despawned? Incorrectly Killed?", i);
+                            sLog.outError("OSCR: Kael'Thas Advisor %u does not exist. Possibly despawned? Incorrectly Killed?", i);
                         else if (pTarget)
                             ((advisorbase_ai*)Advisor->AI())->Revive(pTarget);
                     }
@@ -796,7 +796,7 @@ public:
                         if (me->getThreatManager().getThreatList().size() >= 2)
                             for (uint32 i = 0; i < 3; i++)
                             {
-                                debug_log("OSCR: Kael'Thas mind control not supported.");
+                                sLog.outDebug("OSCR: Kael'Thas mind control not supported.");
                                 //DoCast(pTarget, SPELL_MIND_CONTROL);
                             }
 
@@ -816,7 +816,7 @@ public:
                             pPhoenix->AI()->AttackStart(pTarget);
                     }
                     else
-                        error_log("OSCR: Kael'Thas Phoenix could not be spawned");
+                        sLog.outError("OSCR: Kael'Thas Phoenix could not be spawned");
 
                     switch (rand() % 2)
                     {

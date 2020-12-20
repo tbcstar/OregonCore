@@ -10,7 +10,7 @@ build*/
 *.old
 
 # patch rejects
-*.rej
+#*.rej
 
 # K-Develop files
 *.kdev*

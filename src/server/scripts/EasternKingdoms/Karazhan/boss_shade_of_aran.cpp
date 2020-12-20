@@ -712,7 +712,7 @@ public:
     // CONVERT TO ACID
     CreatureAI* GetAI(Creature* pCreature) const
     {
-        outstring_log("OSCR: Convert simpleAI script for Creature Entry %u to ACID", pCreature->GetEntry());
+         sLog.outString("OSCR: Convert simpleAI script for Creature Entry %u to ACID", pCreature->GetEntry());
         SimpleAI* ai = new SimpleAI(pCreature);
 
         ai->Spell[0].Enabled = true;

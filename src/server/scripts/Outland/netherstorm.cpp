@@ -1076,7 +1076,7 @@ public:
                 return true;
             }
     
-            debug_log("OSCR: npc_commander_dawnforge event already in progress, need to wait.");
+            sLog.outDebug("OSCR: npc_commander_dawnforge event already in progress, need to wait.");
             return false;
         }
     
