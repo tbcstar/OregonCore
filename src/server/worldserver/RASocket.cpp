@@ -314,7 +314,7 @@ int RASocket::subnegotiate()
 
             uint8 param = buf[++i];
             ss << uint32(param);
-            sLog.outRemote(ss.str().c_str());
+            sLog.outString(ss.str().c_str());
         }
         ++i;
     }

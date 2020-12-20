@@ -2708,6 +2708,7 @@ void SpellMgr::LoadSpellCustomAttr()
             spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ANY;
             spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_DEST_TARGET_ANY;
             spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_DEST_TARGET_ANY;
+            spellInfo->EffectTriggerSpell[2] = 33241;
             break;
         case 34444: // Summon Khadgar's Servent
             spellInfo->DurationIndex = 30;
