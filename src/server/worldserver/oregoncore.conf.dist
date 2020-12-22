@@ -36,6 +36,13 @@ ConfVersion=2015071262
 #                        "enable-named-pipe" to [mysqld] section my.ini
 #                    .;/path/to/unix_socket;username;password;database
 #                     - use Unix sockets in Unix/Linux
+#	LoginDatabase.Connections
+#	WorldDatabase.Connections
+#	CharacterDatabase.Connections
+#		 用几个线程处理Mysql数据异步(即延迟)。每个数据库最多16个连接.
+#		 请注意，为了数据一致性，每个数据库只有一个连接用于事务和异步选择.
+#		 因此，计算将建立多少连接的公式是: X = #_connections + 1
+#		 Default: 1 connection for SELECT statements
 #
 #    MaxPingTime
 #        最大数据库ping间隔(ping之间的分钟)的设置
