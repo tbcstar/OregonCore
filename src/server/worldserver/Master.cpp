@@ -70,7 +70,7 @@ class FreezeDetectorRunnable : public ACE_Based::Runnable
         {
             if (!_delaytime)
                 return;
-            sLog.outString("Starting up anti-freeze thread (%u seconds max stuck time)...", _delaytime / 1000);
+            sLog.outString("启动防冻线程 (%u 秒最长卡住时间)...", _delaytime / 1000);
             m_loops = 0;
             w_loops = 0;
             m_lastchange = 0;
@@ -90,14 +90,14 @@ class FreezeDetectorRunnable : public ACE_Based::Runnable
                 // possible freeze
                 else if (getMSTimeDiff(w_lastchange, curtime) > _delaytime)
                 {
-                    sLog.outError("World Thread is stuck.  Terminating server!");
+                    sLog.outError("World线程卡住了。终止服务器！");
 	                signal(SIGSEGV, 0);
 	                Master::m_handleSigvSignals = false;        // disable anticrash
 	                *((uint32 volatile*)nullptr) = 0;              // bang crash
                     abort();
                 }
             }
-            sLog.outString("Anti-freeze thread exiting without problems.");
+            sLog.outString("防冻线程退出没有问题。");
         }
 };
 
@@ -121,11 +121,11 @@ int Master::Run(bool runTests)
         uint32 pid = CreatePIDFile(pidfile);
         if (!pid)
         {
-            sLog.outError("Cannot create PID file %s.\n", pidfile.c_str());
+            sLog.outError("无法创建PID文件 %s.\n", pidfile.c_str());
             return 1;
         }
 
-        sLog.outString("Daemon PID: %u\n", pid);
+        sLog.outString("守护进程的PID: %u\n", pid);
     }
 
     // Start the databases
@@ -197,9 +197,9 @@ int Master::Run(bool runTests)
         if (Prio)
         {
             if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-                sLog.outString("OregonCore process priority class set to HIGH");
+                sLog.outString("OregonCore进程优先级设置为高");
             else
-                sLog.outError("ERROR: Can't set OregonCore process priority class.");
+                sLog.outError("错误:不能设置OregonCore进程优先级。");
             sLog.outString();
         }
     }
@@ -234,7 +234,7 @@ int Master::Run(bool runTests)
 
     if (sWorldSocketMgr->StartNetwork (wsport, bind_ip.c_str ()) == -1)
     {
-        sLog.outError("Failed to start network");
+        sLog.outError("网络启动失败");
         World::StopNow(ERROR_EXIT_CODE);
         // go down and shutdown the server
         // give other threads a chance to start-up so we can shutdown them safely
@@ -309,7 +309,7 @@ int Master::Run(bool runTests)
     WorldDatabase.HaltDelayThread();
     LoginDatabase.HaltDelayThread();
 
-    sLog.outString("Halting process...");
+    sLog.outString("停止进程...");
 
     if (cliThread)
     {
@@ -343,7 +343,7 @@ bool StartDB(std::string name, DatabaseType& database)
     int nAsyncConnections = sConfig.GetIntDefault((name + "Database.WorkerThreads").c_str(), 1);
     if (dbstring.empty())
     {
-        sLog.outError("%s database not specified in configuration file", name.c_str());
+        sLog.outError("没有在配置文件中指定 %s 数据库", name.c_str());
         return false;
     }
 
@@ -376,16 +376,16 @@ bool StartDB(std::string name, DatabaseType& database)
     }
     else
     {
-        sLog.outError("Incorrectly formatted database connection string for database %s", name.c_str());
+        sLog.outError("数据库 %s 的数据库连接字符串格式不正确", name.c_str());
         return false;
     }
 
-    sLog.outString("%s Database: %s, sync threads: %i, workers: %i", name.c_str(), dbStringLog.c_str(), nConnections, nAsyncConnections);
+    sLog.outString("%s 数据库: %s, 同步线程: %i, Workers: %i", name.c_str(), dbStringLog.c_str(), nConnections, nAsyncConnections);
 
     ///- Initialise the world database
     if (!database.Initialize(dbstring.c_str(), nConnections, nAsyncConnections))
     {
-        sLog.outError("Cannot connect to world database %s", name.c_str());
+        sLog.outError("无法连接到World数据库 %s", name.c_str());
         return false;
     }
 
@@ -398,7 +398,7 @@ void Master::_StartDB()
     realmID = sConfig.GetIntDefault("RealmID", 0);
     if (!realmID)
     {
-        sLog.outError("Realm ID not defined in configuration file");
+        sLog.outError("未在配置文件中定义Realm ID");
         return;
     }
 

@@ -54,7 +54,7 @@
 #include "ServiceWin32.h"
 char serviceName[] = "realmd";
 char serviceLongName[] = "Oregon realm service";
-char serviceDescription[] = "Massive Network Game Object Server";
+char serviceDescription[] = "TBCstar项目TBC核心";
 /*
  * -1 - not in service mode
  * 0 - stopped
@@ -77,7 +77,7 @@ uint32 realmID = 0;
 // Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
-    sLog.outString("Usage: \n %s [<options>]\n"
+    sLog.outString("用法: \n %s [<options>]\n"
                    "    -v, --version            print version and exit\n\r"
                    "    -c config_file           use config_file as configuration file\n\r"
                    #ifdef _WIN32
@@ -102,7 +102,7 @@ extern int main(int argc, char** argv)
     #endif
 
     ACE_Get_Opt cmd_opts(argc, argv, options);
-    cmd_opts.long_option("version", 'v');
+    cmd_opts.long_option("版本", 'v');
 
     int option;
     while ((option = cmd_opts()) != EOF)
@@ -123,20 +123,20 @@ extern int main(int argc, char** argv)
                 if (!strcmp(mode, "install"))
                 {
                     if (WinServiceInstall())
-                        sLog.outString("Installing service");
+                        sLog.outString("安装服务");
                     return 1;
                 }
                 else if (!strcmp(mode, "uninstall"))
                 {
                     if (WinServiceUninstall())
-                        sLog.outString("Uninstalling service");
+                        sLog.outString("卸载服务");
                     return 1;
                 }
                 else if (!strcmp(mode, "run"))
                     WinServiceRun();
                 else
                 {
-                    sLog.outError("Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
+                    sLog.outError("运行时错误: -%c 不支持参数 %s", cmd_opts.opt_opt(), mode);
                     usage(argv[0]);
                     return 1;
                 }
@@ -144,11 +144,11 @@ extern int main(int argc, char** argv)
             }
             #endif
         case ':':
-            sLog.outError("Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
+            sLog.outError("运行时错误: -%c 选项需要输入参数", cmd_opts.opt_opt());
             usage(argv[0]);
             return 1;
         default:
-            sLog.outError("Runtime-Error: bad format of commandline arguments");
+            sLog.outError("运行时错误: 命令行参数的格式错误");
             usage(argv[0]);
             return 1;
         }
@@ -156,15 +156,15 @@ extern int main(int argc, char** argv)
 
     if (!sConfig.SetSource(cfg_file))
     {
-        sLog.outError("Invalid or missing configuration file : %s", cfg_file);
-        sLog.outError("Verify that the file exists and has \'[authserver]\' written in the top of the file!");
+        sLog.outError("无效或缺少配置文件: %s", cfg_file);
+        sLog.outError("验证文件是否存在，并在文件顶部写入了 \'[authserver]\' ！");
         return 1;
     }
     sLog.Initialize();
 
     sLog.outString( "%s [realm-daemon]", _FULLVERSION);
     sLog.outString( "<Ctrl-C> to stop.\n" );
-    sLog.outString("Using configuration file %s.", cfg_file);
+    sLog.outString("使用配置文件 %s.", cfg_file);
 
     // Check the version of the configuration file
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);
@@ -180,7 +180,7 @@ extern int main(int argc, char** argv)
         while (pause > clock()) {}
     }
 
-    sLog.outDetail("Using ACE: %s", ACE_VERSION);
+    sLog.outDetail("使用 ACE: %s", ACE_VERSION);
 
     #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
@@ -212,7 +212,7 @@ extern int main(int argc, char** argv)
     sRealmList->Initialize(sConfig.GetIntDefault("RealmsStateUpdateDelay", 20));
     if (sRealmList->size() == 0)
     {
-        sLog.outError("No valid realms specified.");
+        sLog.outError("没有指定有效的Realms.");
         return 1;
     }
 
@@ -233,7 +233,7 @@ extern int main(int argc, char** argv)
 
     if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
     {
-        sLog.outError("realmd can not bind to %s:%d", bind_ip.c_str(), rmport);
+        sLog.outError("realmd不能绑定到 %s:%d", bind_ip.c_str(), rmport);
         return 1;
     }
 
@@ -273,9 +273,9 @@ extern int main(int argc, char** argv)
         if (Prio)
         {
             if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-                sLog.outString("realmd process priority class set to HIGH");
+                sLog.outString("realmd进程优先级设置为高");
             else
-                sLog.outError("ERROR: Can't set realmd process priority class.");
+                sLog.outError("错误:无法设置realmd进程优先级。");
             sLog.outString();
         }
     }
@@ -298,7 +298,7 @@ extern int main(int argc, char** argv)
         if ( (++loopCounter) == numLoops )
         {
             loopCounter = 0;
-            sLog.outDetail("Ping MySQL to keep connection alive");
+            sLog.outDetail("Ping MySQL保持连接活跃");
             LoginDatabase.Ping();
         }
         #ifdef _WIN32
@@ -313,7 +313,7 @@ extern int main(int argc, char** argv)
     // Remove signal handling before leaving
     UnhookSignals();
 
-    sLog.outString( "Halting process..." );
+    sLog.outString( "停止进程..." );
     return 0;
 }
 
@@ -343,14 +343,14 @@ bool StartDB()
     std::string dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
     if (dbstring.empty())
     {
-        sLog.outError("Database not specified");
+        sLog.outError("数据库未指定");
         return false;
     }
 
-    sLog.outString("Database: %s", dbstring.c_str() );
+    sLog.outString("数据库: %s", dbstring.c_str() );
     if (!LoginDatabase.Initialize(dbstring.c_str()))
     {
-        sLog.outError("Cannot connect to database");
+        sLog.outError("无法连接到数据库");
         return false;
     }
 

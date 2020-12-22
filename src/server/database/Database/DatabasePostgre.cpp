@@ -38,7 +38,7 @@ DatabasePostgre::DatabasePostgre()
     {
         if (!PQisthreadsafe())
         {
-            sLog.outError("FATAL ERROR: PostgreSQL libpq isn't thread-safe.");
+            sLog.outError("致命错误: PostgreSQL libpq isn't thread-safe.");
             exit(1);
         }
     }
@@ -77,7 +77,7 @@ bool PostgreSQLConnection::OpenConnection(bool reconnect)
     }
 
     DETAIL_LOG("Connected to Postgre database at %s", m_host.c_str());
-    sLog.outString("PostgreSQL server ver: %d", PQserverVersion(mPGconn));
+    sLog.outString("PostgreSQL 服务器版本: %d", PQserverVersion(mPGconn));
     return true;
 }
 

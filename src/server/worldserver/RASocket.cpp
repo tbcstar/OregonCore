@@ -40,18 +40,18 @@ int RASocket::open(void*)
 
     if (peer().get_remote_addr(remote_addr) == -1)
     {
-        sLog.outError("RASocket::open: peer().get_remote_addr error is %s", ACE_OS::strerror(errno));
+        sLog.outError("RASocket::打开: peer().get_remote_addr error is %s", ACE_OS::strerror(errno));
         return -1;
     }
 
-    sLog.outError ("Incoming connection from %s", remote_addr.get_host_addr());
+    sLog.outError ("传入的连接 %s", remote_addr.get_host_addr());
 
     return activate();
 }
 
 int RASocket::handle_close(ACE_HANDLE, ACE_Reactor_Mask)
 {
-    sLog.outError ("Closing connection");
+    sLog.outError ("关闭连接");
     peer().close_reader();
     wait();
     destroy();
@@ -115,7 +115,7 @@ int RASocket::recv_line(std::string& out_line)
 
     if (recv_line(message_block) == -1)
     {
-        sLog.outError ("Recv error %s", ACE_OS::strerror(errno));
+        sLog.outError ("Recv错误 %s", ACE_OS::strerror(errno));
         return -1;
     }
 
@@ -177,7 +177,7 @@ int RASocket::check_access_level(const std::string& user)
 
     if (!result)
     {
-        sLog.outError ("User %s does not exist in database", user.c_str());
+        sLog.outError ("用户 %s 在数据库中不存在", user.c_str());
         return -1;
     }
 
@@ -185,12 +185,12 @@ int RASocket::check_access_level(const std::string& user)
 
     if (fields[1].GetUInt32() < iMinLevel)
     {
-        sLog.outError ("User %s has no privilege to login", user.c_str());
+        sLog.outError ("用户 %s 没有登录权限", user.c_str());
         return -1;
     }
     else if (fields[2].GetInt32() != -1)
     {
-        sLog.outError ("User %s has to be assigned on all realms (with RealmID = '-1')", user.c_str());
+        sLog.outError ("用户 %s 必须分配到所有服务器 (with RealmID = '-1')", user.c_str());
         return -1;
     }
 
@@ -215,7 +215,7 @@ int RASocket::check_password(const std::string& user, const std::string& pass)
 
     if (!check)
     {
-        sLog.outError ("Wrong password for user: %s", user.c_str());
+        sLog.outError ("密码错误的用户: %s", user.c_str());
         return -1;
     }
 
@@ -238,7 +238,7 @@ int RASocket::authenticate()
     if (recv_line(pass) == -1)
         return -1;
 
-    sLog.outError ("Login attempt for user: %s", user.c_str());
+    sLog.outError ("登录尝试的用户: %s", user.c_str());
 
     if (check_access_level(user) == -1)
         return -1;
@@ -246,7 +246,7 @@ int RASocket::authenticate()
     if (check_password(user, pass) == -1)
         return -1;
 
-    sLog.outError ("User login: %s", user.c_str());
+    sLog.outError ("登录用户: %s", user.c_str());
 
     return 0;
 }
@@ -375,7 +375,7 @@ void RASocket::zprint(void* callbackArg, const char* szText)
 
     if (socket->putq(mb, const_cast<ACE_Time_Value*>(&ACE_Time_Value::zero)) == -1)
     {
-        sLog.outError ("Failed to enqueue message, queue is full or closed. Error is %s", ACE_OS::strerror(errno));
+        sLog.outError ("入队消息失败，队列已满或关闭。错误是 %s", ACE_OS::strerror(errno));
         mb->release();
     }
 }
@@ -396,7 +396,7 @@ void RASocket::commandFinished(void* callbackArg, bool /*success*/)
     if (socket->putq(mb) == -1)
     {
         // getting here is bad, command can't be marked as complete
-        sLog.outError ("Failed to enqueue command end message. Error is %s", ACE_OS::strerror(errno));
+        sLog.outError ("未能加入命令结束消息队列。错误是 %s", ACE_OS::strerror(errno));
         mb->release();
     }
 }

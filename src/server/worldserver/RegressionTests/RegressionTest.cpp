@@ -31,11 +31,11 @@ RegressionTestSuite::~RegressionTestSuite()
 
 bool RegressionTestSuite::RunAll()
 {
-    sLog.outString("Running Regression Tests...");
+    sLog.outString("运行回归测试...");
 
     Run(&RegressionTestSuite::TestBreathingIssues, "Breathing issues Maraudon");
 
-    sLog.outString("Regression Tests Finished. Total: %u, Passed: %u, Failed: %u",
+    sLog.outString("回归测试完成。 总数: %u, 通过: %u, 失败: %u",
                     m_passedTestsCounter + m_failedTestsCounter,
                     m_passedTestsCounter,
                     m_failedTestsCounter);
@@ -47,13 +47,13 @@ bool RegressionTestSuite::Run(bool(RegressionTestSuite::*test)(), const char* co
 {
     if ((this->*test)())
     {
-        sLog.outString("  [OK] Test %s passed.", comment);
+        sLog.outString("  [OK] 测试 %s 通过.", comment);
         ++m_passedTestsCounter;
         return true;
     }
     else
     {
-        sLog.outString("  [ERR] Test %s didnt pass.", comment);
+        sLog.outString("  [ERR] 测试 %s 未通过.", comment);
         ++m_failedTestsCounter;
         return false;
     }

@@ -185,7 +185,7 @@ AuthSocket::~AuthSocket()
 // Accept the connection and set the s random value for SRP6
 void AuthSocket::OnAccept()
 {
-    sLog.outBasic("'%s' Accepting connection", getRemoteAddress().c_str());
+    sLog.outBasic("'%s' 接受连接", getRemoteAddress().c_str());
 }
 
 // Read the packet from the client
@@ -397,7 +397,7 @@ bool AuthSocket::_HandleLogonChallenge()
     if (result)
     {
         pkt << (uint8)WOW_FAIL_BANNED;
-        sLog.outBasic("'%s' [AuthChallenge] Banned ip tries to login!", getRemoteAddress().c_str());
+        sLog.outBasic("'%s' [AuthChallenge] 被禁止的ip试图登录!", getRemoteAddress().c_str());
 
     }
     else
@@ -441,12 +441,12 @@ bool AuthSocket::_HandleLogonChallenge()
                     if ((*banresult)[0].GetUInt64() == (*banresult)[1].GetUInt64())
                     {
                         pkt << (uint8) WOW_FAIL_BANNED;
-                        sLog.outBasic("[AuthChallenge] Banned account %s tries to login!", _login.c_str ());
+                        sLog.outBasic("[AuthChallenge] 被禁止的帐户 %s 试图登录！", _login.c_str ());
                     }
                     else
                     {
                         pkt << (uint8) WOW_FAIL_SUSPENDED;
-                        sLog.outBasic("[AuthChallenge] Temporarily banned account %s tries to login!", _login.c_str ());
+                        sLog.outBasic("[AuthChallenge] 暂时被禁止的帐户 %s 试图登录！", _login.c_str ());
                     }
                 }
                 else
@@ -584,8 +584,8 @@ bool AuthSocket::_HandleLogonProof()
             pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
             pkt << (uint8) 0x00;
             pkt << (uint8) WOW_FAIL_VERSION_INVALID;
-            sLog.outDebug("[AuthChallenge] %u is not a valid client version!", _build);
-            sLog.outDebug("[AuthChallenge] Patch %s not found", tmp);
+            sLog.outDebug("[AuthChallenge] %u 不是有效的客户端版本！", _build);
+            sLog.outDebug("[AuthChallenge] 未找到补丁 %s", tmp);
             send((char const*)pkt.contents(), pkt.size());
             return true;
         }
@@ -676,7 +676,7 @@ bool AuthSocket::_HandleLogonProof()
         uint8* salt = pinData.salt;
         uint8* hash = pinData.hash;
         pinResult = VerifyPinData(std::stoi(_tokenKey), pinData);
-        sLog.outBasic("[AuthChallenge] Account '%s' using IP '%s' PIN result: %u", _login.c_str(), getRemoteAddress().c_str(), pinResult);
+        sLog.outBasic("[AuthChallenge] 账户 '%s' 使用IP '%s' PIN result: %u", _login.c_str(), getRemoteAddress().c_str(), pinResult);
         if (!pinResult)
         {
             char data[4] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
@@ -742,7 +742,7 @@ bool AuthSocket::_HandleLogonProof()
         sha.UpdateBigNumbers(&A, &M, &K, NULL);
         sha.Finalize();
 
-        sLog.outBasic("[AuthChallenge] account '%s' successfully authenticated", _login.c_str());
+        sLog.outBasic("[AuthChallenge] 账户 '%s' 身份验证成功", _login.c_str());
         SendProof(sha);
 
         // Set _status to authed
@@ -761,7 +761,7 @@ bool AuthSocket::_HandleLogonProof()
             char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT};
             send(data, sizeof(data));
         }
-        sLog.outBasic("[AuthChallenge] account %s tried to login with wrong password!", _login.c_str ());
+        sLog.outBasic("[AuthChallenge] 账户 %s 试图用错误的密码登录!", _login.c_str ());
 
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);
         if (MaxWrongPassCount > 0)
@@ -784,7 +784,7 @@ bool AuthSocket::_HandleLogonProof()
                         uint32 acc_id = fields[0].GetUInt32();
                         LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','Oregon realmd','Failed login autoban',1)",
                                                acc_id, WrongPassBanTime);
-                        sLog.outBasic("[AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times",
+                        sLog.outBasic("[AuthChallenge] 账户 %s 被禁止 '%u' 秒，因为它无法验证 '%u' 次",
                                       _login.c_str(), WrongPassBanTime, failed_logins);
                     }
                     else
@@ -793,7 +793,7 @@ bool AuthSocket::_HandleLogonProof()
                         LoginDatabase.escape_string(current_ip);
                         LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','Oregon realmd','Failed login autoban')",
                                                current_ip.c_str(), WrongPassBanTime);
-                        sLog.outBasic("[AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
+                        sLog.outBasic("[AuthChallenge] IP %s 在 '%u' 秒内被禁止，因为帐户 %s 未能验证 '%u' 次",
                                       current_ip.c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
                     }
                 }
@@ -856,7 +856,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     // Stop if the account is not found
     if (!result)
     {
-        sLog.outError("[ERROR] user %s tried to login and we cannot find his session key in the database.", _login.c_str());
+        sLog.outError("[错误] 用户 %s 试图登录，我们无法在数据库中找到他的会话密钥。", _login.c_str());
         close_connection();
         return false;
     }
@@ -916,7 +916,7 @@ bool AuthSocket::_HandleReconnectProof()
     }
     else
     {
-        sLog.outError("[ERROR] user %s tried to login, but session invalid.", _login.c_str());
+        sLog.outError("[错误] 用户 %s 试图登录，但会话无效。", _login.c_str());
         close_connection();
         return false;
     }
@@ -937,7 +937,7 @@ bool AuthSocket::_HandleRealmList()
     QueryResult* result = LoginDatabase.PQuery("SELECT id,sha_pass_hash FROM account WHERE username = '%s'", _safelogin.c_str());
     if (!result)
     {
-        sLog.outError("[ERROR] user %s tried to login and we cannot find him in the database.", _login.c_str());
+        sLog.outError("[错误] 用户 %s 试图登录，我们无法在数据库中找到它。", _login.c_str());
         close_connection();
         return false;
     }

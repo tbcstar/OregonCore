@@ -161,7 +161,7 @@ void SqlResultQueue::Update(uint32 timeout)
     }
 
     if (numUnsafeQueries > 1000) // Bottleneck here
-        sLog.outBasic("Database: %u unsafe queries remaining!", numUnsafeQueries);
+        sLog.outBasic("数据库:仍存在 %u 不安全的查询！", numUnsafeQueries);
 
     for (int i = 0; i < threadsCount; ++i)
     {
