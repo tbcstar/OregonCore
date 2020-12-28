@@ -2497,7 +2497,7 @@ void InstanceMap::CreateInstanceData(bool load)
 {
     if (i_data != NULL)
         return;
-		
+
 #ifdef ELUNA
     i_data = sEluna->GetInstanceData(this);
 
@@ -2720,7 +2720,11 @@ void BattlegroundMap::RemoveAllPlayers()
         for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
             if (Player* plr = itr->GetSource())
                 if (!plr->IsBeingTeleportedFar())
+                {
                     plr->TeleportTo(plr->GetBattlegroundEntryPoint());
+                    if (plr->isSpectator())
+                        plr->SetSpectator(false);
+                }
 
 }
 

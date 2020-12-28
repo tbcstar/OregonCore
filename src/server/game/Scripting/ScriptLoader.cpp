@@ -27,6 +27,7 @@ void AddModuleScripts();
 
 //custom
 void AddSC_custom_dualspec();
+void AddSC_npc_arena_spectator();
 
 //world
 void AddSC_areatrigger_scripts();
@@ -428,6 +429,7 @@ void AddSC_group_commandscript();
 void AddSC_pet_commandscript();
 void AddSC_pdump_commandscript();
 void AddSC_gameobject_commandscript();
+void AddSC_spectator_commandscript();
 
 void AddScripts()
 {
@@ -436,6 +438,7 @@ void AddScripts()
     //    AddSC_custom_gossip_codebox();
     //    AddSC_test();
 	AddSC_custom_dualspec();
+    AddSC_npc_arena_spectator();
     AddModuleScripts();
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();
@@ -834,5 +837,6 @@ void AddScripts()
     AddSC_pet_commandscript();
     AddSC_pdump_commandscript();
     AddSC_gameobject_commandscript();
+    AddSC_spectator_commandscript();
 }
 

@@ -264,10 +264,12 @@ class BattlegroundMgr
         }
 
         void SetHolidayWeekends(uint32 mask);
+
+        BattlegroundSet m_Battlegrounds;
     private:
 
         /* Battlegrounds */
-        BattlegroundSet m_Battlegrounds;
+        //BattlegroundSet m_Battlegrounds;
         uint32 m_MaxRatingDifference;
         uint32 m_RatingDiscardTimer;
         uint32 m_NextRatingDiscardUpdate;

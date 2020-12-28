@@ -117,7 +117,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 return;
             }
 
-			sScriptMgr.OnPlayerChat(GetPlayer(), type, lang, msg);
+            sScriptMgr.OnPlayerChat(GetPlayer(), type, lang, msg);
 
             sLog.out(LOG_CHAT, "[ADDON] 玩家 %s 发送: %s",
                          GetPlayer()->GetName(), msg.c_str());
@@ -247,33 +247,51 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
 
             if (type == CHAT_MSG_SAY)
             {
-			
+            
 #ifdef ELUNA
                 if (!sEluna->OnChat(GetPlayer(), type, lang, msg))
                     return;
 #endif
 
-                GetPlayer()->Say(msg, lang);
+                if (GetPlayer()->isSpectator())
+                {
+                    SendNotification("You can not Speak in this Channel when Spectate Arena Match. Use another Channel!");
+                    return;
+                }
+                else
+                    GetPlayer()->Say(msg, lang);
             }
             else if (type == CHAT_MSG_EMOTE)
             {
-			
+            
 #ifdef ELUNA
                 if (!sEluna->OnChat(GetPlayer(), type, LANG_UNIVERSAL, msg))
                     return;
 #endif
 
-                GetPlayer()->TextEmote(msg);
+                if (GetPlayer()->isSpectator())
+                {
+                    SendNotification("You can not Speak in this Channel when Spectate Arena Match. Use another Channel!");
+                    return;
+                }
+                else
+                    GetPlayer()->TextEmote(msg);
             }
             else if (type == CHAT_MSG_YELL)
             {
-			
+            
 #ifdef ELUNA
                 if (!sEluna->OnChat(GetPlayer(), type, lang, msg))
                     return;
 #endif
 
-                GetPlayer()->Yell(msg, lang);
+                if (GetPlayer()->isSpectator())
+                {
+                    SendNotification("You can not Speak in this Channel when Spectate Arena Match. Use another Channel!");
+                    return;
+                }
+                else
+                    GetPlayer()->Yell(msg, lang);
             }
         }
         break;
@@ -334,8 +352,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 if (!group || group->isBGGroup())
                     return;
             }
-			
-#ifdef ELUNA		
+            
+#ifdef ELUNA        
             // used by eluna
             if (!sEluna->OnChat(GetPlayer(), type, lang, msg, group))
                 return;
@@ -661,6 +679,13 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recv_data)
         SendNotification(GetOregonString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
         return;
     }
+
+    if (_player->isSpectator())
+    {
+        SendNotification("You can not Speak in this Channel when Spectate Arena Match. Use another Channel!");
+        return;
+    }
+
 
     uint32 text_emote, emoteNum;
     uint64 guid;

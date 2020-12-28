@@ -538,7 +538,7 @@ void Unit::Update(uint32 p_time)
         return;
 
     _UpdateSpells(p_time);
-	
+    
 
 #ifdef ELUNA
     elunaEvents->Update(p_time);
@@ -579,77 +579,77 @@ void Unit::Update(uint32 p_time)
 
 bool Unit::UpdateMeleeAttackingState()
 {
-	Unit *victim = GetVictim();
-	if (!victim || IsNonMeleeSpellCast(false))
-		return false;
+    Unit *victim = GetVictim();
+    if (!victim || IsNonMeleeSpellCast(false))
+        return false;
 
-	if (!isAttackReady(BASE_ATTACK) && !(isAttackReady(OFF_ATTACK) && haveOffhandWeapon()))
-		return false;
+    if (!isAttackReady(BASE_ATTACK) && !(isAttackReady(OFF_ATTACK) && haveOffhandWeapon()))
+        return false;
 
-	uint8 swingError = 0;
-	if (!IsWithinMeleeRange(victim))
-	{
-		setAttackTimer(BASE_ATTACK, 100);
-		setAttackTimer(OFF_ATTACK, 100);
-		swingError = 1;
-	}
-	//120 degrees of radiant range
-	else if (!HasInArc(2 * M_PI / 3, victim))
-	{
-		setAttackTimer(BASE_ATTACK, 100);
-		setAttackTimer(OFF_ATTACK, 100);
-		swingError = 2;
-	}
-	else
-	{
-		if (isAttackReady(BASE_ATTACK))
-		{
-			// prevent base and off attack in same time, delay attack at 0.2 sec
-			if (haveOffhandWeapon())
-			{
-				if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-					setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-			}
-			AttackerStateUpdate(victim, BASE_ATTACK);
-			resetAttackTimer(BASE_ATTACK);
-		}
-		if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
-		{
-			// prevent base and off attack in same time, delay attack at 0.2 sec
-			uint32 base_att = getAttackTimer(BASE_ATTACK);
-			if (base_att < ATTACK_DISPLAY_DELAY)
-				setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
-			// do attack
-			AttackerStateUpdate(victim, OFF_ATTACK);
-			resetAttackTimer(OFF_ATTACK);
-		}
-	}
+    uint8 swingError = 0;
+    if (!IsWithinMeleeRange(victim))
+    {
+        setAttackTimer(BASE_ATTACK, 100);
+        setAttackTimer(OFF_ATTACK, 100);
+        swingError = 1;
+    }
+    //120 degrees of radiant range
+    else if (!HasInArc(2 * M_PI / 3, victim))
+    {
+        setAttackTimer(BASE_ATTACK, 100);
+        setAttackTimer(OFF_ATTACK, 100);
+        swingError = 2;
+    }
+    else
+    {
+        if (isAttackReady(BASE_ATTACK))
+        {
+            // prevent base and off attack in same time, delay attack at 0.2 sec
+            if (haveOffhandWeapon())
+            {
+                if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
+                    setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
+            }
+            AttackerStateUpdate(victim, BASE_ATTACK);
+            resetAttackTimer(BASE_ATTACK);
+        }
+        if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
+        {
+            // prevent base and off attack in same time, delay attack at 0.2 sec
+            uint32 base_att = getAttackTimer(BASE_ATTACK);
+            if (base_att < ATTACK_DISPLAY_DELAY)
+                setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
+            // do attack
+            AttackerStateUpdate(victim, OFF_ATTACK);
+            resetAttackTimer(OFF_ATTACK);
+        }
+    }
 
-	Player* player = (GetTypeId() == TYPEID_PLAYER ? (Player*)this : NULL);
-	if (player && swingError != player->LastSwingErrorMsg())
-	{
-		if (swingError == 1)
-			player->SendAttackSwingNotInRange();
-		else if (swingError == 2)
-			player->SendAttackSwingBadFacingAttack();
-		player->SwingErrorMsg(swingError);
-	}
+    Player* player = (GetTypeId() == TYPEID_PLAYER ? (Player*)this : NULL);
+    if (player && swingError != player->LastSwingErrorMsg())
+    {
+        if (swingError == 1)
+            player->SendAttackSwingNotInRange();
+        else if (swingError == 2)
+            player->SendAttackSwingBadFacingAttack();
+        player->SwingErrorMsg(swingError);
+    }
 
-	return swingError == 0;
+    return swingError == 0;
 }
 
 bool Unit::haveOffhandWeapon() const
 {
-	if (GetTypeId() == TYPEID_PLAYER)
-		return ((Player*)this)->GetWeaponForAttack(OFF_ATTACK, true);
-	else
-	{
-		uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (1 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
-		if (itemClass == ITEM_CLASS_WEAPON)
-			return true;
+    if (GetTypeId() == TYPEID_PLAYER)
+        return ((Player*)this)->GetWeaponForAttack(OFF_ATTACK, true);
+    else
+    {
+        uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (1 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
+        if (itemClass == ITEM_CLASS_WEAPON)
+            return true;
 
-		return false;
-	}
+        return false;
+    }
 
     return CanDualWield();
 }
@@ -7399,11 +7399,19 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
 
 bool Unit::IsHostileTo(Unit const* unit) const
 {
+    // Fix Me
+    //if (pTester->isSpectator() || pTarget->isSpectator())
+        //return false;
+
     return GetReactionTo(unit) <= REP_HOSTILE;
 }
 
 bool Unit::IsFriendlyTo(Unit const* unit) const
 {
+    // Fix Me
+    //if (pTester->isSpectator() || pTarget->isSpectator())
+        //return true;
+
     return GetReactionTo(unit) >= REP_FRIENDLY;
 }
 
@@ -7475,6 +7483,15 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
         return false;
+
+	if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->isSpectator())
+		return false;
+
+	if (victim->GetTypeId() == TYPEID_PLAYER)
+	{
+		if (victim->ToPlayer()->isSpectator())
+			return false;
+	}
 
     // nobody can attack GM in GM-mode
     if (victim->GetTypeId() == TYPEID_PLAYER)
@@ -12938,9 +12955,9 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
         }
         // Call KilledUnit for creatures
         if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsAIEnabled)
-		{
+        {
             ToCreature()->AI()->KilledUnit(victim);
-			
+            
 
 #ifdef ELUNA
             if (Creature* killer = ToCreature())
@@ -12999,7 +13016,7 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
             ToCreature()->AI()->KilledUnit(victim);
         else if (Guardian* pPet = GetGuardianPet())
             pPet->AI()->KilledUnit(victim);
-		
+        
  
 #ifdef ELUNA
        if (GetTypeId() == TYPEID_PLAYER)
