@@ -35,9 +35,9 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recv_data)
     if (!pEnemy)
     {
         if (!guid.IsUnit())
-            sLog.outError("WORLD: %s isn't player, pet or creature", guid.GetString().c_str());
+            sLog.outError("WORLD: %s 不是玩家、宠物或生物", guid.GetString().c_str());
         else
-            sLog.outError("WORLD: Enemy %s not found", guid.GetString().c_str());
+            sLog.outError("WORLD: 敌人 %s 没有找到", guid.GetString().c_str());
 
         // stop attack state at client
         SendAttackStop(NULL);
@@ -66,7 +66,7 @@ void WorldSession::HandleSetSheathedOpcode(WorldPacket& recv_data)
 
     if (sheathed >= MAX_SHEATH_STATE)
     {
-        sLog.outError("Unknown sheath state %u ??", sheathed);
+        sLog.outError("未知的sheath状态 %u ?", sheathed);
         return;
     }
 

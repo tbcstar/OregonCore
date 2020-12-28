@@ -92,7 +92,7 @@ enum eCustodian
 ## npc_steward_of_time
 ######*/
 
-#define GOSSIP_ITEM_FLIGHT  "Please take me to the master's lair."
+#define GOSSIP_ITEM_FLIGHT  "请带我去主宰之巢。"
 
 
 
@@ -104,12 +104,12 @@ enum eCustodian
 ## npc_stone_watcher_of_norgannon
 ######*/
 
-#define GOSSIP_ITEM_NORGANNON_1     "What function do you serve?"
-#define GOSSIP_ITEM_NORGANNON_2     "What are the Plates of Uldum?"
-#define GOSSIP_ITEM_NORGANNON_3     "Where are the Plates of Uldum?"
-#define GOSSIP_ITEM_NORGANNON_4     "Excuse me? We've been \"reschedueled for visitations\"? What does that mean?!"
-#define GOSSIP_ITEM_NORGANNON_5     "So, what's inside Uldum?"
-#define GOSSIP_ITEM_NORGANNON_6     "I will return when i have the Plates of Uldum."
+#define GOSSIP_ITEM_NORGANNON_1     "你有什么服务？"
+#define GOSSIP_ITEM_NORGANNON_2     "什么是奥丹姆石座？"
+#define GOSSIP_ITEM_NORGANNON_3     "奥丹姆石座在哪里?"
+#define GOSSIP_ITEM_NORGANNON_4     "对不起？ 我们已经被“重新安排访问”了吗？ 这意味着什么？"
+#define GOSSIP_ITEM_NORGANNON_5     "所以，奥丹姆里面有什么？"
+#define GOSSIP_ITEM_NORGANNON_6     "当我拿到奥丹姆石座后我会回来的。"
 
 
 

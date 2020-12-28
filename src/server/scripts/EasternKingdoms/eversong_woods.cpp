@@ -71,8 +71,8 @@ public:
 ## npc_prospector_anvilward
 ######*/
 
-#define GOSSIP_HELLO    "I need a moment of your time, sir."
-#define GOSSIP_SELECT   "Why... yes, of course. I've something to show you right inside this building, Mr. Anvilward."
+#define GOSSIP_HELLO    "我需要占用您一点时间，先生。"
+#define GOSSIP_SELECT   "为什么...是的，当然。我有东西要告诉你，这栋大楼内，安威瓦尔德先生。"
 
 enum eProspectorAnvilward
 {

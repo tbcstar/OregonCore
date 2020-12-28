@@ -79,7 +79,7 @@ void BattlegroundAV::HandleKillUnit(Creature* unit, Player* killer)
     {
         if (!m_CaptainAlive[0])
         {
-            sLog.outError("Killed a Captain twice, please report this bug, if you haven't done \".respawn\"");
+            sLog.outError("杀了一个队长两次，如果你还没有完成\".respawn\"，请报告这个bug。");
             return;
         }
         m_CaptainAlive[0] = false;
@@ -98,7 +98,7 @@ void BattlegroundAV::HandleKillUnit(Creature* unit, Player* killer)
     {
         if (!m_CaptainAlive[1])
         {
-            sLog.outError("Killed a Captain twice, please report this bug, if you haven't done \".respawn\"");
+            sLog.outError("杀了一个队长两次，如果你还没有完成 \".respawn\"，请报告这个bug。");
             return;
         }
         m_CaptainAlive[1] = false;
@@ -434,7 +434,7 @@ void BattlegroundAV::RemovePlayer(Player* plr, uint64 /*guid*/)
 {
     if (!plr)
     {
-        sLog.outError("bg_AV no player at remove");
+        sLog.outError("bg_AV 没有要移除的玩家");
         return;
     }
     //TODO search more buffs
@@ -455,13 +455,13 @@ void BattlegroundAV::HandleAreaTrigger(Player* Source, uint32 Trigger)
     case 95:
     case 2608:
         if (Source->GetTeam() != ALLIANCE)
-            Source->GetSession()->SendAreaTriggerMessage("Only The Alliance can use that portal");
+            Source->GetSession()->SendAreaTriggerMessage("只有联盟才能使用该传送门");
         else
             Source->LeaveBattleground();
         break;
     case 2606:
         if (Source->GetTeam() != HORDE)
-            Source->GetSession()->SendAreaTriggerMessage("Only The Horde can use that portal");
+            Source->GetSession()->SendAreaTriggerMessage("只有部落才能使用这个传送门");
         else
             Source->LeaveBattleground();
         break;
@@ -537,7 +537,7 @@ void BattlegroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
         if (m_BgCreatures[AV_CPLACE_A_MARSHAL_SOUTH + tmp])
             DelCreature(AV_CPLACE_A_MARSHAL_SOUTH + tmp);
         else
-            sLog.outError("BattlegroundAV:: playerdestroyedpoint: marshal %i doesn't exist", AV_CPLACE_A_MARSHAL_SOUTH + tmp);
+            sLog.outError("BattlegroundAV:: playerdestroyedpoint: 元帅 %i 不存在", AV_CPLACE_A_MARSHAL_SOUTH + tmp);
         //spawn destroyed aura
         for (uint8 i = 0; i <= 9; i++)
             SpawnBGObject(BG_AV_OBJECT_BURN_DUNBALDAR_SOUTH + i + (tmp * 10), RESPAWN_IMMEDIATELY);
@@ -703,7 +703,7 @@ void BattlegroundAV::PopulateNode(BG_AV_Nodes node)
         if (m_BgCreatures[node])
             DelCreature(node);
         if (!AddSpiritGuide(node, BG_AV_CreaturePos[node][0], BG_AV_CreaturePos[node][1], BG_AV_CreaturePos[node][2], BG_AV_CreaturePos[node][3], owner))
-            sLog.outError("AV: couldn't spawn spiritguide at node %i", node);
+            sLog.outError("AV: 不能在节点 %i 生成spiritguide", node);
 
     }
     for (uint8 i = 0; i < 4; i++)
@@ -738,7 +738,7 @@ BG_AV_Nodes BattlegroundAV::GetNodeThroughObject(uint32 object)
         return BG_AV_Nodes(object - 29);
     if (object == BG_AV_OBJECT_FLAG_N_SNOWFALL_GRAVE)
         return BG_AV_NODES_SNOWFALL_GRAVE;
-    sLog.outError("BattlegroundAV: ERROR! GetPlace got a wrong object :(");
+    sLog.outError("BattlegroundAV: 错误！GetPlace得到了错误的对象：(");
     ASSERT(false);
     return BG_AV_Nodes(0);
 }
@@ -777,7 +777,7 @@ uint32 BattlegroundAV::GetObjectThroughNode(BG_AV_Nodes node)
     }
     else if (m_Nodes[node].Owner == BG_AV_NEUTRAL_TEAM)
         return BG_AV_OBJECT_FLAG_N_SNOWFALL_GRAVE;
-    sLog.outError("BattlegroundAV: Error! GetPlaceNode couldn't resolve node %i", node);
+    sLog.outError("BattlegroundAV: 错误!GetPlaceNode无法解析节点 %i", node);
     ASSERT(false);
     return 0;
 }
@@ -789,7 +789,7 @@ void BattlegroundAV::EventPlayerClickedOnFlag(Player* source, GameObject* target
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
     int32 object = GetObjectType(target_obj->GetGUID());
-    sLog.outDebug("BattlegroundAV: using gameobject %i with type %i", target_obj->GetEntry(), object);
+    sLog.outDebug("BattlegroundAV: 使用类型为 %i 的游戏对象 %i", target_obj->GetEntry(), object);
     if (object < 0)
         return;
     switch (target_obj->GetEntry())
@@ -1131,7 +1131,7 @@ bool BattlegroundAV::SetupBattleground()
         // horde gates
         || !AddObject(BG_AV_OBJECT_DOOR_H, BG_AV_OBJECTID_GATE_H, BG_AV_DoorPositons[1][0], BG_AV_DoorPositons[1][1], BG_AV_DoorPositons[1][2], BG_AV_DoorPositons[1][3], 0, 0, sin(BG_AV_DoorPositons[1][3] / 2), cos(BG_AV_DoorPositons[1][3] / 2), RESPAWN_IMMEDIATELY))
     {
-        sLog.outErrorDb("BatteGroundAV: Failed to spawn some object Battleground not created!1");
+        sLog.outErrorDb("BatteGroundAV: 未能生成某个未创建的战场！1");
         return false;
     }
 
@@ -1149,7 +1149,7 @@ bool BattlegroundAV::SetupBattleground()
                   || !AddObject(BG_AV_OBJECT_AURA_A_FIRSTAID_STATION + i * 3, BG_AV_OBJECTID_AURA_A, BG_AV_ObjectPos[i][0], BG_AV_ObjectPos[i][1], BG_AV_ObjectPos[i][2], BG_AV_ObjectPos[i][3], 0, 0, sin(BG_AV_ObjectPos[i][3] / 2), cos(BG_AV_ObjectPos[i][3] / 2), RESPAWN_ONE_DAY)
                   || !AddObject(BG_AV_OBJECT_AURA_H_FIRSTAID_STATION + i * 3, BG_AV_OBJECTID_AURA_H, BG_AV_ObjectPos[i][0], BG_AV_ObjectPos[i][1], BG_AV_ObjectPos[i][2], BG_AV_ObjectPos[i][3], 0, 0, sin(BG_AV_ObjectPos[i][3] / 2), cos(BG_AV_ObjectPos[i][3] / 2), RESPAWN_ONE_DAY))
             {
-                sLog.outError("BatteGroundAV: Failed to spawn some object Battleground not created!2");
+                sLog.outError("BatteGroundAV: 未能生成某个未创建的战场！2");
                 return false;
             }
         }
@@ -1164,7 +1164,7 @@ bool BattlegroundAV::SetupBattleground()
                      || !AddObject(BG_AV_OBJECT_TFLAG_A_DUNBALDAR_SOUTH + (2 * (i - BG_AV_NODES_DUNBALDAR_SOUTH)), BG_AV_OBJECTID_TOWER_BANNER_A, BG_AV_ObjectPos[i + 8][0], BG_AV_ObjectPos[i + 8][1], BG_AV_ObjectPos[i + 8][2], BG_AV_ObjectPos[i + 8][3], 0, 0, sin(BG_AV_ObjectPos[i + 8][3] / 2), cos(BG_AV_ObjectPos[i + 8][3] / 2), RESPAWN_ONE_DAY)
                      || !AddObject(BG_AV_OBJECT_TFLAG_H_DUNBALDAR_SOUTH + (2 * (i - BG_AV_NODES_DUNBALDAR_SOUTH)), BG_AV_OBJECTID_TOWER_BANNER_PH, BG_AV_ObjectPos[i + 8][0], BG_AV_ObjectPos[i + 8][1], BG_AV_ObjectPos[i + 8][2], BG_AV_ObjectPos[i + 8][3], 0, 0, sin(BG_AV_ObjectPos[i + 8][3] / 2), cos(BG_AV_ObjectPos[i + 8][3] / 2), RESPAWN_ONE_DAY))
                 {
-                    sLog.outError("BatteGroundAV: Failed to spawn some object Battleground not created!3");
+                    sLog.outError("BatteGroundAV: 未能生成某个未创建的战场！3");
                     return false;
                 }
             }
@@ -1177,7 +1177,7 @@ bool BattlegroundAV::SetupBattleground()
                        || !AddObject(BG_AV_OBJECT_TFLAG_A_DUNBALDAR_SOUTH + (2 * (i - BG_AV_NODES_DUNBALDAR_SOUTH)), BG_AV_OBJECTID_TOWER_BANNER_PA, BG_AV_ObjectPos[i + 8][0], BG_AV_ObjectPos[i + 8][1], BG_AV_ObjectPos[i + 8][2], BG_AV_ObjectPos[i + 8][3], 0, 0, sin(BG_AV_ObjectPos[i + 8][3] / 2), cos(BG_AV_ObjectPos[i + 8][3] / 2), RESPAWN_ONE_DAY)
                        || !AddObject(BG_AV_OBJECT_TFLAG_H_DUNBALDAR_SOUTH + (2 * (i - BG_AV_NODES_DUNBALDAR_SOUTH)), BG_AV_OBJECTID_TOWER_BANNER_H, BG_AV_ObjectPos[i + 8][0], BG_AV_ObjectPos[i + 8][1], BG_AV_ObjectPos[i + 8][2], BG_AV_ObjectPos[i + 8][3], 0, 0, sin(BG_AV_ObjectPos[i + 8][3] / 2), cos(BG_AV_ObjectPos[i + 8][3] / 2), RESPAWN_ONE_DAY))
                 {
-                    sLog.outError("BatteGroundAV: Failed to spawn some object Battleground not created!4");
+                    sLog.outError("BatteGroundAV: 未能生成某个未创建的战场！4");
                     return false;
                 }
             }
@@ -1185,7 +1185,7 @@ bool BattlegroundAV::SetupBattleground()
             {
                 if (!AddObject(BG_AV_OBJECT_BURN_DUNBALDAR_SOUTH + ((i - BG_AV_NODES_DUNBALDAR_SOUTH) * 10) + j, BG_AV_OBJECTID_FIRE, BG_AV_ObjectPos[AV_OPLACE_BURN_DUNBALDAR_SOUTH + ((i - BG_AV_NODES_DUNBALDAR_SOUTH) * 10) + j][0], BG_AV_ObjectPos[AV_OPLACE_BURN_DUNBALDAR_SOUTH + ((i - BG_AV_NODES_DUNBALDAR_SOUTH) * 10) + j][1], BG_AV_ObjectPos[AV_OPLACE_BURN_DUNBALDAR_SOUTH + ((i - BG_AV_NODES_DUNBALDAR_SOUTH) * 10) + j][2], BG_AV_ObjectPos[AV_OPLACE_BURN_DUNBALDAR_SOUTH + ((i - BG_AV_NODES_DUNBALDAR_SOUTH) * 10) + j][3], 0, 0, sin(BG_AV_ObjectPos[AV_OPLACE_BURN_DUNBALDAR_SOUTH + ((i - BG_AV_NODES_DUNBALDAR_SOUTH) * 10) + j][3] / 2), cos(BG_AV_ObjectPos[AV_OPLACE_BURN_DUNBALDAR_SOUTH + ((i - BG_AV_NODES_DUNBALDAR_SOUTH) * 10) + j][3] / 2), RESPAWN_ONE_DAY))
                 {
-                    sLog.outError("BatteGroundAV: Failed to spawn some object Battleground not created!5.%i", i);
+                    sLog.outError("BatteGroundAV: 未能生成某个未创建的战场！5。%i", i);
                     return false;
                 }
             }
@@ -1349,22 +1349,22 @@ void BattlegroundAV::AssaultNode(BG_AV_Nodes node, uint16 team)
 {
     if (m_Nodes[node].TotalOwner == team)
     {
-        sLog.outError("Crash alert! Assaulting team is TotalOwner of node");
+        sLog.outError("事故警报！ Assaulting team is TotalOwner of node");
         ASSERT(false);
     }
     if (m_Nodes[node].Owner == team)
     {
-        sLog.outError("Crash alert! Assaulting team is owner of node");
+        sLog.outError("事故警报！ Assaulting team is owner of node");
         ASSERT(false);
     }
     if (m_Nodes[node].State == POINT_DESTROYED)
     {
-        sLog.outError("Crash alert! Destroyed node is being assaulted");
+        sLog.outError("事故警报！ Destroyed node is being assaulted");
         ASSERT(false);
     }
     if (m_Nodes[node].State == POINT_ASSAULTED && m_Nodes[node].TotalOwner) //only assault an assaulted node if no totalowner exists
     {
-        sLog.outError("Crash alert! Assault on an not assaulted node with total owner");
+        sLog.outError("事故警报！ Assault on an not assaulted node with total owner");
         ASSERT(false);
     }
     // the timer gets another time, if the previous owner was 0 == Neutral

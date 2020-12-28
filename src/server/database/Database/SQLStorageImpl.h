@@ -215,9 +215,9 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
     if (!result)
     {
         if (error_at_empty)
-            sLog.outError("%s table is empty!\n", store.GetTableName());
+            sLog.outError("%s 表是空的!\n", store.GetTableName());
         else
-            sLog.outString("%s table is empty!\n", store.GetTableName());
+            sLog.outString("%s 表是空的!\n", store.GetTableName());
 
         recordCount = 0;
         return;
@@ -359,9 +359,9 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
     if (!result)
     {
         if (error_at_empty)
-            sLog.outError("%s table is empty!\n", store.GetTableName());
+            sLog.outError("%s 表是空的!\n", store.GetTableName());
         else
-            sLog.outString("%s table is empty!\n", store.GetTableName());
+            sLog.outString("%s 表是空的!\n", store.GetTableName());
 
         recordCount = 0;
         return;

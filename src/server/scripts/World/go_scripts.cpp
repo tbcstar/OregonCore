@@ -84,7 +84,7 @@ enum eCatFigurine
 ## go_orb_of_command
 ######*/
 
-#define GOSSIP_ORB_OF_COMMAND       "<Place my hand on the orb.>"
+#define GOSSIP_ORB_OF_COMMAND       "<把我的手放在球上。>"
 #define QUEST_BLACKHANDS_COMMAND    7761
 
 
@@ -203,9 +203,9 @@ enum eSouthfury
 
 #define GOSSIP_FEL_CRYSTALFORGE_TEXT 31000
 #define GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN 31001
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_1 "Purchase 1 Unstable Flask of the Beast for the cost of 10 Apexis Shards"
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Beast for the cost of 50 Apexis Shards"
-#define GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN "Use the fel crystalforge to make another purchase."
+#define GOSSIP_FEL_CRYSTALFORGE_ITEM_1 "用10个埃匹希斯碎片购买1个不稳定的野兽合剂"
+#define GOSSIP_FEL_CRYSTALFORGE_ITEM_5 "用50个埃匹希斯碎片购买5个不稳定的野兽合剂"
+#define GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN "使用邪能水晶熔炉再次购买。"
 
 enum eFelCrystalforge
 {
@@ -223,9 +223,9 @@ enum eFelCrystalforge
 
 #define GOSSIP_BASHIR_CRYSTALFORGE_TEXT 31100
 #define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN 31101
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1 "Purchase 1 Unstable Flask of the Sorcerer for the cost of 10 Apexis Shards"
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5 "Purchase 5 Unstable Flask of the Sorcerer for the cost of 50 Apexis Shards"
-#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN "Use the bashir crystalforge to make another purchase."
+#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1 "用10个埃匹希斯碎片购买1个不稳定的巫术合剂"
+#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5 "用50个埃匹希斯碎片购买5个不稳定的巫术合剂"
+#define GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN "使用巴什伊尔水晶熔炉再次购买。"
 
 enum eBashirCrystalforge
 {

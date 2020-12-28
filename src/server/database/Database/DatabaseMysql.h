@@ -40,9 +40,9 @@
 #if MYSQL_VERSION_ID >= 80000
 typedef char my_bool;
 #ifdef _MSC_VER
-#pragma message("You are using an incompatible mysql version!")
+#pragma message("您正在使用一个不兼容的mysql版本!")
 #else
-#warning "You are using an incompatible mysql version!"
+#warning "您正在使用一个不兼容的mysql版本!"
 #endif
 #endif
 

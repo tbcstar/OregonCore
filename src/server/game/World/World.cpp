@@ -235,7 +235,7 @@ World::AddSession_(WorldSession* s)
     {
         AddQueuedPlayer(s);
         UpdateMaxSessionCounters();
-        sLog.outDetail("PlayerQueue: Account id %u is in Queue Position (%u).", s->GetAccountId(), ++QueueSize);
+        sLog.outDetail("玩家队列: 账号 id %u 处于排队位置 (%u).", s->GetAccountId(), ++QueueSize);
         return;
     }
 
@@ -256,7 +256,7 @@ World::AddSession_(WorldSession* s)
         popu /= pLimit;
         popu *= 2;
         LoginDatabase.PExecute("UPDATE realmlist SET population = '%f' WHERE id = '%d'", popu, realmID);
-        sLog.outDetail("Server Population (%f).", popu);
+        sLog.outDetail("服务器玩家总量 (%f).", popu);
     }
 }
 
@@ -423,7 +423,7 @@ void World::LoadModuleConfig()
         } while (result->NextRow());
     }
 
-    sLog.outString(">> Loaded %lu module config", count);
+    sLog.outString(">> 加载 %lu个 module config", count);
 	sLog.outString();
 
 }
@@ -435,14 +435,14 @@ void World::LoadConfigSettings(bool reload)
     {
         if (!sConfig.Reload())
         {
-            sLog.outError("World settings reload fail: can't read settings from %s.", sConfig.GetFilename().c_str());
+            sLog.outError("World settings reload fail: 无法从 %s 读取设置。", sConfig.GetFilename().c_str());
             return;
         }
     }
 
     // Read the player limit and the Message of the day from the config file
     SetPlayerLimit(sConfig.GetIntDefault("PlayerLimit", DEFAULT_PLAYER_LIMIT), true);
-    SetMotd(sConfig.GetStringDefault("Motd", "Welcome to a Oregon Core Server."));
+    SetMotd(sConfig.GetStringDefault("Motd", "欢迎回到艾泽拉斯，我的伙伴，这是最初的起点，也是新征程的开始！"));
 
     // Get string for new logins (newly created characters)
     SetNewCharString(sConfig.GetStringDefault("PlayerStart.String", ""));
@@ -828,7 +828,7 @@ void World::LoadConfigSettings(bool reload)
         m_timers[WUPDATE_UPTIME].Reset();
     }
 
-    // log db cleanup interval
+    // db log清理间隔时间
     m_configs[CONFIG_LOGDB_CLEARINTERVAL] = sConfig.GetIntDefault("LogDB.Opt.ClearInterval", 10);
     if (int32(m_configs[CONFIG_LOGDB_CLEARINTERVAL]) <= 0)
     {
@@ -841,7 +841,7 @@ void World::LoadConfigSettings(bool reload)
         m_timers[WUPDATE_CLEANDB].Reset();
     }
     m_configs[CONFIG_LOGDB_CLEARTIME] = sConfig.GetIntDefault("LogDB.Opt.ClearTime", 1209600); // 14 days default
-    sLog.outString("Will clear `logs` table of entries older than %i seconds every %u minutes.",
+    sLog.outString("将每%u分钟清除' logs '表中大于%i秒的条目。",
         m_configs[CONFIG_LOGDB_CLEARTIME], m_configs[CONFIG_LOGDB_CLEARINTERVAL]);
 
     m_configs[CONFIG_SKILL_CHANCE_ORANGE] = sConfig.GetIntDefault("SkillChance.Orange", 100);
@@ -997,7 +997,7 @@ void World::LoadConfigSettings(bool reload)
     else
     {
         m_dataPath = dataPath;
-        sLog.outString("Using DataDir %s", m_dataPath.c_str());
+        sLog.outString("使用Data目录 %s", m_dataPath.c_str());
     }
 
     bool enableIndoor = sConfig.GetBoolDefault("vmap.enableIndoorCheck", true);
@@ -1013,7 +1013,7 @@ void World::LoadConfigSettings(bool reload)
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
     VMAP::VMapFactory::preventSpellsFromBeingTestedForLoS(ignoreSpellIds.c_str());
     sLog.outString("WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i, PetLOS:%i", enableLOS, enableHeight, enableIndoor, enablePetLOS);
-    sLog.outString("WORLD: VMap data directory is: %svmaps", m_dataPath.c_str());
+    sLog.outString("WORLD: VMap数据目录为：%svmaps", m_dataPath.c_str());
 
     m_configs[CONFIG_PET_LOS] = enablePetLOS;
     m_configs[CONFIG_VMAP_TOTEM] = sConfig.GetBoolDefault("vmap.totem", false);
@@ -1174,7 +1174,7 @@ void World::LoadSQLUpdates()
 
         // Change current directory to sql/updates/(path)
         if (-1 == ACE_OS::chdir(path.c_str()))
-              sLog.outError("Can't change directory to %s: %s", path.c_str(), strerror(errno));
+            sLog.outError("无法将目录更改为 %s: %s", path.c_str(), strerror(errno));
 
         // get files in sql/updates/(path)/ directory
         if (ACE_DIR* dir = ACE_OS::opendir(path.c_str()))
@@ -1245,7 +1245,7 @@ void World::LoadModSQLUpdates()
     std::set<std::string> alreadyAppliedFiles;
 
     if (m_ModSQLUpdatesPath.empty()) {
-         sLog.outString(">> Skipping modules SQL updates.");
+         sLog.outString(">> 跳过模块SQL更新。");
 		 sLog.outString();
         return;
     }
@@ -1423,7 +1423,8 @@ void World::SetInitialWorldSettings()
         sLog.outError("Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map/*.vmtree/*.vmtile files in appropriate directories or correct the DataDir value in the oregoncore.conf file.", m_dataPath.c_str(), m_dataPath.c_str());
 
     // Loading strings. Getting no records means core load has to be canceled because no error message can be output.
-    sLog.outString("Loading Oregon strings...");
+
+    sLog.outString("加载 Oregon strings...");
     if (!sObjectMgr.LoadOregonStrings())
         exit(1);                                            // Error message displayed in function already
 
@@ -1440,13 +1441,13 @@ void World::SetInitialWorldSettings()
 
     if (getConfig(CONFIG_SQLUPDATER_ENABLED))
     {
-        sLog.outString("Applying SQL Updates...");
+        sLog.outString("应用SQL更新...");
         LoadSQLUpdates();
         LoadModSQLUpdates();
     }
 
     // Load the DBC files
-    sLog.outString("Initialize data stores...");
+    sLog.outString("初始化数据存储...");
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
 
@@ -1463,17 +1464,17 @@ void World::SetInitialWorldSettings()
 
     LoadM2Cameras(m_dataPath);
 
-    sLog.outString("Loading Script Names...");
+    sLog.outString("加载脚本名字...");
     sObjectMgr.LoadScriptNames();
 
-    sLog.outString("Loading Instance Template...");
+    sLog.outString("加载副本模板...");
     sObjectMgr.LoadInstanceTemplate();
 
-    sLog.outString("Loading SkillLineAbilityMultiMap Data...");
+    sLog.outString("加载SkillLineAbilityMultiMap数据...");
     sSpellMgr.LoadSkillLineAbilityMap();
 
     // Clean up and pack instances
-    sLog.outString("Cleaning up instances...");
+    sLog.outString("清理副本...");
     sInstanceSaveMgr.CleanupInstances();                // must be called before `creature_respawn`/`gameobject_respawn` tables
 
     sLog.outString("Packing instances...");
@@ -1493,7 +1494,7 @@ void World::SetInitialWorldSettings()
 	
 #ifdef ELUNA
     ///- Initialize Lua Engine
-    sLog.outString("Initialize Eluna Lua Engine...");
+    sLog.outString("初始化Eluna Lua引擎…");
     Eluna::Initialize();
 #endif
 
@@ -1641,7 +1642,7 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading spell extra attributes...");
     sSpellMgr.LoadSpellCustomAttr();
 
-    sLog.outString("Loading GameObject models...");
+    sLog.outString("加载 GameObject models...");
     LoadGameObjectModelList();
 
     sLog.outString("Loading linked spells...");
@@ -1893,7 +1894,7 @@ void World::SetInitialWorldSettings()
 
     // Print startup time
     uint32 uStartInterval = getMSTimeDiff(uStartTime, getMSTime());
-    sLog.outString("SERVER STARTUP TIME: %i minutes %i seconds", uStartInterval / 60000, (uStartInterval % 60000) / 1000);
+    sLog.outString("服务器启动时间:%i分%i秒", uStartInterval / 60000, (uStartInterval % 60000) / 1000);
 }
 
 void World::DetectDBCLang()
@@ -1902,7 +1903,7 @@ void World::DetectDBCLang()
 
     if (m_lang_confid != 255 && m_lang_confid >= MAX_LOCALE)
     {
-        sLog.outError("Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", MAX_LOCALE);
+        sLog.outError("不正确的DBC.Locale !必须是 >= 0 和 < %d(设置为0)", MAX_LOCALE);
         m_lang_confid = LOCALE_enUS;
     }
 
@@ -1927,11 +1928,11 @@ void World::DetectDBCLang()
         default_locale = m_lang_confid;
 
     if (default_locale >= MAX_LOCALE)
-          sLog.outError("Unable to determine your DBC Locale! (corrupt DBC?)");
+          sLog.outError("无法确定您的DBC语言环境! (corrupt DBC?)");
 
     m_defaultDbcLocale = LocaleConstant(default_locale);
 
-    sLog.outString("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[m_defaultDbcLocale], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
+    sLog.outString("默认情况下使用%s DBC语言环境。 所有可用的DBC语言环境：%s", localeNames[m_defaultDbcLocale], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
 }
 
 void World::RecordTimeDiff(const char* text, ...)
@@ -1968,7 +1969,7 @@ void World::LoadAutobroadcasts()
 
     if (!result)
     {
-        sLog.outString(">> Loaded 0 autobroadcasts definitions");
+        sLog.outString(">> 加载 0个 autobroadcasts definitions");
 		sLog.outString();
         return;
     }
@@ -1985,7 +1986,7 @@ void World::LoadAutobroadcasts()
 
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u autobroadcasts definitions", count);
+    sLog.outString(">> 加载 %u个 autobroadcasts definitions", count);
 	sLog.outString();
 }
 
@@ -2001,7 +2002,7 @@ void World::LoadIp2nation()
         count = fields[0].GetUInt32();
     }
 
-    sLog.outString(">> Loaded %u ip2nation definitions", count);
+    sLog.outString(">> 加载 %u个 ip2nation definitions", count);
 	sLog.outString();
 }
 
@@ -2032,7 +2033,7 @@ void World::LoadOpcodeProtection()
         } while (result->NextRow());
     }
 
-    sLog.outString(">> Loaded %lu opcode protections.", count);
+    sLog.outString(">> 加载 %lu个 opcode protections.", count);
 	sLog.outString();
 }
 
@@ -2098,7 +2099,7 @@ void World::Update(uint32 diff)
     {
         if (m_updateTimeSum > m_configs[CONFIG_INTERVAL_LOG_UPDATE] && uint32(diff) >= m_configs[CONFIG_MIN_LOG_UPDATE])
         {
-            sLog.outBasic("Update time diff: %u. Players online: %u.", m_updateTimeSum / m_updateTimeCount, GetActiveSessionCount());
+            sLog.outBasic("更新时间差：%u。 在线玩家：%u。", m_updateTimeSum / m_updateTimeCount, GetActiveSessionCount());
             m_updateTimeSum = m_updateTime;
             m_updateTimeCount = 1;
         }
@@ -2888,7 +2889,7 @@ void World::UpdateAllowedSecurity()
 
 void World::ResetDailyQuests()
 {
-    sLog.outDetail("Daily quests reset for all characters.");
+    sLog.outDetail("所有角色的每日任务已重置。");
     CharacterDatabase.Execute("DELETE FROM character_queststatus_daily");
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (itr->second->GetPlayer())
@@ -2919,6 +2920,6 @@ void World::LoadDBVersion()
         m_DBVersion = fields[0].GetString();
     }
     else
-        m_DBVersion = "unknown world database";
+        m_DBVersion = "未知的world数据库";
 }
 

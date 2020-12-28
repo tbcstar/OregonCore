@@ -73,7 +73,7 @@ SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
         if(!pStmt->prepare())
         {
             //ASSERT(false && "Unable to prepare SQL statement");
-            sLog.outError("Can't prepare %s, statement not executed!", fmt.c_str());
+            sLog.outError("不能准备 %s，语句不执行！", fmt.c_str());
             return nullptr;
         }
 

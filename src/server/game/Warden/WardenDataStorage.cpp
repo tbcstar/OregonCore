@@ -59,7 +59,7 @@ void CWardenDataStorage::LoadWardenDataResult(bool reload)
 
     if (!result)
     {
-        sLog.outString(">> Loaded %u warden data and results", count);
+        sLog.outString(">> 加载 %u个 warden data and results", count);
 		sLog.outString();
         return;
     }
@@ -128,7 +128,7 @@ void CWardenDataStorage::LoadWardenDataResult(bool reload)
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u warden data and results", count);
+    sLog.outString(">> 加载 %u个 warden data and results", count);
 	sLog.outString();
 }
 

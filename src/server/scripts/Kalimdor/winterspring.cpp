@@ -36,13 +36,13 @@ EndContentData */
 ## npc_lorax
 ######*/
 
-#define GOSSIP_HL "Talk to me"
+#define GOSSIP_HL "和我说话"
 
-#define GOSSIP_SL1 "What do you do here?"
-#define GOSSIP_SL2 "I can help you"
-#define GOSSIP_SL3 "What deal?"
-#define GOSSIP_SL4 "Then what happened?"
-#define GOSSIP_SL5 "He is not safe, i'll make sure of that."
+#define GOSSIP_SL1 "你在这里做什么?"
+#define GOSSIP_SL2 "我有什么能帮你"
+#define GOSSIP_SL3 "什么交易？"
+#define GOSSIP_SL4 "然后发生了什么?"
+#define GOSSIP_SL5 "他很危险，我确定。"
 
 
 
@@ -60,7 +60,7 @@ EndContentData */
 ## npc_witch_doctor_mauari
 ######*/
 
-#define GOSSIP_HWDM "I'd like you to make me a new Cache of Mau'ari please."
+#define GOSSIP_HWDM "我希望你能给我一个新的玛艾里的容器。"
 
 
 

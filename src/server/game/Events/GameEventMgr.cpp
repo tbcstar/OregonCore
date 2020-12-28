@@ -170,7 +170,7 @@ void GameEventMgr::LoadFromDB()
         QueryResult* result = WorldDatabase.Query("SELECT MAX(entry) FROM game_event");
         if (!result)
         {
-            sLog.outString(">> Table game_event is empty.");
+            sLog.outString(">> 表 game_event 为空.");
 			sLog.outString();
             return;
         }
@@ -186,7 +186,7 @@ void GameEventMgr::LoadFromDB()
     if (!result)
     {
         mGameEvent.clear();
-        sLog.outString(">> Table game_event is empty:");
+        sLog.outString(">> 表 game_event 使用操作符:");
 		sLog.outString();
         return;
     }
@@ -202,7 +202,7 @@ void GameEventMgr::LoadFromDB()
         uint16 event_id = fields[0].GetUInt16();
         if (event_id == 0)
         {
-            sLog.outErrorDb("game_event game event id (%i) is reserved and can't be used.", event_id);
+            sLog.outErrorDb("游戏事件id (%i)被保留，但不能使用。", event_id);
             continue;
         }
 
@@ -226,7 +226,7 @@ void GameEventMgr::LoadFromDB()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u game events", count);
+    sLog.outString(">> 加载 %u个 game events", count);
 	sLog.outString();
 
     // load game event saves
@@ -236,7 +236,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u game event saves in game events", count);
+        sLog.outString(">> 加载 %u个 game event saves in game events", count);
 		sLog.outString();
 	}
     else
@@ -270,7 +270,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u game event saves in game events", count);
+        sLog.outString(">> 加载 %u个 game event saves in game events", count);
 		sLog.outString();
     }
 
@@ -278,7 +278,7 @@ void GameEventMgr::LoadFromDB()
     result = WorldDatabase.Query("SELECT event_id, prerequisite_event FROM game_event_prerequisite");
     if (!result)
 	{
-        sLog.outString(">> Loaded %u game event prerequisites in game events", count);
+        sLog.outString(">> 加载 %u个 game event prerequisites in game events", count);
 		sLog.outString();
 	}
     else
@@ -318,7 +318,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u game event prerequisites in game events", count);
+        sLog.outString(">> 加载 %u个 game event prerequisites in game events", count);
 		sLog.outString();
     }
 
@@ -330,7 +330,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u creatures in game events", count);
+        sLog.outString(">> 加载 %u个 creatures in game events", count);
 		sLog.outString();
 	}
     else
@@ -358,7 +358,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u creatures in game events", count);
+        sLog.outString(">> 加载 %u个 creatures in game events", count);
 		sLog.outString();
     }
 
@@ -370,7 +370,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u gameobjects in game events", count);
+        sLog.outString(">> 加载 %u个 gameobjects in game events", count);
 		sLog.outString();
 	}
     else
@@ -398,7 +398,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u gameobjects in game events", count);
+        sLog.outString(">> 加载 %u个 gameobjects in game events", count);
 		sLog.outString();
     }
 
@@ -412,7 +412,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u model/equipment changes in game events", count);
+        sLog.outString(">> 加载 %u个 model/equipment changes in game events", count);
 		sLog.outString();
 	}
     else
@@ -453,7 +453,7 @@ void GameEventMgr::LoadFromDB()
         }
         while (result->NextRow());
 		sLog.outString();
-        sLog.outString(">> Loaded %u model/equipment changes in game events", count);
+        sLog.outString(">> 加载 %u个 model/equipment changes in game events", count);
     }
 
     mGameEventCreatureQuests.resize(mGameEvent.size());
@@ -463,7 +463,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u quests additions in game events", count);
+        sLog.outString(">> 加载 %u个 quests additions in game events", count);
 	    sLog.outString();
      }
     else
@@ -489,7 +489,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u quests additions in game events", count);
+        sLog.outString(">> 加载 %u个 quests additions in game events", count);
 		sLog.outString();
     }
 
@@ -500,7 +500,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u go quests additions in game events", count);
+        sLog.outString(">> 加载 %u个 go quests additions in game events", count);
 		sLog.outString();
 	}
     else
@@ -526,7 +526,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u quests additions in game events", count);
+        sLog.outString(">> 加载 %u个 quests additions in game events", count);
 		sLog.outString();
     }
 
@@ -537,7 +537,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u quest event conditions in game events", count);
+        sLog.outString(">> 加载 %u个 quest event conditions in game events", count);
 		sLog.outString();
 	}
     else
@@ -565,7 +565,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u quest event conditions in game events", count);
+        sLog.outString(">> 加载 %u个 quest event conditions in game events", count);
 		sLog.outString();
     }
 
@@ -576,7 +576,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u conditions in game events", count);
+        sLog.outString(">> 加载 %u个 conditions in game events", count);
 		sLog.outString();
 	}
     else
@@ -604,7 +604,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u conditions in game events", count);
+        sLog.outString(">> 加载 %u个 conditions in game events", count);
 		sLog.outString();
     }
 
@@ -615,7 +615,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u condition saves in game events", count);
+        sLog.outString(">> 加载 %u个 condition saves in game events", count);
 		sLog.outString();
 	}
     else
@@ -647,7 +647,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u condition saves in game events", count);
+        sLog.outString(">> 加载 %u个 condition saves in game events", count);
 		sLog.outString();
     }
 
@@ -659,7 +659,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u npcflags in game events", count);
+        sLog.outString(">> 加载 %u个 npcflags in game events", count);
 		sLog.outString();
 	}
     else
@@ -685,7 +685,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u npcflags in game events", count);
+        sLog.outString(">> 加载 %u个 npcflags in game events", count);
 		sLog.outString();
     }
 
@@ -696,7 +696,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u vendor additions in game events", count);
+        sLog.outString(">> 加载 %u个 vendor additions in game events", count);
 		sLog.outString();
 	}
     else
@@ -746,7 +746,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u vendor additions in game events", count);
+        sLog.outString(">> 加载 %u个 vendor additions in game events", count);
 		sLog.outString();
     }
 
@@ -757,7 +757,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u npc gossip textids in game events", count);
+        sLog.outString(">> 加载 %u个 npc gossip textids in game events", count);
 		sLog.outString();
 	}
     else
@@ -783,7 +783,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u npc gossip textids in game events", count);
+        sLog.outString(">> 加载 %u个 npc gossip textids in game events", count);
 		sLog.outString();
     }
 
@@ -796,7 +796,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u battleground holidays in game events", count);
+        sLog.outString(">> 加载 %u个 battleground holidays in game events", count);
 		sLog.outString();
 	}
     else
@@ -821,7 +821,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u battleground holidays in game events", count);
+        sLog.outString(">> 加载 %u个 battleground holidays in game events", count);
 		sLog.outString();
     }
 
@@ -838,7 +838,7 @@ void GameEventMgr::LoadFromDB()
     count = 0;
     if (!result)
 	{
-        sLog.outString(">> Loaded %u pools in game events", count);
+        sLog.outString(">> 加载 %u个 pools in game events", count);
 		sLog.outString();
 	}
     else
@@ -872,7 +872,7 @@ void GameEventMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u pools in game events", count);
+        sLog.outString(">> 加载 %u个 pools in game events", count);
 		sLog.outString();
     }
 }

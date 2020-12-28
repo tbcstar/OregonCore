@@ -143,7 +143,7 @@ void RealmList::UpdateIfNeed()
 
 void RealmList::UpdateRealms(bool init)
 {
-    sLog.outDetail("Updating Realm List...");
+    sLog.outDetail("更新Realm列表...");
 
     //                                                        0   1     2        3     4     5           6         7                     8           9
     QueryResult* result = LoginDatabase.Query( "SELECT id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel, population, realmbuilds FROM realmlist WHERE (realmflags & 1) = 0 ORDER BY name" );
@@ -172,7 +172,7 @@ void RealmList::UpdateRealms(bool init)
                 fields[8].GetFloat(), fields[9].GetString());
 
             if (init)
-                sLog.outString("Added realm \"%s\"", fields[1].GetString());
+                sLog.outString("添加Realm \"%s\"", fields[1].GetString());
         }
         while ( result->NextRow() );
     }

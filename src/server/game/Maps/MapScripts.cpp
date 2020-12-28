@@ -101,7 +101,7 @@ inline Player* Map::_GetScriptPlayerSourceOrTarget(Object* source, Object* targe
 {
     Player* pPlayer = NULL;
     if (!source && !target)
-        sLog.outError("%s source and target objects are NULL.", scriptInfo->GetDebugInfo().c_str());
+        sLog.outError("%s 源和目标对象为空.", scriptInfo->GetDebugInfo().c_str());
     else
     {
         // Check target first, then source.
@@ -123,7 +123,7 @@ inline Creature* Map::_GetScriptCreatureSourceOrTarget(Object* source, Object* t
 {
     Creature* pCreature = NULL;
     if (!source && !target)
-        sLog.outError("%s source and target objects are NULL.", scriptInfo->GetDebugInfo().c_str());
+        sLog.outError("%s 源和目标对象为空.", scriptInfo->GetDebugInfo().c_str());
     else
     {
         if (bReverse)
@@ -235,7 +235,7 @@ inline void Map::_ScriptProcessDoor(Object* source, Object* target, const Script
     if (!guid)
         sLog.outError("%s door guid is not specified.", scriptInfo->GetDebugInfo().c_str());
     else if (!source)
-        sLog.outError("%s source object is NULL.", scriptInfo->GetDebugInfo().c_str());
+        sLog.outError("%s 源对象为空.", scriptInfo->GetDebugInfo().c_str());
     else if (!source->isType(TYPEMASK_UNIT))
         sLog.outError("%s source object is not unit (TypeId: %u, Entry: %u, GUID: %u), skipping.", scriptInfo->GetDebugInfo().c_str(),
                       source->GetTypeId(), source->GetEntry(), source->GetGUIDLow());
@@ -547,12 +547,12 @@ void Map::ScriptsProcess()
             {
                 if (!source)
                 {
-                    sLog.outError("%s source object is NULL.", step.script->GetDebugInfo().c_str());
+                    sLog.outError("%s 源对象为空.", step.script->GetDebugInfo().c_str());
                     break;
                 }
                 if (!target)
                 {
-                    sLog.outError("%s target object is NULL.", step.script->GetDebugInfo().c_str());
+                    sLog.outError("%s 目标对象为空.", step.script->GetDebugInfo().c_str());
                     break;
                 }
 
@@ -685,7 +685,7 @@ void Map::ScriptsProcess()
                 // Target must be GameObject.
                 if (!target)
                 {
-                    sLog.outError("%s target object is NULL.", step.script->GetDebugInfo().c_str());
+                    sLog.outError("%s 目标对象为空.", step.script->GetDebugInfo().c_str());
                     break;
                 }
 
@@ -716,7 +716,7 @@ void Map::ScriptsProcess()
                 // @todo Allow gameobjects to be targets and casters
                 if (!source && !target)
                 {
-                    sLog.outError("%s source and target objects are NULL.", step.script->GetDebugInfo().c_str());
+                    sLog.outError("%s 源和目标对象为空.", step.script->GetDebugInfo().c_str());
                     break;
                 }
 
@@ -948,7 +948,7 @@ void Map::ScriptsProcess()
             break;
 		 
         default:
-            sLog.outError("Unknown script command %s.", step.script->GetDebugInfo().c_str());
+            sLog.outError("未知的脚本命令 %s.", step.script->GetDebugInfo().c_str());
             break;
         }
 

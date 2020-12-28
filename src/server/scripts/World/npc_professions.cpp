@@ -16,7 +16,7 @@
  */
 
 /* ScriptData
-SDName: Npc_Professions
+SDName: Npc_专业
 SD%Complete: 80
 SDComment: Provides learn/unlearn/relearn-options for professions. Not supported: Unlearn engineering, re-learn engineering, re-learn leatherworking.
 SDCategory: NPCs
@@ -40,7 +40,7 @@ there is no difference here (except that default text is chosen with `gameobject
 /*###
 # to be removed from here (->ncp_text). This is data for database projects.
 ###*/
-#define TALK_MUST_UNLEARN_WEAPON    "You must forget your weapon type specialty before I can help you. Go to Everlook in Winterspring and seek help there."
+#define TALK_MUST_UNLEARN_WEAPON    "在我可以帮助您之前，您必须忘记武器类型的专业知识。到冬泉市的永望镇寻求帮助。"
 
 #define TALK_HAMMER_LEARN           "Ah, a seasoned veteran you once were. I know you are capable, you merely need to ask and I shall teach you the way of the hammersmith."
 #define TALK_AXE_LEARN              "Ah, a seasoned veteran you once were. I know you are capable, you merely need to ask and I shall teach you the way of the axesmith."
@@ -106,8 +106,8 @@ there is no difference here (except that default text is chosen with `gameobject
 
 #define BOX_UNLEARN_TAILOR_SPEC     "Do you really want to unlearn your tailoring specialty and lose all associated recipes? \n Cost: "
 
-#define GOSSIP_LEARN_GOBLIN         "I am absolutely certain that i want to learn Goblin engineering"
-#define GOSSIP_LEARN_GNOMISH        "I am absolutely certain that i want to learn Gnomish engineering"
+#define GOSSIP_LEARN_GOBLIN         "我非常确定我想学习地精工程"
+#define GOSSIP_LEARN_GNOMISH        "我非常肯定我想学习侏儒工程学"
 
 /*###
 # spells defines

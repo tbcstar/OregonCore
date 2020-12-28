@@ -69,7 +69,7 @@ void RARunnable::run()
 
     if (acceptor.open(listen_addr, m_Reactor) == -1)
     {
-        sLog.outError("Oregon RA can not bind to port %d on %s", raport, stringip.c_str());
+        sLog.outError("Oregon RA 不能绑定到端口 %d 在 %s 上", raport, stringip.c_str());
         return;
     }
 
@@ -85,5 +85,5 @@ void RARunnable::run()
             break;
     }
 
-    sLog.outString("Oregon RA thread exiting");
+    sLog.outString("Oregon RA 线程正在退出");
 }

@@ -40,7 +40,7 @@
 #include <process.h>
 char serviceName[] = "Oregond";
 char serviceLongName[] = "Oregon core service";
-char serviceDescription[] = "Massive Network Game Object Server";
+char serviceDescription[] = "TBCstar项目TBC核心";
 /*
  * -1 - not in service mode
  * 0 - stopped
@@ -59,7 +59,7 @@ uint32 realmID;                                             ///< Id of the realm
 // Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
-    sLog.outString("Usage: \n %s [<options>]\n"
+    sLog.outString("用法: \n %s [<options>]\n"
                    "    -v, --version            print version and exit\n\r"
                    "    -c config_file           use config_file as configuration file\n\r"
                    #ifdef _WIN32
@@ -109,20 +109,20 @@ extern int main(int argc, char** argv)
                 if (!strcmp(mode, "install"))
                 {
                     if (WinServiceInstall())
-                        sLog.outString("Installing service");
+                        sLog.outString("安装服务");
                     return 1;
                 }
                 else if (!strcmp(mode, "uninstall"))
                 {
                     if (WinServiceUninstall())
-                        sLog.outString("Uninstalling service");
+                        sLog.outString("卸载服务");
                     return 1;
                 }
                 else if (!strcmp(mode, "run"))
                     WinServiceRun();
                 else
                 {
-                    sLog.outError("Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
+                    sLog.outError(" 运行时错误: -%c 不支持参数 %s", cmd_opts.opt_opt(), mode);
                     usage(argv[0]);
                     return 1;
                 }
@@ -133,11 +133,11 @@ extern int main(int argc, char** argv)
             runRegressionTtests = true;
             break;
         case ':':
-            sLog.outError("Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
+            sLog.outError(" 运行时错误: -%c 选项需要输入参数", cmd_opts.opt_opt());
             usage(argv[0]);
             return 1;
         default:
-            sLog.outError("Runtime-Error: bad format of commandline arguments");
+            sLog.outError("运行时错误: 命令行参数的格式错误");
             usage(argv[0]);
             return 1;
         }
@@ -145,26 +145,26 @@ extern int main(int argc, char** argv)
 
     if (!sConfig.SetSource(cfg_file))
     {
-        sLog.outError("Invalid or missing configuration file : %s", cfg_file);
-        sLog.outError("Verify that the file exists and has \'[worldserver]' written in the top of the file!");
+        sLog.outError("无效或缺少配置文件: %s", cfg_file);
+        sLog.outError("检查文件是否存在，并在文件顶部写入了 \'[worldserver]' !");
         return 1;
     }
-    sLog.outString("Using configuration file %s.", cfg_file);
+    sLog.outString("使用配置文件 %s.", cfg_file);
 
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);
     if (confVersion < _OREGON_CORE_CONFVER)
     {
         sLog.outError("*****************************************************************************");
-        sLog.outError(" WARNING: Your oregoncore.conf version indicates your conf file is out of date!");
-        sLog.outError("          Please check for updates, as your current default values may cause");
-        sLog.outError("          strange behavior.");
+        sLog.outError(" 警告: 您的oregoncore.conf版本表明您的配置文件已过期!");
+        sLog.outError("       请检查更新，因为您的当前默认值可能会导致");
+        sLog.outError("       古怪的行为。");
         sLog.outError("*****************************************************************************");
         clock_t pause = 3000 + clock();
 
         while (pause > clock()) {}
     }
 
-    sLog.outDetail("Using ACE: %s", ACE_VERSION);
+    sLog.outDetail("使用ACE: %s", ACE_VERSION);
 
     // and run the 'Master'
     // todo - Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?
@@ -202,7 +202,7 @@ extern int main(int argc, char** argv)
         _execv(path, argv);
         #endif
 
-        fprintf(stderr, "Couldn't restart server: %s", strerror(errno));
+        fprintf(stderr, "无法重新启动服务器: %s", strerror(errno));
         _exit(exitcode); // avoid crashes as we closed fds
     }
     return exitcode;

@@ -121,7 +121,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
     }
     else
     {
-        sLog.outError("Addon packet uncompress error :(");
+        sLog.outError("插件数据包解压缩错误：(");
         return false;
     }
     return true;

@@ -32,7 +32,7 @@ void MapManager::LoadTransports()
 
     if (!result)
     {
-        sLog.outString(">> Loaded %u transports", count);
+        sLog.outString(">> 加载 %u个 transports", count);
 		sLog.outString();
         return;
     }
@@ -104,7 +104,7 @@ void MapManager::LoadTransports()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u transports", count);
+    sLog.outString(">> 加载 %u个 transports", count);
 	sLog.outString();
 
     // check transport data DB integrity

@@ -38,7 +38,7 @@ EndContentData */
 ## npc_blood_knight_dawnstar
 ######*/
 
-#define GOSSIP_H_BKD "Take Blood Knight Insignia"
+#define GOSSIP_H_BKD "拿上血骑士的徽章"
 
 
 
@@ -48,7 +48,7 @@ EndContentData */
 ## npc_budd_nedreck
 ######*/
 
-#define GOSSIP_HBN "You gave the crew disguises?"
+#define GOSSIP_HBN "你让船员们乔装打扮了吗?"
 
 
 

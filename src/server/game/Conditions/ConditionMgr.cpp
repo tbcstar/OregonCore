@@ -592,7 +592,7 @@ void ConditionMgr::LoadConditions(bool isReload)
     //must clear all custom handled cases (groupped types) before reload
     if (isReload)
     {
-        sLog.outString("Reseting Loot Conditions...");
+        sLog.outString("重置战利品条件……");
         LootTemplates_Creature.ResetConditions();
         LootTemplates_Fishing.ResetConditions();
         LootTemplates_Gameobject.ResetConditions();
@@ -604,10 +604,10 @@ void ConditionMgr::LoadConditions(bool isReload)
         LootTemplates_Disenchant.ResetConditions();
         LootTemplates_Prospecting.ResetConditions();
 
-        sLog.outString("Re-Loading `gossip_menu` Table for Conditions!");
+        sLog.outString("重新加载 `gossip_menu` 表!");
         sObjectMgr.LoadGossipMenu();
 
-        sLog.outString("Re-Loading `gossip_menu_option` Table for Conditions!");
+        sLog.outString("重新加载 `gossip_menu_option` 表!");
         sObjectMgr.LoadGossipMenuItems();
     }
 
@@ -617,7 +617,7 @@ void ConditionMgr::LoadConditions(bool isReload)
     if (!result)
     {
         sLog.outString();
-        sLog.outErrorDb(">> Loaded `conditions`, table is empty!");
+        sLog.outErrorDb(">> 加载 `conditions`, 表为空！");
         return;
     }
 
@@ -816,7 +816,7 @@ void ConditionMgr::LoadConditions(bool isReload)
     while (result->NextRow());
 
     sLog.outString();
-    sLog.outString(">> Loaded %u conditions", count);
+    sLog.outString(">> 加载 %u个 conditions", count);
 	sLog.outString();
 }
 
@@ -824,7 +824,7 @@ bool ConditionMgr::addToLootTemplate(Condition* cond, LootTemplate* loot)
 {
     if (!loot)
     {
-        sLog.outErrorDb("ConditionMgr: LootTemplate %u not found", cond->SourceGroup);
+        sLog.outErrorDb("ConditionMgr: LootTemplate %u 未找到！", cond->SourceGroup);
         return false;
     }
 

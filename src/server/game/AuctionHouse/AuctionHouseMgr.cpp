@@ -141,7 +141,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction)
 
             uint32 owner_accid = sObjectMgr.GetPlayerAccountIdByGUID(auction->owner);
 
-            sLog.outCommand(bidder_accId, "GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
+            sLog.outCommand(bidder_accId, "GM %s (账号: %u) 拍卖中拍到的物品: %s (Entry: %u 数量: %u) 并支付金币: %u. 原本归属 %s (账号: %u)",
                             bidder_name.c_str(), bidder_accId, pItem->GetProto()->Name1, pItem->GetEntry(), pItem->GetCount(), auction->bid, owner_name.c_str(), owner_accid);
         }
     }
@@ -276,7 +276,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
     if (!result)
     {
-        sLog.outString(">> Loaded 0 auction items");
+        sLog.outString(">> 已加载0件拍卖物品");
 		sLog.outString();
         return;
     }
@@ -296,7 +296,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
         if (!proto)
         {
-            sLog.outError("AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid, item_template);
+            sLog.outError("AuctionHouseMgr::拍卖品中有未知的物品(GUID: %u id: #%u)，已跳过。", item_guid, item_template);
             continue;
         }
 
@@ -313,7 +313,7 @@ void AuctionHouseMgr::LoadAuctionItems()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u auction items", count);
+    sLog.outString(">> 已加载%u件拍卖物品", count);
 	sLog.outString();
 }
 
@@ -322,7 +322,7 @@ void AuctionHouseMgr::LoadAuctions()
     QueryResult* result = CharacterDatabase.Query("SELECT COUNT(*) FROM auctionhouse");
     if (!result)
     {
-        sLog.outString(">> Loaded 0 auctions. DB table auctionhouse is empty.");
+        sLog.outString(">> 已加载0件拍卖物品。DB表auctionhouse是空的。");
 		sLog.outString();
         return;
     }
@@ -332,7 +332,7 @@ void AuctionHouseMgr::LoadAuctions()
 
     if (!AuctionCount)
     {
-        sLog.outString(">> Loaded 0 auctions. DB table auctionhouse is empty.");
+        sLog.outString(">> 已加载0件拍卖物品。DB表auctionhouse是空的。");
 		sLog.outString();
         return;
     }
@@ -340,7 +340,7 @@ void AuctionHouseMgr::LoadAuctions()
     result = CharacterDatabase.Query("SELECT id,auctioneerguid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit FROM auctionhouse");
     if (!result)
     {
-        sLog.outString(">> Loaded 0 auctions. DB table auctionhouse is empty.");
+        sLog.outString(">> 已加载0件拍卖物品。DB表auctionhouse是空的。");
 		sLog.outString();
         return;
     }
@@ -370,7 +370,7 @@ void AuctionHouseMgr::LoadAuctions()
         if (!auctioneerData)
         {
             aItem->DeleteFromDB();
-            sLog.outError("Auction %u has invalid auctioneer (GUID : %u)", aItem->Id, aItem->auctioneer);
+            sLog.outError("拍卖物品%u无效(GUID: %u)", aItem->Id, aItem->auctioneer);
             delete aItem;
             continue;
         }
@@ -379,7 +379,7 @@ void AuctionHouseMgr::LoadAuctions()
         if (!auctioneerInfo)
         {
             aItem->DeleteFromDB();
-            sLog.outError("Auction %u has invalid auctioneer (GUID : %u Entry: %u)", aItem->Id, aItem->auctioneer, auctioneerData->id);
+            sLog.outError("拍卖物品%u无效(GUID: %u Entry:%u)", aItem->Id, aItem->auctioneer, auctioneerData->id);
             delete aItem;
             continue;
         }

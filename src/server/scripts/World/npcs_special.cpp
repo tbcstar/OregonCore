@@ -964,7 +964,7 @@ public:
 ######*/
 
 #define SPELL_DEATHTOUCH                5
-#define SAY_AGGRO                        "This area is closed!"
+#define SAY_AGGRO                        "该区域已关闭！"
 
 class npc_guardian : public CreatureScript
 {
@@ -1103,9 +1103,9 @@ public:
 ## npc_rogue_trainer
 ######*/
 
-#define GOSSIP_HELLO_ROGUE1 "I wish to unlearn my talents"
-#define GOSSIP_HELLO_ROGUE2 "<Take the letter>"
-#define GOSSIP_HELLO_ROGUE3 "Purchase a Dual Talent Specialization."
+#define GOSSIP_HELLO_ROGUE1 "我想要忘记我的天赋"
+#define GOSSIP_HELLO_ROGUE2 "<把这封信>"
+#define GOSSIP_HELLO_ROGUE3 "购买双天赋。"
 
 class npc_rogue_trainer : public CreatureScript
 {
@@ -1186,7 +1186,7 @@ public:
 #define GOSSIP_SENDACTION_SAYGE14   "Take credit, keep gold"
 #define GOSSIP_SENDACTION_SAYGE15   "Take credit, share the gold"
 #define GOSSIP_SENDACTION_SAYGE16   "Let the knight take credit"
-#define GOSSIP_SENDACTION_SAYGE17   "Thanks"
+#define GOSSIP_SENDACTION_SAYGE17   "谢谢"
 
 class npc_sayge : public CreatureScript
 {
@@ -1722,14 +1722,14 @@ public:
 };
 
 
-#define SAY_RANDOM_MOJO0    "Now that's what I call froggy-style!"
+#define SAY_RANDOM_MOJO0    "这就是我所说的froggy-style!"
 #define SAY_RANDOM_MOJO1    "Your lily pad or mine?"
-#define SAY_RANDOM_MOJO2    "This won't take long, did it?"
-#define SAY_RANDOM_MOJO3    "I thought you'd never ask!"
+#define SAY_RANDOM_MOJO2    "不会花很长时间吧?"
+#define SAY_RANDOM_MOJO3    "正等你这句话呢！"
 #define SAY_RANDOM_MOJO4    "I promise not to give you warts..."
-#define SAY_RANDOM_MOJO5    "Feelin' a little froggy, are ya?"
+#define SAY_RANDOM_MOJO5    "感觉有点像青蛙，是吗?"
 #define SAY_RANDOM_MOJO6a   "Listen, "
-#define SAY_RANDOM_MOJO6b   ", I know of a little swamp not too far from here...."
+#define SAY_RANDOM_MOJO6b   "，我知道离这里不远的一个小沼泽..."
 #define SAY_RANDOM_MOJO7    "There's just never enough Mojo to go around..."
 
 class mob_mojo : public CreatureScript
@@ -1829,9 +1829,9 @@ public:
 ## mob_rift_spawn
 ######*/
 
-#define RIFT_EMOTE_AGGRO    "%s is angered and attacks!"
-#define RIFT_EMOTE_EVADE    "%s escapes into the void!"
-#define RIFT_EMOTE_SUCKED   "%s is sucked into the coffer!"
+#define RIFT_EMOTE_AGGRO    "%s 被激怒了！"
+#define RIFT_EMOTE_EVADE    "%s 逃入虚空！"
+#define RIFT_EMOTE_SUCKED   "%s 被吸进保险箱了！"
 
 enum RiftSpawn
 {

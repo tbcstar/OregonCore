@@ -153,7 +153,7 @@ void WorldSession::HandleCharEnum(QueryResult* result)
         do
         {
             uint32 guidlow = (*result)[0].GetUInt32();
-            sLog.outDetail("Loading char guid %u from account %u.", guidlow, GetAccountId());
+            sLog.outDetail("加载角色guid %u 来自帐户 %u", guidlow, GetAccountId());
             if (Player::BuildEnumData(result, &data))
             {
                 _allowedCharsToLogin.insert(guidlow);
@@ -243,7 +243,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
-        sLog.outError("Class: %u or Race %u not found in DBC (Wrong DBC files?) or Cheater?", class_, race_);
+        sLog.outError("Class: 在DBC中没有找到 %u 或种族 %u (DBC文件错误?)或作弊者", class_, race_);
         return;
     }
 
@@ -251,7 +251,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
     if (raceEntry->addon > Expansion())
     {
         data << (uint8)CHAR_CREATE_EXPANSION;
-        sLog.outError("Not Expansion 1 account:[%d] but tried to Create character with expansion 1 race (%u)", GetAccountId(), race_);
+        sLog.outError("不是资料片1账号:[%d]，但试图创建资料片1种族的角色(%u)", GetAccountId(), race_);
         SendPacket(&data);
         return;
     }
@@ -261,7 +261,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
     {
         data << (uint8)CHAR_NAME_INVALID_CHARACTER;
         SendPacket(&data);
-        sLog.outError("Account:[%d] but tried to Create character with empty [name] ", GetAccountId());
+        sLog.outError("账号:[%d]，但试图创建角色为空的[名字] ", GetAccountId());
         return;
     }
 
@@ -393,8 +393,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 
     std::string IP_str = GetRemoteAddress();
-    sLog.outBasic("Account: %d (IP: %s) Create Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Create Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    sLog.outBasic("账号: %d (IP: %s) 创建角色:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    sLog.out(LOG_CHAR, "账号: %d (IP: %s) 创建角色:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
 
 #ifdef ELUNA
     // used by eluna
@@ -449,8 +449,8 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
         return;
 
     std::string IP_str = GetRemoteAddress();
-    sLog.outDetail("Account: %d (IP: %s) Delete Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
-	sLog.out(LOG_CHAR, "Account: %d (IP: %s) Delete Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
+    sLog.outDetail("账号: %d (IP: %s) 删除角色:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
+	sLog.out(LOG_CHAR, "账号: %d (IP: %s) 删除角色:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
 
 #ifdef ELUNA
     // used by eluna
@@ -475,7 +475,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
 {
     if (PlayerLoading() || GetPlayer() != NULL)
     {
-        sLog.outError("Player tries to login again, AccountId = %d", GetAccountId());
+        sLog.outError("玩家试图再次登录， 账号Id = %d", GetAccountId());
         KickPlayer();
         return;
     }
@@ -489,7 +489,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
 
     if (!CharCanLogin(GUID_LOPART(playerGuid)))
     {
-        sLog.outError("Account (%u) can't login with that character (%u).", GetAccountId(), GUID_LOPART(playerGuid));
+        sLog.outError("账号 (%u) 不能使用角色(%u)登录。", GetAccountId(), GUID_LOPART(playerGuid));
         KickPlayer();
         return;
     }
@@ -663,7 +663,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         else
         {
             // remove wrong guild data
-            sLog.outError("Player %s (GUID: %u) marked as member of invalid guild (id: %u), removing guild membership for player.", pCurrChar->GetName(), pCurrChar->GetGUIDLow(), pCurrChar->GetGuildId());
+            sLog.outError("玩家 %s (GUID: %u) 被标记为无效公会成员 (id: %u)，取消公会会员资格。", pCurrChar->GetName(), pCurrChar->GetGUIDLow(), pCurrChar->GetGuildId());
             pCurrChar->SetInGuild(0);
         }
     }
@@ -802,7 +802,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     pCurrChar->SetORace(pCurrChar->getRace());
 
     std::string IP_str = GetRemoteAddress();
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Login Character:[%s] (guid: %u)",
+    sLog.out(LOG_CHAR, "账号: %d (IP: %s) 登录角色:[%s] (guid: %u)",
                  GetAccountId(), IP_str.c_str(), pCurrChar->GetName(), pCurrChar->GetGUIDLow());
 
     m_playerLoading = false;
@@ -971,7 +971,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult* result, uin
     CharacterDatabase.PExecute("UPDATE characters set name = '%s', at_login = at_login & ~ %u WHERE guid ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME), guidLow);
     CharacterDatabase.PExecute("DELETE FROM character_declinedname WHERE guid ='%u'", guidLow);
     CharacterDatabase.CommitTransaction();
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
+    sLog.out(LOG_CHAR, "账号: %d (IP: %s) 角色:[%s] (guid:%u) 修改名字为: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
 
     WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + (newname.size() + 1));
     data << uint8(RESPONSE_SUCCESS);

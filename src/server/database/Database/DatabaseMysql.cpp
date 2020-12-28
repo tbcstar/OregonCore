@@ -56,7 +56,7 @@ DatabaseMysql::DatabaseMysql()
 
         if (!mysql_thread_safe())
         {
-            sLog.outError("FATAL ERROR: Used MySQL library isn't thread-safe.");
+            sLog.outError("致命错误: 使用MySQL库的线程不是安全的。");
             Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
@@ -206,10 +206,10 @@ bool MySQLConnection::OpenConnection(bool reconnect)
         sLog.outErrorDb("MySQL client library: %s", mysql_get_client_info());
         sLog.outErrorDb("MySQL server ver: %s ", mysql_get_server_info(mMysql));
 
-        /*----------SET AUTOCOMMIT ON---------*/
-        // It seems mysql 5.0.x have enabled this feature
-        // by default. In crash case you can lose data!!!
-        // So better to turn this off
+        /*----------自动提交设置---------*/
+        // 看起来是mysql 5.0。x已启用此功能
+        // 默认情况下。在崩溃的情况下，你可能会丢失数据!!
+        // 所以最好把这个关掉
         // ---
         // This is wrong since mangos use transactions,
         // autocommit is turned of during it.
@@ -218,13 +218,13 @@ bool MySQLConnection::OpenConnection(bool reconnect)
         // LEAVE 'AUTOCOMMIT' MODE ALWAYS ENABLED!!!
         // W/O IT EVEN 'SELECT' QUERIES WOULD REQUIRE TO BE WRAPPED INTO 'START TRANSACTION'<>'COMMIT' CLAUSES!!!
         if (!mysql_autocommit(mMysql, 1))
-            sLog.outErrorDb("AUTOCOMMIT SUCCESSFULLY SET TO 1");
+            sLog.outErrorDb("自动提交成功设置为1");
         else
-            sLog.outErrorDb("AUTOCOMMIT NOT SET TO 1");
+            sLog.outErrorDb("自动提交没有设置为1");
         /*-------------------------------------*/
 
-        // set connection properties to UTF8 to properly handle locales for different
-        // server configs - core sends data in UTF8, so MySQL must expect UTF8 too
+        // 将连接属性设置为UTF8，以正确处理不同的区域设置
+        // 服务器配置-核心发送的数据是UTF8，所以MySQL必须也期望UTF8
         Execute("SET NAMES `utf8`");
         Execute("SET CHARACTER SET `utf8`");
 
@@ -241,12 +241,12 @@ bool MySQLConnection::OpenConnection(bool reconnect)
 
 bool MySQLConnection::Reconnect()
 {
-    sLog.outString("Reconnection attempt to database %s (on %s)", m_database.c_str(), m_host.c_str());
+    sLog.outString("尝试重新连接数据库 %s (on %s)", m_database.c_str(), m_host.c_str());
 
     if (OpenConnection(true))
     {
         FreePreparedStatements(); // We need to prepare everything again!
-        sLog.outString("Successfully reconnected to %s @%s:%u.",
+        sLog.outString("成功重新连接到 %s @%s:%u.",
             m_database.c_str(), m_host.c_str(), m_port);
 
         return true;

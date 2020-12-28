@@ -50,7 +50,7 @@ bool WorldSession::processChatmessageFurtherAfterSecurityChecks(std::string& msg
         if (sWorld.getConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && GetSecurity() < SEC_MODERATOR
             && !ChatHandler(this).isValidChatMessage(msg.c_str()))
         {
-            sLog.outError("Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName(),
+            sLog.outError("玩家 %s (GUID: %u) 发送了一个无效链接的聊天消息: %s", GetPlayer()->GetName(),
                           GetPlayer()->GetGUIDLow(), msg.c_str());
             if (sWorld.getConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
                 KickPlayer();
@@ -71,7 +71,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
-        sLog.outError("CHAT: Wrong message type received: %u", type);
+        sLog.outError("CHAT: 接收到错误的信息类型: %u", type);
         return;
     }
 
@@ -113,13 +113,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
 
             if (msg.empty())
             {
-                sLog.outDebug("Player %s send empty addon msg", GetPlayer()->GetName());
+                sLog.outDebug("玩家 %s 发送空的附加信息", GetPlayer()->GetName());
                 return;
             }
 
 			sScriptMgr.OnPlayerChat(GetPlayer(), type, lang, msg);
 
-            sLog.out(LOG_CHAT, "[ADDON] Player %s sends: %s",
+            sLog.out(LOG_CHAT, "[ADDON] 玩家 %s 发送: %s",
                          GetPlayer()->GetName(), msg.c_str());
         }
 
@@ -406,7 +406,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 }
 
                 if (sWorld.getConfig(CONFIG_CHATLOG_GUILD))
-                    sLog.out(LOG_CHAT, "[OFFICER] Player %s tells guild %s officers: %s",
+                    sLog.out(LOG_CHAT, "[OFFICER] 玩家 %s tells guild %s officers: %s",
                                  GetPlayer()->GetName(), guild->GetName().c_str(), msg.c_str());
             }
         }
@@ -433,7 +433,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             group->BroadcastPacket(&data, false);
 
             if (sWorld.getConfig(CONFIG_CHATLOG_RAID))
-                sLog.out(LOG_CHAT, "[RAID] Player %s tells raid with leader %s: %s",
+                sLog.out(LOG_CHAT, "[RAID] 玩家 %s tells raid with leader %s: %s",
                              GetPlayer()->GetName(), group->GetLeaderName(), msg.c_str());
         }
         break;
@@ -510,7 +510,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             group->BroadcastPacket(&data, false);
 
             if (sWorld.getConfig(CONFIG_CHATLOG_BGROUND))
-                sLog.out(LOG_CHAT, "[BATTLEGROUND] Player %s tells battleground with leader %s: %s",
+                sLog.out(LOG_CHAT, "[BATTLEGROUND] 玩家 %s tells battleground with leader %s: %s",
                              GetPlayer()->GetName(), group->GetLeaderName(), msg.c_str());
         }
         break;
@@ -563,10 +563,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                          chn->HasFlag(CHANNEL_FLAG_CITY) ||
                          chn->HasFlag(CHANNEL_FLAG_LFG)) &&
                         sWorld.getConfig(CONFIG_CHATLOG_SYSCHAN))
-                        sLog.out(LOG_CHAT, "[SYSCHAN] Player %s tells channel %s: %s",
+                        sLog.out(LOG_CHAT, "[SYSCHAN] 玩家 %s 在频道 %s: %s",
                                      GetPlayer()->GetName(), chn->GetName().c_str(), msg.c_str());
                     else if (sWorld.getConfig(CONFIG_CHATLOG_CHANNEL))
-                        sLog.out(LOG_CHAT, "[CHANNEL] Player %s tells channel %s: %s",
+                        sLog.out(LOG_CHAT, "[CHANNEL] 玩家 %s 在频道 %s: %s",
                                      GetPlayer()->GetName(), chn->GetName().c_str(), msg.c_str());
                 }
             }
@@ -629,7 +629,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         break;
 
     default:
-        sLog.outError("CHAT: unknown message type %u, lang: %u", type, lang);
+        sLog.outError("CHAT: 未知消息类型 %u, 语言: %u", type, lang);
         break;
     }
 }

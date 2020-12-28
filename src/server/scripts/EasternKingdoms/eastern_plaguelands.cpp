@@ -35,10 +35,10 @@
 
 #define SPELL_SPIRIT_SPAWNIN    17321
 
-#define GOSSIP_HELLO    "I am ready to hear your tale, Tirion."
-#define GOSSIP_SELECT1  "Thank you, Tirion.  What of your identity?"
-#define GOSSIP_SELECT2  "That is terrible."
-#define GOSSIP_SELECT3  "I will, Tirion."
+#define GOSSIP_HELLO    "我已经准备好听你的故事了，提里奥。"
+#define GOSSIP_SELECT1  "谢谢你,提里奥。你的身份呢?"
+#define GOSSIP_SELECT2  "这是可怕的。"
+#define GOSSIP_SELECT3  "我愿意,提里奥。"
 
 class mobs_ghoul_flayer : public CreatureScript
 {

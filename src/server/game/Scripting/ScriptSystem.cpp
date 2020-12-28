@@ -39,7 +39,7 @@ void SystemMgr::LoadVersion()
     {
         Field* pFields = Result->Fetch();
 
-         sLog.outString("OSCR: Database version is: %s\n", pFields[0].GetString());
+         sLog.outString("OSCR: 数据库版本: %s\n", pFields[0].GetString());
     }
     else
         sLog.outError("OSCR: Missing version.script_version information.\n");
@@ -95,12 +95,12 @@ void SystemMgr::LoadScriptTexts()
         }
         while (Result->NextRow());
 
-         sLog.outString(">> Loaded %u additional Script Texts data.", uiCount);
+         sLog.outString(">> 加载 %u个 additional Script Texts data.", uiCount);
 		 sLog.outString();
     }
 	else
 	{
-		sLog.outString(">> Loaded 0 additional Script Texts data. DB table script_texts is empty.");
+		sLog.outString(">> 加载 0个 additional Script Texts data. DB table script_texts is empty.");
 		sLog.outString();
 	}
 }
@@ -155,12 +155,12 @@ void SystemMgr::LoadScriptTextsCustom()
         }
         while (Result->NextRow());
 
-         sLog.outString(">> Loaded %u additional Custom Texts data.", uiCount);
+         sLog.outString(">> 加载 %u个 additional Custom Texts data.", uiCount);
 		 sLog.outString();
     }
 	else
 	{
-		sLog.outString(">> Loaded 0 additional Custom Texts data. DB table custom_texts is empty.");
+		sLog.outString(">> 加载 0个 additional Custom Texts data. DB table custom_texts is empty.");
 		sLog.outString();
 	}
 }
@@ -212,12 +212,12 @@ void SystemMgr::LoadScriptWaypoints()
         }
         while (Result->NextRow());
 
-         sLog.outString(">> Loaded %u Script Waypoint nodes.", uiNodeCount);
+         sLog.outString(">> 加载 %u个 Script Waypoint nodes.", uiNodeCount);
 		 sLog.outString();
     }
 	else
 	{
-		sLog.outString(">> Loaded 0 Script Waypoints. DB table script_waypoint is empty.");
+		sLog.outString(">> 加载 0个 Script Waypoints. DB table script_waypoint is empty.");
 		sLog.outString();
 	}
 }

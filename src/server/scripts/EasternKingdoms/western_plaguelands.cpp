@@ -39,12 +39,12 @@ EndContentData */
 ## npcs_dithers_and_arbington
 ######*/
 
-#define GOSSIP_HDA1 "What does the Felstone Field Cauldron need?"
-#define GOSSIP_HDA2 "What does the Dalson's Tears Cauldron need?"
-#define GOSSIP_HDA3 "What does the Writhing Haunt Cauldron need?"
-#define GOSSIP_HDA4 "What does the Gahrron's Withering Cauldron need?"
+#define GOSSIP_HDA1 "费尔斯通农场的瘟疫之锅需要什么?"
+#define GOSSIP_HDA2 "达尔松之泪的瘟疫之锅需要什么?"
+#define GOSSIP_HDA3 "嚎哭鬼屋的瘟疫之锅需要什么?"
+#define GOSSIP_HDA4 "盖罗恩农场的瘟疫之锅需要什么?"
 
-#define GOSSIP_SDA1 "Thanks, i need a Vitreous Focuser"
+#define GOSSIP_SDA1 "谢谢，我需要一个玻璃放大镜。"
 
 
 
@@ -61,7 +61,7 @@ enum eMyranda
     SPELL_SCARLET_ILLUSION  = 17961
 };
 
-#define GOSSIP_ITEM_ILLUSION    "I am ready for the illusion, Myranda."
+#define GOSSIP_ITEM_ILLUSION    "我已经准备好接受幻象了，麦兰达。"
 
 
 

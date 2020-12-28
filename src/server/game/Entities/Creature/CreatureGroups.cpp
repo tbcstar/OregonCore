@@ -84,7 +84,7 @@ void FormationMgr::LoadCreatureFormations()
 
     if (!result)
     {
-        sLog.outError(">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
+        sLog.outError(">>  加载 0 creatures in formations. DB table `creature_formations` is empty!");
         return;
     }
 
@@ -138,7 +138,7 @@ void FormationMgr::LoadCreatureFormations()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u creatures in formations", count);
+    sLog.outString(">> 加载 %u个 creatures in formations", count);
 	sLog.outString();
 }
 

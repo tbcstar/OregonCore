@@ -534,7 +534,7 @@ void PoolMgr::LoadFromDB()
     QueryResult* result = WorldDatabase.Query("SELECT MAX(entry) FROM pool_template");
     if (!result)
     {
-        sLog.outString(">> Loaded 0 object pools. DB table `pool_template` is empty.");
+        sLog.outString(">> 加载 0个 object pools. DB table `pool_template` is empty.");
 		sLog.outString();
         return;
     }
@@ -550,7 +550,7 @@ void PoolMgr::LoadFromDB()
     if (!result)
     {
         mPoolTemplate.clear();
-        sLog.outString(">> Loaded 0 object pools. DB table `pool_template` is empty.");
+        sLog.outString(">> 加载 0个 object pools. DB table `pool_template` is empty.");
 		sLog.outString();
         return;
     }
@@ -570,7 +570,7 @@ void PoolMgr::LoadFromDB()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u objects pools", count);
+    sLog.outString(">> 加载 %u个 objects pools", count);
 	sLog.outString();
 
     // Creatures
@@ -582,7 +582,7 @@ void PoolMgr::LoadFromDB()
     count = 0;
 	if (!result)
 	{
-		sLog.outString(">> Loaded 0 creatures in  pools. DB table `pool_creature` is empty.");
+		sLog.outString(">> 加载 0个 creatures in  pools. DB table `pool_creature` is empty.");
 		sLog.outString();
 	}
     else
@@ -625,7 +625,7 @@ void PoolMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u creatures in pools", count);
+        sLog.outString(">> 加载 %u个 creatures in pools", count);
 		sLog.outString();
     }
 
@@ -638,7 +638,7 @@ void PoolMgr::LoadFromDB()
     count = 0;
 	if (!result)
 	{
-		sLog.outString(">> Loaded 0 gameobjects in pools. DB table `pool_gameobject` is empty.");
+		sLog.outString(">> 加载 0个 gameobjects in pools. DB table `pool_gameobject` is empty.");
 		sLog.outString();
 	}
     else
@@ -688,7 +688,7 @@ void PoolMgr::LoadFromDB()
 
         }
         while (result->NextRow());
-        sLog.outString(">> Loaded %u gameobject in pools", count);
+        sLog.outString(">> 加载 %u个 gameobject in pools", count);
 		sLog.outString();
     }
 
@@ -700,7 +700,7 @@ void PoolMgr::LoadFromDB()
     count = 0;
 	if (!result)
 	{
-		sLog.outString(">> Loaded 0 pools in pools");
+		sLog.outString(">> 加载 0个 pools in pools");
 		sLog.outString();
 	}
     else
@@ -770,7 +770,7 @@ void PoolMgr::LoadFromDB()
             }
         }
 
-        sLog.outString(">> Loaded %u pools in mother pools", count);
+        sLog.outString(">> 加载 %u个 pools in mother pools", count);
 		sLog.outString();
     }
 }
@@ -785,7 +785,7 @@ void PoolMgr::LoadQuestPools()
     uint32 count = 0;
     if (!result)
     {
-        sLog.outString(">> Loaded 0 quests in pools");
+        sLog.outString(">> 加载 0个 quests in pools");
 		sLog.outString();
         return;
     }
@@ -861,7 +861,7 @@ void PoolMgr::LoadQuestPools()
 
     } while (result->NextRow());
 
-    sLog.outString(">> Loaded %u quests in pools", count);
+    sLog.outString(">> 加载 %u个 quests in pools", count);
 	sLog.outString();
 }
 

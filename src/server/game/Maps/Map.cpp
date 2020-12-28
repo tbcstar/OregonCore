@@ -189,11 +189,11 @@ void Map::LoadMap(int gx, int gy, bool reload)
     int len = sWorld.GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
     tmp = new char[len];
     snprintf(tmp, len, (char*)(sWorld.GetDataPath() + "maps/%03u%02u%02u.map").c_str(), GetId(), gx, gy);
-    sLog.outDetail("Loading map %s", tmp);
+    sLog.outDetail("加载 map %s", tmp);
     // loading data
     GridMaps[gx][gy] = new GridMap();
     if (!GridMaps[gx][gy]->loadData(tmp))
-        sLog.outError("Error loading map file: \n %s\n", tmp);
+        sLog.outError("加载Map文件时出错: \n %s\n", tmp);
     delete [] tmp;
 
     sScriptMgr.OnLoadGridMap(this, gx, gy);
@@ -403,7 +403,7 @@ bool Map::EnsureGridLoaded(const Cell& cell)
     ASSERT(grid != NULL);
     if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
     {
-        DEBUG_LOG("Loading grid[%u,%u] for map %u instance %u", cell.GridX(), cell.GridY(), GetId(), i_InstanceId);
+        DEBUG_LOG("为地图 %u 副本%u 加载网格[%u，%u]", cell.GridX(), cell.GridY(), GetId(), i_InstanceId);
 
         setGridObjectDataLoaded(true, cell.GridX(), cell.GridY());
 
@@ -976,7 +976,7 @@ bool Map::UnloadGrid(NGridType& ngrid, bool unloadAll)
                 return false;
         }
 
-        DEBUG_LOG("Unloading grid[%u,%u] for map %u", x, y, GetId());
+        DEBUG_LOG("为地图%u卸载网格[%u,%u]", x, y, GetId());
 
         if (!unloadAll)
         {
@@ -1034,7 +1034,7 @@ bool Map::UnloadGrid(NGridType& ngrid, bool unloadAll)
 
         GridMaps[gx][gy] = NULL;
     }
-    sLog.outDebug("Unloading grid[%u,%u] for map %u finished", x, y, GetId());
+    sLog.outDebug("为 map %u 完成卸载网格[%u,%u]", x, y, GetId());
     return true;
 }
 
@@ -2539,7 +2539,7 @@ void InstanceMap::CreateInstanceData(bool load)
             const char* data = fields[0].GetString();
             if (data && *data)
             {
-                DEBUG_LOG("Loading instance data for %s with id %u", sObjectMgr.GetScriptName(i_script_id), i_InstanceId);
+                DEBUG_LOG("为%s加载id为%u的副本数据", sObjectMgr.GetScriptName(i_script_id), i_InstanceId);
                 i_data->Load(data);
             }
         }

@@ -453,7 +453,7 @@ void ObjectMgr::LoadCreatureLocales()
     {
 
 
-        sLog.outString(">> Loaded 0 creature locale strings. DB table locales_creature is empty.");
+        sLog.outString(">>  加载 0个 creature locale strings. DB table locales_creature is empty.");
 		sLog.outString();
         return;
     }
@@ -497,7 +497,7 @@ void ObjectMgr::LoadCreatureLocales()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu creature locale strings", mCreatureLocaleMap.size());
+    sLog.outString(">> 加载 %lu个 creature locale strings", mCreatureLocaleMap.size());
 	sLog.outString();
 }
 
@@ -516,7 +516,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
     {
 
 
-        sLog.outString(">> Loaded 0 gossip_menu_option locale strings. DB table `locales_gossip_menu_option` is empty.");
+        sLog.outString(">> 加载 0个 gossip_menu_option locale strings. DB table `locales_gossip_menu_option` is empty.");
 		sLog.outString();
         return;
     }
@@ -561,7 +561,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u gossip_menu_option locale strings", mGossipMenuItemsLocaleMap.size());
+    sLog.outString(">> 加载 %u个 gossip_menu_option locale strings", mGossipMenuItemsLocaleMap.size());
 	sLog.outString();
 }
 
@@ -579,7 +579,7 @@ void ObjectMgr::LoadCreatureTemplates()
     SQLCreatureLoader loader;
     loader.Load(sCreatureStorage);
 
-    sLog.outString(">> Loaded %u creature definitions", sCreatureStorage.GetRecordCount());
+    sLog.outString(">> 加载 %u个 creature definitions", sCreatureStorage.GetRecordCount());
 	sLog.outString();
 
     std::set<uint32> heroicEntries;                         // already loaded heroic value in creatures
@@ -844,7 +844,7 @@ void ObjectMgr::LoadCreatureAddons()
 {
     sCreatureInfoAddonStorage.Load();
 
-    sLog.outString(">> Loaded %u creature template addons", sCreatureInfoAddonStorage.GetRecordCount());
+    sLog.outString(">> 加载 %u个 creature template addons", sCreatureInfoAddonStorage.GetRecordCount());
 	sLog.outString();
 
     // check data correctness and convert 'auras'
@@ -865,7 +865,7 @@ void ObjectMgr::LoadCreatureAddons()
 
     sCreatureDataAddonStorage.Load();
 
-    sLog.outString(">> Loaded %u creature addons", sCreatureDataAddonStorage.GetRecordCount());
+    sLog.outString(">> 加载 %u个 creature addons", sCreatureDataAddonStorage.GetRecordCount());
 	sLog.outString();
 
     // check data correctness and convert 'auras'
@@ -894,7 +894,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
     if (!result)
     {
-        sLog.outErrorDb(">> Loaded 0 creature base stats. DB table `creature_classlevelstats` is empty.");
+        sLog.outErrorDb(">> 加载 0个 creature base stats. DB table `creature_classlevelstats` is empty.");
         return;
     }
 
@@ -940,7 +940,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u creature base stats", count);
+    sLog.outString(">> 加载 %u个 creature base stats", count);
 	sLog.outString();
 }
 
@@ -1008,7 +1008,7 @@ void ObjectMgr::LoadEquipmentTemplates()
         }
     }
 
-    sLog.outString(">> Loaded %u equipment template", sEquipmentStorage.GetRecordCount());
+    sLog.outString(">> 加载 %u个 equipment template", sEquipmentStorage.GetRecordCount());
 	sLog.outString();
 
     sEquipmentStorageRaw.Load();
@@ -1017,7 +1017,7 @@ void ObjectMgr::LoadEquipmentTemplates()
             if (sEquipmentStorage.LookupEntry<EquipmentInfo>(i))
                 sLog.outErrorDb("Table 'creature_equip_template_raw` have redundant data for ID %u ('creature_equip_template` already have data)", i);
 
-    sLog.outString( ">> Loaded %u equipment template (deprecated format)", sEquipmentStorageRaw.GetRecordCount() );
+    sLog.outString( ">> 加载 %u个 equipment template (deprecated format)", sEquipmentStorageRaw.GetRecordCount() );
 }
 
 CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelid)
@@ -1083,7 +1083,7 @@ void ObjectMgr::LoadCreatureModelInfo()
 {
     sCreatureModelStorage.Load();
 
-    sLog.outString(">> Loaded %u creature model based info", sCreatureModelStorage.GetRecordCount());
+    sLog.outString(">> 加载 %u个 creature model based info", sCreatureModelStorage.GetRecordCount());
 	sLog.outString();
 
     // check if combat_reach is valid
@@ -1140,7 +1140,7 @@ void ObjectMgr::LoadCreatureLinkedRespawn()
     {
 
 
-        sLog.outErrorDb(">> Loaded 0 linked respawns. DB table creature_linked_respawn is empty.");
+        sLog.outErrorDb(">> 加载 0个 linked respawns. DB table creature_linked_respawn is empty.");
         return;
     }
 
@@ -1158,7 +1158,7 @@ void ObjectMgr::LoadCreatureLinkedRespawn()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu linked respawns", mCreatureLinkedRespawnMap.size());
+    sLog.outString(">> 加载 %lu个 linked respawns", mCreatureLinkedRespawnMap.size());
 	sLog.outString();
 }
 
@@ -1194,7 +1194,7 @@ void ObjectMgr::LoadTempSummons()
 
     if (!result)
     {
-        sLog.outString(">> Loaded 0 temp summons. DB table `creature_summon_groups` is empty.");
+        sLog.outString(">> 加载 0个 temp summons. DB table `creature_summon_groups` is empty.");
 		sLog.outString();
         return;
     }
@@ -1269,7 +1269,7 @@ void ObjectMgr::LoadTempSummons()
 
     } while (result->NextRow());
 
-    sLog.outString(">> Loaded %u temp summons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog.outString(">> 加载 %u个 temp summons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 	sLog.outString();
 }
 
@@ -1289,7 +1289,7 @@ void ObjectMgr::LoadCreatures()
     {
 
 
-        sLog.outErrorDb(">> Loaded 0 creature. DB table creature is empty.");
+        sLog.outErrorDb(">> 加载 0个 creature. DB table creature is empty.");
         return;
     }
 
@@ -1395,7 +1395,7 @@ void ObjectMgr::LoadCreatures()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u creatures", (uint32)mCreatureDataMap.size());
+    sLog.outString(">> 加载 %u个 creatures", (uint32)mCreatureDataMap.size());
 	sLog.outString();
 }
 
@@ -1538,7 +1538,7 @@ void ObjectMgr::LoadGameobjects()
     {
 
 
-        sLog.outErrorDb(">> Loaded 0 gameobjects. DB table gameobject is empty.");
+        sLog.outErrorDb(">> 加载 0个 gameobjects. DB table gameobject is empty.");
         return;
     }
 
@@ -1612,7 +1612,7 @@ void ObjectMgr::LoadGameobjects()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu gameobjects", mGameObjectDataMap.size());
+    sLog.outString(">> 加载 %lu个 gameobjects", mGameObjectDataMap.size());
 	sLog.outString();
 }
 
@@ -1654,7 +1654,7 @@ void ObjectMgr::LoadCreatureRespawnTimes()
     {
 
 
-        sLog.outString(">> Loaded 0 creature respawn time.");
+        sLog.outString(">> 加载 0个 creature respawn time.");
 		sLog.outString();
         return;
     }
@@ -1674,7 +1674,7 @@ void ObjectMgr::LoadCreatureRespawnTimes()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu creature respawn times", mCreatureRespawnTimes.size());
+    sLog.outString(">> 加载 %lu个 creature respawn times", mCreatureRespawnTimes.size());
 	sLog.outString();
 }
 
@@ -1691,7 +1691,7 @@ void ObjectMgr::LoadGameobjectRespawnTimes()
     {
 
 
-        sLog.outString(">> Loaded 0 gameobject respawn time.");
+        sLog.outString(">> 加载 0个 gameobject respawn time.");
 		sLog.outString();
         return;
     }
@@ -1711,7 +1711,7 @@ void ObjectMgr::LoadGameobjectRespawnTimes()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu gameobject respawn times", mGORespawnTimes.size());
+    sLog.outString(">> 加载 %lu个 gameobject respawn times", mGORespawnTimes.size());
 	sLog.outString();
 }
 
@@ -1797,7 +1797,7 @@ void ObjectMgr::LoadItemLocales()
     {
 
 
-        sLog.outString(">> Loaded 0 Item locale strings. DB table locales_item is empty.");
+        sLog.outString(">> 加载 0个 Item locale strings. DB table locales_item is empty.");
 		sLog.outString();
         return;
     }
@@ -1842,7 +1842,7 @@ void ObjectMgr::LoadItemLocales()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu Item locale strings", mItemLocaleMap.size());
+    sLog.outString(">> 加载 %lu个 Item locale strings", mItemLocaleMap.size());
 	sLog.outString();
 }
 
@@ -1859,7 +1859,7 @@ void ObjectMgr::LoadItemTemplates()
 {
     SQLItemLoader loader;
     loader.Load(sItemStorage);
-    sLog.outString(">> Loaded %u item prototypes", sItemStorage.GetRecordCount());
+    sLog.outString(">> 加载 %u个 item prototypes", sItemStorage.GetRecordCount());
 	sLog.outString();
 
     // check data correctness
@@ -2169,7 +2169,7 @@ void ObjectMgr::LoadPetLevelInfo()
         if (!result)
         {
 
-            sLog.outString(">> Loaded %u level pet stats definitions", count);
+            sLog.outString(">> 加载 %u个 level pet stats definitions", count);
             sLog.outErrorDb("Error loading pet_levelstats table or empty table.");
 			sLog.outString();
             return;
@@ -2221,7 +2221,7 @@ void ObjectMgr::LoadPetLevelInfo()
         }
         while (result->NextRow());
 
-        sLog.outString(">> Loaded %u level pet stats definitions", count);
+        sLog.outString(">> 加载 %u个 level pet stats definitions", count);
 		sLog.outString();
     }
 
@@ -2269,7 +2269,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            sLog.outString(">> Loaded %u player create definitions", count);
+            sLog.outString(">> 加载 %u个 player create definitions", count);
               sLog.outError("Error loading playercreateinfo table or empty table.");
         }
 
@@ -2341,7 +2341,7 @@ void ObjectMgr::LoadPlayerInfo()
         }
         while (result->NextRow());
 
-        sLog.outString(">> Loaded %u player create definitions", count);
+        sLog.outString(">> 加载 %u个 player create definitions", count);
 		sLog.outString();
     }
 
@@ -2355,7 +2355,7 @@ void ObjectMgr::LoadPlayerInfo()
 		if (!result)
 
 		{
-			sLog.outString(">> Loaded %u custom player create items", count);
+			sLog.outString(">> 加载 %u个 custom player create items", count);
 			sLog.outString();
 		}
         else
@@ -2403,7 +2403,7 @@ void ObjectMgr::LoadPlayerInfo()
             }
             while (result->NextRow());
 
-            sLog.outString(">> Loaded %u custom player create items", count);
+            sLog.outString(">> 加载 %u个 custom player create items", count);
 			sLog.outString();
         }
     }
@@ -2422,7 +2422,7 @@ void ObjectMgr::LoadPlayerInfo()
         if (!result)
         {
 
-            sLog.outString(">> Loaded %u player create spells", count);
+            sLog.outString(">> 加载 %u个 player create spells", count);
             sLog.outErrorDb("Error loading player starting spells or empty table.");
 			sLog.outString();
         }
@@ -2454,7 +2454,7 @@ void ObjectMgr::LoadPlayerInfo()
             }
             while (result->NextRow());
 
-            sLog.outString(">> Loaded %u player create spells", count);
+            sLog.outString(">> 加载 %u个 player create spells", count);
 			sLog.outString();
         }
     }
@@ -2469,7 +2469,7 @@ void ObjectMgr::LoadPlayerInfo()
         if (!result)
         {
 
-            sLog.outString(">> Loaded %u player create actions", count);
+            sLog.outString(">> 加载 %u个 player create actions", count);
             sLog.outErrorDb("Error loading playercreateinfo_action table or empty table.");
 			sLog.outString();
         }
@@ -2504,7 +2504,7 @@ void ObjectMgr::LoadPlayerInfo()
             }
             while (result->NextRow());
 
-            sLog.outString(">> Loaded %u player create actions", count);
+            sLog.outString(">> 加载 %u个 player create actions", count);
 			sLog.outString();
         }
     }
@@ -2519,7 +2519,7 @@ void ObjectMgr::LoadPlayerInfo()
         if (!result)
         {
 
-            sLog.outString(">> Loaded %u level health/mana definitions", count);
+            sLog.outString(">> 加载 %u个 level health/mana definitions", count);
               sLog.outError("Error loading player_classlevelstats table or empty table.");
 			  sLog.outString();
         }
@@ -2560,7 +2560,7 @@ void ObjectMgr::LoadPlayerInfo()
         }
         while (result->NextRow());
 
-        sLog.outString(">> Loaded %u level health/mana definitions", count);
+        sLog.outString(">> 加载 %u个 level health/mana definitions", count);
 		sLog.outString();
     }
 
@@ -2597,7 +2597,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            sLog.outString(">> Loaded %u level stats definitions", count);
+            sLog.outString(">> 加载 %u个 level stats definitions", count);
               sLog.outError("Error loading player_levelstats table or empty table.");
 			  sLog.outString();
         }
@@ -2645,7 +2645,7 @@ void ObjectMgr::LoadPlayerInfo()
         }
         while (result->NextRow());
 
-        sLog.outString(">> Loaded %u level stats definitions", count);
+        sLog.outString(">> 加载 %u个 level stats definitions", count);
 		sLog.outString();
     }
 
@@ -2812,7 +2812,7 @@ void ObjectMgr::LoadGuilds()
 
 
 
-        sLog.outString(">> Loaded %u guild definitions", count);
+        sLog.outString(">> 加载 %u个 guild definitions", count);
 		sLog.outString();
         return;
     }
@@ -2862,7 +2862,7 @@ void ObjectMgr::LoadGuilds()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u guild definitions", count);
+    sLog.outString(">> 加载 %u个 guild definitions", count);
 	sLog.outString();
 }
 
@@ -2881,7 +2881,7 @@ void ObjectMgr::LoadArenaTeams()
 
 
 
-        sLog.outString(">> Loaded %u arenateam definitions", count);
+        sLog.outString(">> 加载 %u个 arenateam definitions", count);
 		sLog.outString();
         return;
     }
@@ -2909,7 +2909,7 @@ void ObjectMgr::LoadArenaTeams()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u arenateam definitions", count);
+    sLog.outString(">> 加载 %u个 arenateam definitions", count);
 	sLog.outString();
 }
 
@@ -2919,7 +2919,7 @@ void ObjectMgr::LoadReferredFriends()
     if (!result)
     {
 
-        sLog.outString(">> Loaded 0 Referred Friends");
+        sLog.outString(">> 加载 0个 Referred Friends");
 		sLog.outString();
         return;
     }
@@ -3077,7 +3077,7 @@ void ObjectMgr::LoadGroups()
     {
 
 
-        sLog.outString(">> Loaded %u group definitions", count);
+        sLog.outString(">> 加载 %u个 group definitions", count);
 		sLog.outString();
         return;
     }
@@ -3100,7 +3100,7 @@ void ObjectMgr::LoadGroups()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u group definitions", count);
+    sLog.outString(">> 加载 %u个 group definitions", count);
 	sLog.outString();
 
     // -- loading members --
@@ -3197,12 +3197,11 @@ void ObjectMgr::LoadGroups()
         }
         while (result->NextRow());
     }
-
-    sLog.outString(">> Loaded %u group-instance binds total", count);
+    sLog.outString(">> 加载 %u个 group-instance binds total", count);
 	sLog.outString();
 
 
-    sLog.outString(">> Loaded %u group members total", count);
+    sLog.outString(">> 加载 %u个 group members total", count);
 	sLog.outString();
 }
 
@@ -3250,7 +3249,7 @@ void ObjectMgr::LoadQuests()
     if (!result)
     {
 
-        sLog.outString(">> Loaded 0 quests definitions");
+        sLog.outString(">> 加载 0个 quests definitions");
 		sLog.outString();
         sLog.outErrorDb("quest_template table is empty!");
 
@@ -3825,7 +3824,7 @@ void ObjectMgr::LoadQuests()
         }
     }
 
-    sLog.outString(">> Loaded %u quest definitions", mQuestTemplates.size());
+    sLog.outString(">> 加载 %u个 quest definitions", mQuestTemplates.size());
 	sLog.outString();
 }
 
@@ -3849,7 +3848,7 @@ void ObjectMgr::LoadQuestLocales()
     {
 
 
-        sLog.outString(">> Loaded 0 Quest locale strings. DB table locales_quest is empty.");
+        sLog.outString(">> 加载 0个 Quest locale strings. DB table locales_quest is empty.");
 		sLog.outString();
         return;
     }
@@ -3956,7 +3955,7 @@ void ObjectMgr::LoadQuestLocales()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u Quest locale strings", mQuestLocaleMap.size());
+    sLog.outString(">> 加载 %u个 Quest locale strings", mQuestLocaleMap.size());
 	sLog.outString();
 }
 
@@ -3966,7 +3965,7 @@ void ObjectMgr::LoadPetCreateSpells()
     if (!result)
     {
 
-        sLog.outString(">> Loaded 0 pet create spells");
+        sLog.outString(">> 加载 0个 pet create spells");
 		sLog.outString();
         sLog.outErrorDb("petcreateinfo_spell table is empty!");
         return;
@@ -4001,7 +4000,7 @@ void ObjectMgr::LoadPetCreateSpells()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u pet create spells", count);
+    sLog.outString(">> 加载 %u个 pet create spells", count);
 	sLog.outString();
 }
 
@@ -4027,7 +4026,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
     if (!result)
     {
 
-        sLog.outString(">> Loaded %u script definitions", count);
+        sLog.outString(">> 加载 %u个 script definitions", count);
 		sLog.outString();
         return;
     }
@@ -4317,7 +4316,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u script definitions", count);
+    sLog.outString(">> 加载 %u个 script definitions", count);
 	sLog.outString();
 }
 
@@ -4506,7 +4505,7 @@ void ObjectMgr::LoadItemTexts()
     if (!result)
     {
 
-        sLog.outString(">> Loaded %u item pages", count);
+        sLog.outString(">> 加载 %u个 item pages", count);
 		sLog.outString();
         return;
     }
@@ -4525,14 +4524,14 @@ void ObjectMgr::LoadItemTexts()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u item texts", count);
+    sLog.outString(">> 加载 %u个 item texts", count);
 	sLog.outString();
 }
 
 void ObjectMgr::LoadPageTexts()
 {
     sPageTextStore.Load();
-    sLog.outString(">> Loaded %u page texts", sPageTextStore.GetRecordCount());
+    sLog.outString(">> 加载 %u个 page texts", sPageTextStore.GetRecordCount());
 	sLog.outString();
 
     for (uint32 i = 1; i < sPageTextStore.GetMaxEntry(); ++i)
@@ -4581,7 +4580,7 @@ void ObjectMgr::LoadPageTextLocales()
     {
 
 
-        sLog.outString(">> Loaded 0 PageText locale strings. DB table locales_page_text is empty.");
+        sLog.outString(">> 加载 0个 PageText locale strings. DB table locales_page_text is empty.");
 		sLog.outString();
         return;
     }
@@ -4614,7 +4613,7 @@ void ObjectMgr::LoadPageTextLocales()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu PageText locale strings", mPageTextLocaleMap.size());
+    sLog.outString(">> 加载 %lu个 PageText locale strings", mPageTextLocaleMap.size());
 	sLog.outString();
 }
 
@@ -4658,7 +4657,7 @@ void ObjectMgr::LoadInstanceTemplate()
         temp->reset_delay = std::max((uint32)1, (uint32)(temp->reset_delay * sWorld.getRate(RATE_INSTANCE_RESET_TIME)));
     }
 
-    sLog.outString(">> Loaded %u Instance Template definitions", sInstanceTemplate.GetRecordCount());
+    sLog.outString(">> 加载 %u个 Instance Template definitions", sInstanceTemplate.GetRecordCount());
 	sLog.outString();
 }
 
@@ -4689,7 +4688,7 @@ void ObjectMgr::LoadGossipText()
     if (!result)
     {
 
-        sLog.outString(">> Loaded %u npc texts", count);
+        sLog.outString(">> 加载 %u个 npc texts", count);
 		sLog.outString();
         return;
     }
@@ -4737,7 +4736,7 @@ void ObjectMgr::LoadGossipText()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u npc texts", count);
+    sLog.outString(">> 加载 %u个 npc texts", count);
 	sLog.outString();
 }
 
@@ -4760,7 +4759,7 @@ void ObjectMgr::LoadNpcTextLocales()
     {
 
 
-        sLog.outString(">> Loaded 0 Quest locale strings. DB table locales_npc_text is empty.");
+        sLog.outString(">> 加载 0个 Quest locale strings. DB table locales_npc_text is empty.");
 		sLog.outString();
         return;
     }
@@ -4807,7 +4806,7 @@ void ObjectMgr::LoadNpcTextLocales()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu NpcText locale strings", mNpcTextLocaleMap.size());
+    sLog.outString(">> 加载 %lu个 NpcText locale strings", mNpcTextLocaleMap.size());
 	sLog.outString();
 }
 
@@ -4909,7 +4908,7 @@ void ObjectMgr::LoadQuestAreaTriggers()
     if (!result)
     {
 
-        sLog.outString(">> Loaded %u quest trigger points", count);
+        sLog.outString(">> 加载 %u个 quest trigger points", count);
 		sLog.outString();
         return;
     }
@@ -4954,7 +4953,7 @@ void ObjectMgr::LoadQuestAreaTriggers()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u quest trigger points", count);
+    sLog.outString(">> 加载 %u个 quest trigger points", count);
 	sLog.outString();
 }
 
@@ -4969,7 +4968,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
     if (!result)
     {
 
-        sLog.outString(">> Loaded %u tavern triggers", count);
+        sLog.outString(">> 加载 %u个 tavern triggers", count);
 		sLog.outString();
         return;
     }
@@ -4994,7 +4993,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u tavern triggers", count);
+    sLog.outString(">> 加载 %u个 tavern triggers", count);
 	sLog.outString();
 }
 
@@ -5008,7 +5007,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
     if (!result)
     {
 
-        sLog.outString(">> Loaded %u areatrigger scripts", count);
+        sLog.outString(">> 加载 %u个 areatrigger scripts", count);
 		sLog.outString();
         return;
     }
@@ -5033,7 +5032,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u areatrigger scripts", count);
+    sLog.outString(">> 加载 %u个 areatrigger scripts", count);
 	sLog.outString();
 }
 
@@ -5140,7 +5139,7 @@ void ObjectMgr::LoadGraveyardZones()
     if (!result)
     {
 
-        sLog.outString(">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
+        sLog.outString(">> 加载 0个 graveyard-zone links. DB table `graveyard_zone` is empty.");
 		sLog.outString();
         return;
     }
@@ -5186,7 +5185,7 @@ void ObjectMgr::LoadGraveyardZones()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u graveyard-zone links", count);
+    sLog.outString(">> 加载 %u个 graveyard-zone links", count);
 	sLog.outString();
 }
 
@@ -5417,7 +5416,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
     QueryResult* result = WorldDatabase.Query("SELECT id, access_id, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM areatrigger_teleport");
     if (!result)
     {
-        sLog.outString(">> Loaded 0 area trigger teleport definitions.", count);
+        sLog.outString(">> 加载 0个 area trigger teleport definitions.", count);
 		sLog.outString();
         return;
     }
@@ -5462,7 +5461,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u area trigger teleport definitions", count);
+    sLog.outString(">> 加载 %u个 area trigger teleport definitions", count);
 	sLog.outString();
 }
 
@@ -5479,7 +5478,7 @@ void ObjectMgr::LoadAccessRequirements()
 
 
 
-        sLog.outString(">> Loaded %u access requirement definitions", count);
+        sLog.outString(">> 加载 %u个 access requirement definitions", count);
 		sLog.outString();
         return;
     }
@@ -5570,7 +5569,7 @@ void ObjectMgr::LoadAccessRequirements()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u access requirement definitions", count);
+    sLog.outString(">> 加载 %u个 access requirement definitions", count);
 	sLog.outString();
 }
 
@@ -5813,7 +5812,7 @@ void ObjectMgr::LoadGameObjectLocales()
     {
 
 
-        sLog.outString(">> Loaded 0 gameobject locale strings. DB table locales_gameobject is empty.");
+        sLog.outString(">> 加载 0个 gameobject locale strings. DB table locales_gameobject is empty.");
 		sLog.outString();
         return;
     }
@@ -5862,7 +5861,7 @@ void ObjectMgr::LoadGameObjectLocales()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu gameobject locale strings", mGameObjectLocaleMap.size());
+    sLog.outString(">> 加载 %lu个 gameobject locale strings", mGameObjectLocaleMap.size());
 	sLog.outString();
 }
 
@@ -6047,7 +6046,7 @@ void ObjectMgr::LoadGameobjectInfo()
         }
     }
 
-    sLog.outString(">> Loaded %u game object templates", sGOStorage.GetRecordCount());
+    sLog.outString(">> 加载 %u个 game object templates", sGOStorage.GetRecordCount());
 	sLog.outString();
 }
 
@@ -6060,7 +6059,7 @@ void ObjectMgr::LoadExplorationBaseXP()
     {
 
 
-        sLog.outString(">> Loaded %u BaseXP definitions", count);
+        sLog.outString(">> 加载 %u个 BaseXP definitions", count);
 		sLog.outString();
         return;
     }
@@ -6077,7 +6076,7 @@ void ObjectMgr::LoadExplorationBaseXP()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u BaseXP definitions", count);
+    sLog.outString(">> 加载 %u个 BaseXP definitions", count);
 	sLog.outString();
 }
 
@@ -6093,7 +6092,7 @@ void ObjectMgr::LoadPetNames()
 
     if (!result)
     {
-        sLog.outString(">> Loaded %u pet name parts", count);
+        sLog.outString(">> 加载 %u个 pet name parts", count);
 		sLog.outString();
         return;
     }
@@ -6113,7 +6112,7 @@ void ObjectMgr::LoadPetNames()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u pet name parts", count);
+    sLog.outString(">> 加载 %u个 pet name parts", count);
 	sLog.outString();
 }
 
@@ -6161,7 +6160,7 @@ void ObjectMgr::LoadCorpses()
 
     if (!result)
     {
-        sLog.outString(">> Loaded %u corpses", count);
+        sLog.outString(">> 加载 %u个 corpses", count);
 		sLog.outString();
         return;
     }
@@ -6191,7 +6190,7 @@ void ObjectMgr::LoadCorpses()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u corpses", count);
+    sLog.outString(">> 加载 %u个 corpses", count);
 	sLog.outString();
 }
 
@@ -6209,7 +6208,7 @@ void ObjectMgr::LoadReputationOnKill()
     {
 
 
-        sLog.outErrorDb(">> Loaded 0 creature award reputation definitions. DB table creature_onkill_reputation is empty.");
+        sLog.outErrorDb(">> 加载 0个 creature award reputation definitions. DB table creature_onkill_reputation is empty.");
         return;
     }
 
@@ -6263,7 +6262,7 @@ void ObjectMgr::LoadReputationOnKill()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u creature award reputation definitions", count);
+    sLog.outString(">> 加载 %u个 creature award reputation definitions", count);
 	sLog.outString();
 }
 
@@ -6371,7 +6370,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
         ++count;
     } while (result->NextRow());
 
-    sLog.outString(">> Loaded %u reputation_spillover_template", count);
+    sLog.outString(">> 加载 %u个 reputation_spillover_template", count);
 	sLog.outString();
 }
 
@@ -6386,7 +6385,7 @@ void ObjectMgr::LoadWeatherZoneChances()
     {
 
 
-        sLog.outErrorDb(">> Loaded 0 weather definitions. DB table game_weather is empty.");
+        sLog.outErrorDb(">> 加载 0个 weather definitions. DB table game_weather is empty.");
         return;
     }
 
@@ -6428,7 +6427,7 @@ void ObjectMgr::LoadWeatherZoneChances()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u weather definitions", count);
+    sLog.outString(">> 加载 %u个 weather definitions", count);
 	sLog.outString();
 }
 
@@ -6525,7 +6524,7 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string table,
     {
 
 
-        sLog.outErrorDb(">> Loaded 0 quest relations from %s, table is empty.", table.c_str());
+        sLog.outErrorDb(">> 加载 0个 quest relations from %s, table is empty.", table.c_str());
         return;
     }
 
@@ -6556,7 +6555,7 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string table,
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u quest relations from %s", count, table.c_str());
+    sLog.outString(">> 加载 %u个 quest relations from %s", count, table.c_str());
 	sLog.outString();
 }
 
@@ -6627,7 +6626,7 @@ void ObjectMgr::LoadReservedPlayersNames()
     if (!result)
     {
 
-        sLog.outString(">> Loaded %u reserved player names", count);
+        sLog.outString(">> 加载 %u个 reserved player names", count);
 		sLog.outString();
         return;
     }
@@ -6646,7 +6645,7 @@ void ObjectMgr::LoadReservedPlayersNames()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u reserved player names", count);
+    sLog.outString(">> 加载 %u个 reserved player names", count);
 	sLog.outString();
 }
 
@@ -6809,7 +6808,7 @@ void ObjectMgr::LoadBattleMastersEntry()
     if (!result)
     {
 
-        sLog.outString(">> Loaded 0 battlemaster entries - table is empty!");
+        sLog.outString(">> 加载 0个 battlemaster entries - table is empty!");
 		sLog.outString();
         return;
     }
@@ -6829,7 +6828,7 @@ void ObjectMgr::LoadBattleMastersEntry()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u battlemaster entries", count);
+    sLog.outString(">> 加载 %u个 battlemaster entries", count);
 	sLog.outString();
 }
 
@@ -6875,7 +6874,7 @@ void ObjectMgr::LoadGameObjectForQuests()
         }
     }
 
-    sLog.outString(">> Loaded %u GameObject for quests", count);
+    sLog.outString(">> 加载 %u个 GameObject for quests", count);
 	sLog.outString();
 }
 
@@ -6922,10 +6921,10 @@ bool ObjectMgr::LoadOregonStrings(DatabaseType& db, char const* table, int32 min
 
 
         if (min_value == MIN_OREGON_STRING_ID)              // error only in case internal strings
-            sLog.outErrorDb(">> Loaded 0 Oregon strings. DB table %s is empty. Cannot continue.", table);
+            sLog.outErrorDb(">> 加载 0个 Oregon strings. DB table %s is empty. Cannot continue.", table);
 		else
 		{
-			sLog.outString(">> Loaded 0 string templates. DB table %s is empty.", table);
+			sLog.outString(">> 加载 0个 string templates. DB table %s is empty.", table);
 			sLog.outString();
 		}
         return false;
@@ -6986,12 +6985,12 @@ bool ObjectMgr::LoadOregonStrings(DatabaseType& db, char const* table, int32 min
 
 	if (min_value == MIN_OREGON_STRING_ID)
 	{
-		sLog.outString(">> Loaded %u Oregon strings from table %s", count, table);
+		sLog.outString(">> 加载 %u个 Oregon strings from table %s", count, table);
 		sLog.outString();
 	}
 	else
 	{
-		sLog.outString(">> Loaded %u string templates from %s", count, table);
+		sLog.outString(">> 加载 %u个 string templates from %s", count, table);
 		sLog.outString();
 	}
 
@@ -7052,7 +7051,7 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u areas for fishing base skill level", count);
+    sLog.outString(">> 加载 %u个 areas for fishing base skill level", count);
 	sLog.outString();
 }
 
@@ -7163,7 +7162,7 @@ void ObjectMgr::LoadGameTele()
     }
     while (result->NextRow());
 
-    sLog.outString(">> Loaded %u game tele's", count);
+    sLog.outString(">> 加载 %u个 game tele's", count);
 	sLog.outString();
 }
 
@@ -7442,7 +7441,7 @@ void ObjectMgr::LoadGossipMenu()
     }
     while (result->NextRow());
 
-    sLog.outString( ">> Loaded %u gossip_menu entries", count);
+    sLog.outString( ">> 加载 %u个 gossip_menu entries", count);
 }
 
 void ObjectMgr::LoadGossipMenuItems()
@@ -7527,7 +7526,7 @@ void ObjectMgr::LoadGossipMenuItems()
             sLog.outErrorDb("Table `gossip_scripts` contain unused script, id %u.", *itr);
     }
 
-    sLog.outString(">> Loaded %u gossip_menu_option entries", count);
+    sLog.outString(">> 加载 %u个 gossip_menu_option entries", count);
 	sLog.outString();
 }
 

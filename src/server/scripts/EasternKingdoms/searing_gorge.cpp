@@ -36,9 +36,9 @@ EndContentData */
 ## npc_kalaran_windblade
 ######*/
 
-#define GOSSIP_HELLO_KW    "Tell me what drives this vengance?"
-#define GOSSIP_SELECT_KW1  "Continue please"
-#define GOSSIP_SELECT_KW2  "Let me confer with my colleagues"
+#define GOSSIP_HELLO_KW    "告诉我是什么驱使着你复仇?"
+#define GOSSIP_SELECT_KW1  "请继续"
+#define GOSSIP_SELECT_KW2  "让我和同伴们商量一下"
 
 
 
@@ -48,7 +48,7 @@ EndContentData */
 ## npc_lothos_riftwaker
 ######*/
 
-#define GOSSIP_HELLO_LR "Teleport me to the Molten Core"
+#define GOSSIP_HELLO_LR "将我传送到熔火之心"
 
 
 
@@ -58,9 +58,9 @@ EndContentData */
 ## npc_zamael_lunthistle
 ######*/
 
-#define GOSSIP_HELLO_ZL     "Tell me your story"
-#define GOSSIP_SELECT_ZL1   "Please continue..."
-#define GOSSIP_SELECT_ZL2   "Goodbye"
+#define GOSSIP_HELLO_ZL     "告诉我你的故事"
+#define GOSSIP_SELECT_ZL1   "请继续……"
+#define GOSSIP_SELECT_ZL2   "再见"
 
 
 
